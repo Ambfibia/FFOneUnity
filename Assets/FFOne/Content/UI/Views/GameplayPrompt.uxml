@@ -1,0 +1,16 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+  <Style src="../Styles/FFTheme.uss" />
+  <Style src="../Styles/Gameplay.uss" />
+  <!-- Shared native dialog for gameplay controllers; the original NanoCom popup is not yet converted. -->
+  <ui:VisualElement name="gameplay-prompt" class="gameplay-prompt">
+    <ui:VisualElement class="gameplay-prompt-panel">
+      <ui:Label name="prompt-title" class="ff-label gameplay-prompt-title" />
+      <ui:Label name="prompt-body" class="ff-label gameplay-prompt-body" />
+      <ui:TextField name="prompt-value" class="ff-input" style="height:32px; display:none;" />
+      <ui:VisualElement class="gameplay-prompt-actions">
+        <ui:Button name="prompt-cancel" class="ff-button ff-button--primary" text="CANCEL" />
+        <ui:Button name="prompt-confirm" class="ff-button ff-button--primary" text="ACCEPT" />
+      </ui:VisualElement>
+    </ui:VisualElement>
+  </ui:VisualElement>
+</ui:UXML>

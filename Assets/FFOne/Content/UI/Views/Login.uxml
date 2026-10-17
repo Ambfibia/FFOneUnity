@@ -1,0 +1,16 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="/Assets/FFOne/Content/UI/Styles/FFTheme.uss" />
+    <Style src="/Assets/FFOne/Content/UI/Styles/Frontend.uss" />
+    <ui:VisualElement name="login-screen" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;">
+        <ui:Image name="login-background" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; width: 1920px; height: 1080px;" />
+        <ui:VisualElement name="login-panel" picking-mode="Ignore" style="position: absolute; width: 370px; height: 299px;">
+            <ui:Label name="username-label" text="USERNAME :" class="ff-label" picking-mode="Ignore" style="position: absolute; left: 50px; top: 15px; width: 200px; height: 20px; padding-top: 3px; padding-bottom: 3px;" />
+            <ui:TextField name="username" class="ff-input" max-length="32" style="position: absolute; left: 45px; top: 40px; width: 280px; height: 25px;" />
+            <ui:Label name="password-label" text="PASSWORD :" class="ff-label" picking-mode="Ignore" style="position: absolute; left: 50px; top: 75px; width: 200px; height: 20px; padding-top: 3px; padding-bottom: 3px;" />
+            <ui:TextField name="password" class="ff-input" is-password-field="true" max-length="32" style="position: absolute; left: 45px; top: 100px; width: 280px; height: 25px;" />
+            <ui:Button name="login-submit" text="LOG IN" class="ff-button ff-button--primary" style="position: absolute; left: 45px; top: 159px; width: 280px; height: 35px;" />
+            <ui:Button name="login-language" text="LANGUAGE: ENGLISH" class="ff-button ff-button--primary" style="position: absolute; left: 45px; top: 202px; width: 280px; height: 35px;" />
+            <ui:Button name="registration-help" text="HOW TO REGISTER?" class="ff-button ff-button--primary" style="position: absolute; left: 45px; top: 245px; width: 280px; height: 35px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

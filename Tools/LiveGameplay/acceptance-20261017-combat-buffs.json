@@ -1,0 +1,1257 @@
+{
+  "schema": 1,
+  "generatedAtUtc": "2026-10-17T08:38:54.088096+00:00",
+  "passed": true,
+  "scope": "Real server and rendered Unity-player acceptance of the implemented accepted 0104 weapon, privileged PvP and buff contracts.",
+  "originalBehaviorParityComplete": false,
+  "playerAssemblySha256": "22e28718f0ab2935acdc94b4f2574c8bc611362912cb747b81822646f570239a",
+  "playerContentCatalogHashes": {
+    "settings.json": "151638dfe389a2990aaa0bdb372525d3785f354842f85ce90de61d62e56a5fb3",
+    "catalog.bin": "778aebd6faa8572476b60d64fafda124a9b12c373a90d8af413d4b97ef9fe676",
+    "catalog.hash": "ea043201609404e297a27300d4425f14df1629a1b85e8f32bc872b2c73382af2"
+  },
+  "serverBinarySha256": "38e92b256e63ed35c01411170fd7b005423674c9480c857f433eae148072afb6",
+  "harnessAssemblySha256": "6a4e5cc81636df467cf25ee1b2da1842c7edc70cdf9d7e41ade0dc74b487fa81",
+  "sourceHashes": {
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Settings\\MainPanel.asset": "e662c57ca79f49726c3b5c57314495bb40f693007ff376513e0cc0dadbb36f64",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Styles\\CharacterCreation.uss": "1eefa86217c208883fa367776f39a4a1cb0e23dfaadc988c1e801d5a15711158",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Styles\\CharacterSelection.uss": "6632e95463768e45e895a0cdb1b5c10f8be4af54e0d890a552585150ac3df66c",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Styles\\FFTheme.uss": "7e94cbdc463e68cb2d32c9396cd531b2a17ef4d7127d150ad0a943413784992b",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Styles\\Frontend.uss": "d5b89ae7367df0e1dbc17391f6c9f867516124f601a8330840ac4daaee9bf495",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Styles\\Gameplay.uss": "fda0821fb96f03e8c5a7f8fcc9d213382740c31dc1834c0d15d012c988ea48a2",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Styles\\Retrobution.uss": "7d11bfc839c94ae4e098b4ca2eab35992240387e7f1c81bf92eb11206c709833",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Styles\\Settings.uss": "3b0176fd0589fc14ad2eb6ae4d8fc63704b2e98f4de5d9f1ee126af1ba3a2927",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Views\\CharacterCreation.uxml": "f88ab1ad54a9d3f20396d03169c3d22c941a3f8af05a7d6308f2e1bcfd0b40f3",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Views\\CharacterSelection.uxml": "cf44c540bcf089b8f353325c1eb7103859f7d90a711e794b43f6c388a45171b4",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Views\\GameplayPrompt.uxml": "31838ab18f96c6f0d1c98b983ea1569dae27721ad15e59d17753c9960aa57c61",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Views\\Login.uxml": "ae6c37c57677fd7bd80494ae6a7327b0d3eee89e675adabc25df8734946c50b2",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Views\\Retrobution\\Chat.uxml": "effe66ac84380f1f85df2d2b3afde921d8f956f843fdd80c5bb8f7883fd780c7",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Views\\Retrobution\\ChatRow.uxml": "6c63caa140a20da181a1396092278ad9ffea11ae08ad4d84f92e1c59e6ab9ba2",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Views\\Retrobution\\GameplayHud.uxml": "5cc36c234b82bcf9d27c52dabe2105865e52bdb1b2984e08d479b7c563f1b357",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Views\\Retrobution\\GameplayNanoHud.uxml": "a9d7a344923635485ef42380c471e5439b4e672f3d98e4ffa89d04d96b5fa1be",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Views\\Retrobution\\Inventory.uxml": "4c1ac4a0b04096258066a9cbfa68d68c250d6709fd4e77931be82092904208d8",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Views\\Retrobution\\MissionJournal.uxml": "c629484f04b28e889c0c2124fedaebef5d15721fa6f37805c1ff8041cf0415f3",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Views\\Retrobution\\MissionRow.uxml": "f55c5e5c115ac4842040c098073df26879c19b9395db5d9ff524484dfb22f5f1",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Views\\Retrobution\\NanoCom.uxml": "515e9dc1e719638f2c856fdd1095b061e5b168380bdd09fc31c3a12c9dff3362",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Views\\Retrobution\\NanoInventorySlot.uxml": "51ed9146e9edb22bad8e79122239fc330e8d8b92ce9db9205daf4948bf9eac0b",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Views\\Retrobution\\QuitMenu.uxml": "4ab43fc22fefb0166217fd577ce395dc1ecb3a0597f192d2f4dc9626fdb05da5",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Views\\Retrobution\\Trade.uxml": "e786ee569831aeb0106b31c8f968ead8cea05eea13df952769696c879282eb44",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Views\\Retrobution\\WorldMap.uxml": "a601c378e4b96c8d1384a10f441bfe199b1b8c05bd81636282a088c9f2c65fab",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Views\\Settings.uxml": "0e5dfb0fea2e912b823b0dcfdb4b267fdedaa07d5daab4c4b213b3da5cab03e3",
+    "FFOneUnity\\Assets\\FFOne\\Content\\UI\\Views\\WorldMenu.uxml": "e649434cb3b5a22cbfa629fed87b322631ff2460c062f3e5fdcf8808f6a25ebf",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Characters\\Creation\\CharacterCreationController.cs": "bc958d1f742036a692edbf257fd5184fb6899b46f01565ffaa3cb93a4cbc76e1",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Core\\Integration\\PreviewStage.cs": "2dcd1abc982730249a4309334dca3d5bc231810daca7a5935c0a4b44f78bc988",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Gameplay\\Tutorial\\TutorialEffectAssets.cs": "86611937edca2b4bea36149547be1a3d1bf44a85a050e2d36f651f0d524871d9",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Gameplay\\Tutorial\\TutorialEffectPlayback.cs": "0eb194a59889901e8e6b31797caf4eb45f10152441776d725e3975ab61422764",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\ProtocolGameplay.cs": "89ae355627fc9da03b4658a5b700dfcd3ac5c80d28a335ef2df7d9c38df60b31",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\ProtocolProjectiles.cs": "ac1b5e29db8f54cb6825c3d9cd6db63a1b573444ea36ad5f8514f1b5dc9ac87c",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\FrontendBuffEffects.cs": "7d438494070a0c715dd6a0bcba003c5e1b23142b3e9c3d9483345d7b126bc65d",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\FrontendCombat.cs": "179e3ef4c13641ec363063444ecfff02cbfbb083c9b01ae12ee36414b3085840",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\FrontendController.cs": "448470c18db663dceaa3a4a444bd9e35f0f67342385c66d2c96838fff70bbe29",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\FrontendDialogs.cs": "055c47741c1fb693fc59ee6e4f9ea7e1fa902a526b9b06f8680e428a93ccb9f8",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\FrontendGameplay.cs": "ce1b568977619c09acc707758d41ade8eecb9c56414e69b2fad285f0ce81d148",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\FrontendGameplayAppearance.cs": "be008aa12a13e5ff9f9232aa299aa642d4858c2a1883465565022e3d728db137",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\FrontendLayout.cs": "5d2522849dbb9d738c6cd9fb1b874c1965f8f9aa2520b70466b3793d4474118c",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\FrontendLoginBrowser.cs": "f6cde9bafb0ef616db54f304f86eec91863522c1de226fcc3ba343dc42aa0c8c",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\FrontendLoginView.cs": "6a46b70b5b7ffef3f61e0483c0de54c46822b6a855de6a432ce1961c05bd22cf",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\FrontendMissions.cs": "a0d3e89a31a45dffc473955e615ca692331f3539141d87992061de33d21024e3",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\FrontendOptions.cs": "095c73df22df67aeb8fa4ea91fb3a9e0ea38209c871686514cac4bf220d9b250",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\FrontendSelectionView.cs": "004d9586683bead6ea8cfee7af532fb672166dff1d91407dccb9b99eedfc9cca",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\FrontendTravel.cs": "da8eceaffd6a2c836442b63752a9eb22dacbc00a53f035d69718339199d855f7",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\FrontendWorldFlow.cs": "41ab81bcb4108d5493d08e17af3e3b3c8eb9d92410e32492dafc3a312eb09414",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\Gameplay\\GameplayLiveState.cs": "a82453918b5178fa5bb467bc50bb1c657765f97fc88d1af8bf5d003e4e0ecbe7",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\Gameplay\\GameplayNanoHudController.cs": "514ed5017e7153655ea67c19474149801bb8b5274aa9dec1dbfe13c2c7ed2010",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\Gameplay\\GameplayNanoRenderStage.cs": "ed14e15214cfdf9f21fb3c2bb5908f743d1c9420b83d2570f94d0a9759012f76",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\Gameplay\\GameplayUiSession.cs": "4df130c09b1c68912427a1b413b1a218389635cc8ad866ab71335a96599734f4",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\Gameplay\\LiveGameplayWeaponSmoke.cs": "98882f3223e7dbb5eefe542fadca1b658d6bb28b5e8a5f2636dfaa2f59ddf913",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\SettingsPreferences.cs": "fe118de916945e90e1a07767741296b91a6a515c632b6b222047490e8828aa32",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\SettingsWindow.cs": "ca11ea784b3a98740d831abe2c70794a3916fc60e01b04a334ae3b622b6b2ce9",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\World\\NetworkWorldProjectiles.cs": "84faf2f43a998cc32cb4a579dedda3184baba7298ddfbc968a1eefe73c6a2d5c",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\World\\WorldWeaponCatalog.cs": "38656a73c3289b61506f05a6d58916a966f49acc8dbffbba59db2befb88809fd",
+    "FFOneUnity\\Assets\\FFOne\\Tests\\Editor\\WeaponCombatProtocolTests.cs": "76e79bb1c417dae10cb99310ade9b80a20044a8036b443ba8259a4e61a3c5261",
+    "FFOneUnity\\Tools\\LiveGameplay\\LiveGameplay.csproj": "43de47ed60dd75f45cfa32d795002c363edb6a17b6072b4ef0f4543cf7c34b90",
+    "FFOneUnity\\Tools\\LiveGameplay\\Program.cs": "86a87feb5aaf17d4f0a81a6bdb9d04bdafb8a8ecfc03069b28019c90fbdba64f",
+    "FFOneUnity\\Tools\\LiveGameplay\\Program.WeaponCombat.cs": "a8b8a917bd6f5de59b3f404cced25604e24dffbf1195ecfa9ec32bdc66c24453",
+    "FFOneUnity\\Tools\\LiveGameplay\\weapon_combat.py": "ba7f9f69f29797a53566b608a3221fba0dfa30da8c28c33a10787ba37d2bbcb8",
+    "FFOneUnity\\Tools\\run_weapon_validation.py": "c8cca17ec5d65009731c3761b1e7ff63f88abdbcf5cf7ea9b175d0f6a6ee4e5e",
+    "RustyFusion\\src\\entity\\player.rs": "2a83cb2943e3b10284798ec483901777eb1bffb2f3e98e370cfe86be971b1810",
+    "RustyFusion\\src\\net\\ffconnection.rs": "70bc530e71fd014dfa2176d2ac739029d961104ed6c9a2abd797d2980f793587",
+    "RustyFusion\\src\\server\\shard\\combat.rs": "b47d5b55d6f2908386e080593e5a6526e99556831870028b52e72570c34c7b65",
+    "RustyFusion\\src\\server\\shard\\weapon_combat_tests.rs": "5884411d712e971967ef97a4dd85618a35316b4b39de89ba7654fc8fd36f1363",
+    "RustyFusion\\src\\skills.rs": "2bde5a7f9065a2c300ca95c788671506e4bcd30e1ec7f95f7107e994bea8a816",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\FrameConnection.cs": "b90daf594e9fb9aab215a8fb0a8becbb3072e64611270f643a69b4b113be9173",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\FusionClient.Characters.cs": "633d5e14d42aed9a0969d046e0e45097a340f2ea6ef67edaaa44874057f9caa7",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\FusionClient.Chat.cs": "56352f072c71fcf0ab458b8f1e8b870715cf62e4426e3714539a6d71462a9f72",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\FusionClient.cs": "761a0ed065ec0f050ce6a4e637b903b563e48f97c81c26b46962c4daaf08c2f4",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\FusionClient.Gameplay.cs": "1c7ab63c85e82c026f5d0ac129db7b148ee3388a202a27202ade74db679daa79",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\FusionClient.Inventory.cs": "33fc9520afe4354ecf7211bbfb8efdbb67790ec2782bc1c78a2f8d1a1b6a69d7",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\FusionClient.Launcher.cs": "3c118f502b8c7bc6d3eed5e7488e9887af19db53f58eadb8dc608ba95b904aec",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\FusionClient.Missions.cs": "88906e0c46e5472b4b05cb39514def71e09877b5178262779e843e97797c3985",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\FusionClient.Services.cs": "980fea817310bf8fa74039a0d9029f7931b663299f398171ed7bbf538f3dcc66",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\FusionClient.Social.cs": "99e49c64b1d2cfa86d7c649b5e517324ea8ad4fb924f6cca1ca347b84932ce17",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\FusionClient.Trade.cs": "80e4ecd5130a1efc5e4412faa967b9794cebf43653b365cba23d5001ab269555",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\FusionClient.TradeChat.cs": "db3012b2ed80ea49183875997f6c7b5bac2af1d44c1f337f050516808d2d48f7",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\LoginServer.cs": "58c096bcabe5a5a2d1378e2b9a31fcaa1df8c75559249ea053f0879da850135d",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\NetworkModels.cs": "2302e4c9a9bde7c2e1a8ac551e0b5a7232aafd96211b5595e8500e856cb13dcb",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\Protocol0104.cs": "0bbfda0970867a3f030eba9442926e788fb7a62c522890f726e1000f20dc9ac9",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\ProtocolBuff.cs": "157b00029468fd064b6cd9b575389181815eb4c39447c527b6c30858f1c5d198",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\ProtocolChat.cs": "3e54008f8dd22aeff2f71c1e8203bf971d1fb6e745880803350cfd00c2bd7f38",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\ProtocolInventory.cs": "b8f47eb53902ec0e93eb4445a11c80177e9647529c798dac56da1f7617d36b3e",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\ProtocolItemUse.cs": "e60d28adecec36eecb4dbf590ba96716a8596458cc4923046f04c2e441483fd5",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\ProtocolMail.cs": "92b415103941c857088f245263700d9b9de93bbef18a7615f9ef3010751a3c8c",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\ProtocolNanoSkill.cs": "f31c7403c60fe48417b272362dab0145ef1026e3b96fbbc6c9de947ddd790940",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\ProtocolNpcSkill.cs": "756c0cdc68d330a91002db0fe2a9e76e8a547e385862a5e3de52889fce07943c",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\ProtocolRecall.cs": "0ac2e3ee4eb7a0a6bef30e737f872ab904a87fffee4dc409675cc536adbd9a1e",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\ProtocolServices.cs": "b7978ce5dfbd9d29814ff78e4b7d9fcb7446574d6964c6e3764e0a308eba9eff",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\ProtocolShiny.cs": "869c019cc40b2b2473a67ea3ae8bca2f983131fffb0e6a24789bd50dee3b2c5d",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\ProtocolSlider.cs": "f6567d43cf5ee48e8d8d1064c43f8a500d2ab70e350eb67aed4e7ee1bda61e35",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\ProtocolSocial.cs": "5de104f684e1b7f4ef7fb2c18c3e39b8a73f587a383e0a065bb8daffecb6263c",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\ProtocolTrade.cs": "487c5c24b0d467df0bc6dbbdae20adbd7b455e2c314d27cecc46192f56fd2e5d",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\ProtocolTradeChat.cs": "c640b69896d5ccb292625a0b33d080f65ecd848dc9e76a79d03f57e0e070d288",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\ProtocolTravel.cs": "76f17089b807014cb727fdf8bf8084b14e43283cf7392d1cfb3681bf82bf6cd0",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\ProtocolVehicle.cs": "976228899c69976fe11f26c89ad99c0b47001e60b6379244ee42419d5712a361",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\ProtocolWorld.cs": "380257b9b5b2a97ad176804a652a027cc507fb66ee79e086dd0a333ed0a5eeaa",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\Network\\WorldEntitySession.cs": "af07db8d3b2e1d03dbb5ce161224ab2e359068d5a89ce7a30ba3b2efd40255d3",
+    "FFOneUnity\\Tools\\run_buff_validation.py": "210f6bc4a4d1285861f0685b23769e49199d5220101994a8e36d8717f40dcf47",
+    "FFOneUnity\\Tools\\LiveGameplay\\buffs.py": "decebf4c37fd0dbfb983c1a42ff1d3a8bd28dfcf0d0e1273740059a82a36e790",
+    "FFOneUnity\\Tools\\LiveGameplay\\Program.Buffs.cs": "e8686c905a0df213303f979d9f866835bf4af3b51100ab3bf500c235b8983018",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\Gameplay\\LiveGameplayBuffSmoke.cs": "8afa2d952ffb2bb194d4562d394a38ee4c9406f0143da35a7610466df726805d",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\Gameplay\\LiveGameplayPlayerSmoke.cs": "879762987ae946d8e1c1797292b7dcac15c6067983eaf896dc7211281127b682",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\Gameplay\\LiveGameplayInstanceSmoke.cs": "9d57544998019d564cdf56b57ea23cac52ce2516fee76a445b2611c171f10a07",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\Gameplay\\GameplayBuffState.cs": "2b4d5e9ab80d51495711055a2f6964b515e925446efce53e8c8741bb36c0c0fd",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\Gameplay\\GameplayUiCatalog.cs": "dddb44eeccc013913426315f1d0c561d9eeb79ae7022021e145c78d326c1bfb5",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\World\\NativeBuffPresentation.cs": "627a45f3d4a99035f0acc0f488cf5c6906aa6d6e6c51975f221eb9bfb2b13d2c",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\World\\NetworkWorldBuffEffects.cs": "42f32f2e3acbae738db2bde495558d8c28908fc23bfd49634bb76908922f8226",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\World\\NetworkWorldController.cs": "f0a22a3f39865799c99c4f776b5101ca49ed54927e1b203454eff1f26f123326",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\World\\NetworkWorldPersonalVehicle.cs": "6bf5dd687dbd455114133e7d76d021f267c218df15e94b795ebe3e6cf8a86c04",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\World\\NetworkWorldEntities.cs": "5a36dd924c12f8f1e2d62c99ae7261c5c5769e02c8458175e3616b051c52221a",
+    "FFOneUnity\\Assets\\FFOne\\Runtime\\UI\\Gameplay\\GameplayItemUse.cs": "b26b9019df67c6d59af3a35b55d0b41e4d2471adc3cc7e5dfebc48330f640235",
+    "FFOneUnity\\Assets\\FFOne\\Tests\\Editor\\BuffEffectsTests.cs": "f895ef555a044cd465a710eab40ea04898f7aaacf446dcf90d6675900471b65a",
+    "RustyFusion\\src\\entity\\npc.rs": "a389e652430630dcc176c6a3dc0297da51469d9a8bd1c1b656da57374bfc5bca",
+    "RustyFusion\\src\\server\\shard\\item.rs": "054a8dc523327de12d2c85f16bbcb616aa88a83d3c0dc1622f3d66b22e5cfaa9",
+    "RustyFusion\\src\\server\\shard\\pc.rs": "895744fe1d6dac5e32f75ffa859d3d98962e7f797013a125926efdd10ee5212b",
+    "RustyFusion\\src\\server\\shard\\nano.rs": "ddeffcb7498122deba0f4cb9e95ef70a3c5d9c349394b03e176730f013ebee66",
+    "RustyFusion\\src\\server\\shard\\group.rs": "3556228a1fab598197e92061a632fd1245c46bfe28546591262fb0956aae44b6",
+    "RustyFusion\\src\\server\\shard\\mod.rs": "a8f2459d268416c35c391aa913cca25cd3f763ec2c134445c2204b8eea6c7a97",
+    "RustyFusion\\src\\chunk.rs": "52a883abaf19ddf66f580864112d427e76f1f63320d037b13a0a9afc448dafbd",
+    "RustyFusion\\src\\scripting\\entity.rs": "862505615318626a46fb205f3b31705fa3e4e83815384ab0c93bca56bf6e3b7a",
+    "RustyFusion\\src\\skills_buff_tests.rs": "3115f0f1707b92c0fe259825391e07d4d750b873068c1c538ff694fc0b65d5e5",
+    "RustyFusion\\src\\server\\shard\\item_buff_tests.rs": "78844282bb2e9a32024f02e5cdf7b7bfa87b98b13812c7d5aa52d27954564956",
+    "RustyFusion\\scripts\\lib\\behaviors.luau": "1f83048c8cfaefa246c3b6c1b3b4ec69ef2f16dadd002f3c7c5b4e80483714e7",
+    "RustyFusion\\tabledata\\xdt.json": "191a9d17f4d233270cceb574a9087990e1526ae697174655203fbb1c6116955c",
+    "RustyFusion/scripts/ai/mob_pack_member.luau": "3af5c81e62689e566d73342b379e6e319272194ff08a72163233ddcc18a133a4",
+    "RustyFusion/src/scripting/npc.rs": "b3888bab374b39c83a4da7c386ab2c45d7dded55bf2063969bb81f192525b05f",
+    "RustyFusion/src/ai_tests.rs": "613e5b1027016d467659959ba1619466301e4f86957b20b54df73819a0b103fb",
+    "RustyFusion/src/net/ffconnection.rs": "70bc530e71fd014dfa2176d2ac739029d961104ed6c9a2abd797d2980f793587"
+  },
+  "reports": {
+    "weapons": {
+      "path": "D:\\CodexProject\\FusionFallProject\\FFOneUnity\\Logs\\WeaponValidationFinal.json",
+      "sha256": "0f5ae4a5334c779adc1523b7fd547850cb7afcf857d3331b9b9dbd4c3360530d"
+    },
+    "buffs": {
+      "path": "D:\\CodexProject\\FusionFallProject\\FFOneUnity\\Logs\\BuffValidationFinal.json",
+      "sha256": "e7fdd3c21bc5502742f6ca5473de2602ef0944ea136df5bf936277ec8eaedf09"
+    },
+    "editor": {
+      "path": "D:\\CodexProject\\FusionFallProject\\FFOneUnity\\Logs\\CombatBuffEditorTests-20261017.xml",
+      "sha256": "b62e21a92785a6cd68982338e2bdb26a09835e27192f07af42af400b2a18bf79"
+    },
+    "server": {
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\combat-buff-acceptance\\final-test-all.log",
+      "sha256": "d47de6cb67453fab9c3c1f3acc02320d88e886e732f431ff0a2268a980176adc"
+    },
+    "ai": {
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\combat-buff-acceptance\\ai-follow-20261016\\focused-final.log",
+      "sha256": "6fc7d4957e25ce623853841b9345a625072ccc7fe72378f83dfed935f1545a71"
+    },
+    "gameplay": {
+      "path": "D:\\CodexProject\\FusionFallProject\\FFOneUnity\\Logs\\CombatBuffGameplayRegressionFinal.json",
+      "sha256": "3069606cf0fd83cbc6906ed014ec63119ab3cfcc1e077c7e768bd32605ca0eab"
+    },
+    "frontend": {
+      "path": "D:\\CodexProject\\FusionFallProject\\FFOneUnity\\Logs\\FrontendFullHd\\validation.json",
+      "sha256": "5c763abc11fbc9d8d6d021b0cfdaf71ec061166636dc7ea52ec9e69b4b624388"
+    },
+    "weaponPlayerServer": {
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-server.log",
+      "sha256": "e58e678b70b04744e696dd21af9c20a5f3eb8a063d1bb4d5b00e7b08b373a9f1"
+    },
+    "buffServer": {
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-server.log",
+      "sha256": "fa983a5eb21358e67dc5df2456be6619f9621b3fc12cd8f7295f4399b7e2f7dc"
+    }
+  },
+  "checks": {
+    "weapons": {
+      "network": 42,
+      "player": 220
+    },
+    "buffs": {
+      "network": 212,
+      "player": 428
+    },
+    "gameplay": {
+      "network": 221,
+      "player": 194
+    },
+    "frontend": {
+      "viewports": 2,
+      "captures": 18
+    }
+  },
+  "renderedEvidence": {
+    "projectileClosures": 22,
+    "actualProjectileFlights": 2,
+    "weaponBatteryReceipts": 7,
+    "buffClosures": 15,
+    "buffIconReceipts": 13,
+    "phoenixObserverDeathReceipts": 1
+  },
+  "editorTests": {
+    "total": 328,
+    "passed": 328
+  },
+  "serverTests": 234,
+  "privilegedPvp": {
+    "targetId": 2,
+    "damage": 12,
+    "beforeHp": 1375,
+    "afterHp": 1363,
+    "weaponBattery": 988
+  },
+  "captures": [
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-135-flight-effect-hidden.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-135-flight.png",
+      "sha256": "12b9b470be7f420a861d57922408462c187b9199e7408426f2bf95c28822b5a6"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-135-impact-effect-hidden.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-135-impact.png",
+      "sha256": "abeec676d4fc4988f2c29acfbab25f628cf471963985adff8606c0e16cb46b18"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-149-flight-effect-hidden.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-149-flight.png",
+      "sha256": "3073f56ecbc5af5cbd9dba81de6e096ccf3dfae927e50751bad488f4e7ad9e7c"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-149-impact-effect-hidden.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-149-impact.png",
+      "sha256": "602d59e42519395c365b4f591928b6486e640dec15356b0b66777d9a9a333e38"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-150-flight-effect-hidden.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-150-flight.png",
+      "sha256": "a11ac4da02e127a690227e9960ed54a78bf9c16360a4ad2913ecb86077f427a8"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-150-impact-effect-hidden.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-150-impact.png",
+      "sha256": "d89c1a979212ea7af22dba4efc9840064a8582096fc64d4cb2795124c54f67ab"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-160-flight-effect-hidden.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-160-flight.png",
+      "sha256": "d9429f457ec367946df40698f6e2b7fa77f138f3b3762c798c999035146ea471"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-160-impact-effect-hidden.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-160-impact.png",
+      "sha256": "dac7fa0767b21e117e4f5d87d6c85a911951aac33fed2ab980946e7b10f1f38f"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-161-flight-effect-hidden.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-161-flight.png",
+      "sha256": "c204f087a5ac5532133ac223415b57d62f642ff544b08eaf661beb35f7a85b2f"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-161-impact-effect-hidden.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-161-impact.png",
+      "sha256": "35b09620d9298d093c30ed5b7117aa32a2fa7b20c495ed7bb0d1217e88a7c92f"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-162-flight-effect-hidden.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-162-flight.png",
+      "sha256": "a4fbf699f3eb0243eaea6ab3026d63d39cd1f0163fbfcc055c06897523e7fa50"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-162-impact-effect-hidden.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-162-impact.png",
+      "sha256": "4245c0c2e1c905a6e1c822b7cfb8b88bdf3a70dc23701bb1cfaea18979d7fbe3"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-163-flight-effect-hidden.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-163-flight.png",
+      "sha256": "e1f3692d9373b93720048ce3463e395490c1ec49eb270faacc8252ede698608b"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-163-impact-effect-hidden.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-163-impact.png",
+      "sha256": "2c48e37f10efd864128c18fae938d49fb02d7dd4a9f949afcc7fb4b34d4a313f"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-164-flight-effect-hidden.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-164-flight.png",
+      "sha256": "06d442bb41154b53847f43bd4962f23d1b6af89391cd9ce83766366dd5693812"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-164-impact-effect-hidden.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-164-impact.png",
+      "sha256": "532aac065d72655ee376b4f58f02940c5f2d00fde148c57f0710a998405bd334"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-68-flight-effect-hidden.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-68-flight.png",
+      "sha256": "8250e422c4c676fb6e984a6d769d7689adade494f89264adf18af04262017a7c"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-68-impact-effect-hidden.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-68-impact.png",
+      "sha256": "ed62300d3cd3cbf7e145d567ee48bd4db9aaef6d517d6fdddd2ccce52e36356c"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-69-flight-effect-hidden.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-69-flight.png",
+      "sha256": "3c8d4cf3756b3f7e960ed785885ad92b07a3cf88929292c126e6431027de9637"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-69-impact-effect-hidden.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-69-impact.png",
+      "sha256": "8767a656779538fd51d47e9674c0dcdae1c6db5a554ffdb615b266cce0c3f31e"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-72-flight-effect-hidden.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-72-flight.png",
+      "sha256": "010eadca062d5ac7c8e880476c1893f3607ff00c68ab1be9972af37633f86c54"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-72-impact-effect-hidden.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\bullet-72-impact.png",
+      "sha256": "4119f9890a31a1f036d7afa042081e7d13eb34d2cf95ea69743f72db0aca5725"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-1-battery-hud-label-hidden.png",
+      "sha256": "350255cb4911393420022cba0b416408c791f71d308d99c8af1eb1bea37cec21"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-1-battery-hud.png",
+      "sha256": "5032ecca3316b4633460038aed100a2516682b4eee9bda1f923c2ac41bf54c9a"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-1-damage.png",
+      "sha256": "da2cae8cc7f0e4c7acf90b703551b5aa3c3afe788867d4f1f2541f069b4165f4"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-2-battery-hud-label-hidden.png",
+      "sha256": "b44363241067315941e3473e559a428c913cf9ee6c91c7688d9da1a8c300cb43"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-2-battery-hud.png",
+      "sha256": "c3f8089cba2f5f988c652d47f1d002242ba02d05a998a436f32e6f65c65934f1"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-2-damage.png",
+      "sha256": "30056f7282e848166fb0534a0f26962bba5974446d64a583490c64f243181241"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-3-battery-hud-label-hidden.png",
+      "sha256": "0f17965ec63a100e48d58c8cc130261aae0e2516826d6cad144b2a7d228408fe"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-3-battery-hud.png",
+      "sha256": "bdfdf6fd28a31a9004b40074bebee14f42b40293356b53dadff6fba696309957"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-3-damage.png",
+      "sha256": "be6c4f6f852237301f7a4cbb35bd0d61b27de4400434accb5a4032470fbc58a1"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-4-battery-hud-label-hidden.png",
+      "sha256": "01698504a0c1040bb2d2450af8a3f82c66c3e9ddb8634563e0e144a25b42c0ea"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-4-battery-hud.png",
+      "sha256": "7139922cf1c7f1b8b492d314fab4e9a115073729ae49ae187bc11408beab3ae5"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-4-damage.png",
+      "sha256": "2b01e9a280de4f82df7a99f305c452de44401ccd58d3f9fffcad23af20b51803"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-5-battery-hud-label-hidden.png",
+      "sha256": "234374ad110cbb8c4337554eeff948b36f8dabd95de60ba37a94f310e663004d"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-5-battery-hud.png",
+      "sha256": "c929d297d6a7f40756168f16b756334d36f64c059f13b689d07729a8c9603934"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-5-damage.png",
+      "sha256": "a6b01c216f14704dac1aa99e2f3dea4673717bfb8f9e69027e6169e81cf44735"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-5-flight-attempt-000-motor-hidden.png",
+      "sha256": "5da0ae36fe8ca95c22140d67033ae0e1c24cab2a42f67054c4426614f1d69d6f"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-5-flight-attempt-000.png",
+      "sha256": "5da0ae36fe8ca95c22140d67033ae0e1c24cab2a42f67054c4426614f1d69d6f"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-5-flight-attempt-001-motor-hidden.png",
+      "sha256": "ee6142338df46cf3b6be35cbd62e6d2c1c714621bc66d01d2fc7cd504f7852f4"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-5-flight-attempt-001.png",
+      "sha256": "4257b26424df4ca764f753252b183d3d6f1c8a9f6037345434699f2eff1b38b5"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-5-flight-motor-hidden.png",
+      "sha256": "ee6142338df46cf3b6be35cbd62e6d2c1c714621bc66d01d2fc7cd504f7852f4"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-5-flight.png",
+      "sha256": "4257b26424df4ca764f753252b183d3d6f1c8a9f6037345434699f2eff1b38b5"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-6-battery-hud-label-hidden.png",
+      "sha256": "b5ecc1ae350d9dde88e1090fb7dd78cf8cb56f486735d1783a7ab85357720b61"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-6-battery-hud.png",
+      "sha256": "2cfa54f72f7e86abb310a94acdf575ea7ec3b1e6c39723bdd38e23149832d2d2"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-6-damage.png",
+      "sha256": "87a9f4e601c371a4a35bbda1a58d3fd6fc1e962ca9a762eef1c6b974e311bbd5"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-6-flight-attempt-002-motor-hidden.png",
+      "sha256": "54f19d2d586693bbc8a4d5618e4fc64a9f693f63a4e7af95585a37cd26d1aea8"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-6-flight-attempt-002.png",
+      "sha256": "35963bdbd82bd46f5656de80c488de6c0fb55c53f79ff1c4ab54e401437bda3b"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-6-flight-motor-hidden.png",
+      "sha256": "54f19d2d586693bbc8a4d5618e4fc64a9f693f63a4e7af95585a37cd26d1aea8"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-6-flight.png",
+      "sha256": "35963bdbd82bd46f5656de80c488de6c0fb55c53f79ff1c4ab54e401437bda3b"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-pvp-gm-battery-hud-label-hidden.png",
+      "sha256": "329e7699046f90079c5562227ff124c8b9b1c0e5f8ee74193a413a37907f941d"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-pvp-gm-battery-hud.png",
+      "sha256": "9ee49e8380418ef359566b52255b309f6beed69f77898550421000c0f079149d"
+    },
+    {
+      "run": "weapons",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-weapons-20261017-111715-648493\\player-profile\\weapon-pvp-gm-damage.png",
+      "sha256": "09b34982dda5b2f7343e73edfb8c909d23261f5dc8d5cc7378b89c4e96009485"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-1-hud-icon-hidden.png",
+      "sha256": "63ede817324baf59dde0ac849961036910bd3c5745baa4104d9185ff62e209fa"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-1-hud.png",
+      "sha256": "a508bbde8eeac342258bd89eaca16ed77a4cef50f8570db3e000d98127e03af7"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-1-icon-and-effect.png",
+      "sha256": "16ea619a976684e107de00a29ede1b252b2f5f08151f3e7e812271b59cce9e2c"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-13-hud-icon-hidden.png",
+      "sha256": "9f6bb9bf9966a20a4740e6cbeabcac453ec13b9f5843a15bca8a0e3af98f2149"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-13-hud.png",
+      "sha256": "a28ddc965d3fc5096098d098ce15dd06abcdb0792ec63a02de53d0fae0b194ad"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-13-icon-and-effect.png",
+      "sha256": "afd04641d14058ec9952a205bbbf257de65eee7bf26942b44f5a105d4f96cc84"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-14-hud-icon-hidden.png",
+      "sha256": "10a8196befe3e8730111efa0ebe1ceb31bb5fd0ae871356d8afb81ecdd4c9c8c"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-14-hud.png",
+      "sha256": "97852248891b1faceeaf57c4e11ff90bd5a67c11277766b2243a26d54280c0d4"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-14-icon-and-effect.png",
+      "sha256": "2457ecd459920ff706e9fcc9d45bf3f124efa941442eff2290a48ba484a9ca37"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-15-hud-icon-hidden.png",
+      "sha256": "93a0c465e566cc02ad5f3db6ddb4aa5375a13722215555d9c497b1e96e8edc1b"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-15-hud.png",
+      "sha256": "03ad7fe5110dfdac610ab7abb98f352c1c7cd9badd0a56b5fdf2acc079567104"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-15-icon-and-effect.png",
+      "sha256": "55c836527a864f5e24f1c0431c0aed61d7859300062eb903836dab925df29439"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-16-hud-icon-hidden.png",
+      "sha256": "e6a73f161c2bb1bbf5528e65cba56049082697541a334f75a39a6f9e76232577"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-16-hud.png",
+      "sha256": "7b6be830edb7aeab1a7ad3805dc159e8c8faf9cb80e725d22fa16b46a5b2dfda"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-16-icon-and-effect.png",
+      "sha256": "f1c2c1e2a0f7cac1870b99ae4ce25b69ff237bab537f9fd7eb3fe0d4085f5ead"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-18-hud-icon-hidden.png",
+      "sha256": "1f98d3e2b7bbfac62a7b05dc4857b87994111fb2b2265e157786dc2f50ddf81b"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-18-hud.png",
+      "sha256": "ea941bfdf61b0a2a9d099779986e10e74b0936658dd6f610ccd124e3f7f4bf3b"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-18-icon-and-effect.png",
+      "sha256": "658fd1e8bbb557b64d59c26cd0151c4b1705e7c76265decfcd5f11d0456f3c65"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-3-hud-icon-hidden.png",
+      "sha256": "660058eef8659721805d3bd9b95497475522c72d7489ea2f02bb2400fae4da11"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-3-hud.png",
+      "sha256": "d6add1e70d84c50859e1b4605d11156c95ed933a3104744c87496f0e5b4d09de"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-3-icon-and-effect.png",
+      "sha256": "a7dc1a3fe173eb829ee406f0ec00de060f5052dccf67edd60f7867cf51a7bdad"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-4-hud-icon-hidden.png",
+      "sha256": "7c6d88d0821862e79b57faaff15f3062b1cd8ea28eba06fbb8459eb3fabef17e"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-4-hud.png",
+      "sha256": "72ef30d6487e2eab5068c0ad9820a78714f837c4a30a49f4add917bd34b4d9c1"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-4-icon-and-effect.png",
+      "sha256": "104d49ef8f7761723e49d3ea258c56dcc6acd194c6a0d509ceb6614c4a132329"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-5-hud-icon-hidden.png",
+      "sha256": "f5721c555d41770313bbffb8be85c2745d20e6b99e5244952fe39d217d671a5e"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-5-hud.png",
+      "sha256": "9c4242af358c5d17bd4c5447bae8c350d28056ee225e1613204db6de491b10ff"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-5-icon-and-effect.png",
+      "sha256": "59270aadb3eae708cec55820533602e3392e5b154b5434ec6981b7abb62187f3"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-6-hud-icon-hidden.png",
+      "sha256": "65567329383e7b9c3aa67502301bf25a6368984eedf00d06c68dee8c1606d112"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-6-hud.png",
+      "sha256": "bb3e91a917351662244dde231954ec9c13324add01521a890739024d2d0c3ecc"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-6-icon-and-effect.png",
+      "sha256": "a2404f60edf7a9cdfbe90e5d86356cea27e2586a7e9da3c0811d2c7a87a1655d"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-7-hud-icon-hidden.png",
+      "sha256": "92dd8b0e26e041461e2d78b531a1c8610abbba68456ed5c8299d60c7d05342fb"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-7-hud.png",
+      "sha256": "6f6460bf5775722530fdb8c00d22a672c61a5dcc6727c2311656287f05e871f7"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\buff-7-icon-and-effect.png",
+      "sha256": "00f03855ace7134be1e43a5dbd9cb7b7d14d39a72fbd57499027db3292e66216"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es366-baseline.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es366.png",
+      "sha256": "3d01a287972538bcb262c820f49b11b070a71560d7c3967d0825808caf749392"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es368-baseline.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es368.png",
+      "sha256": "685b08c39bf7fd1f754612a4555506e4e78c52ab4a767fc96cd3db1ea8961119"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es370-baseline.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es370.png",
+      "sha256": "280e8a01e304d1e80152e7f437109547c287d94269aa7d28dbaf50b1b0dc0934"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es376-baseline.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es376.png",
+      "sha256": "b7e0c248e70885d57114e3e04654666350c10fc0e1f838376f8d54bcfc0f481b"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es411-baseline.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es411.png",
+      "sha256": "26265d394399e911f557eb30714fbbf93a734669184d7a9659bcc22b7d5c431d"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es412-baseline.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es412.png",
+      "sha256": "3765f93541ced1461eca6783eeb21472405b9fb707500e0101c1115ed6e25959"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es429-baseline.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es429.png",
+      "sha256": "612d21f6e6ed3fde416072df9a7770acab0ed29e8709bae78ac6b3557d5ab61f"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es431-baseline.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es431.png",
+      "sha256": "9f220d1470f89be06e2f2a6eef225ccba260ad5a663258b36fee3c21e374ab6d"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es434-baseline.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es434.png",
+      "sha256": "731cd92a7cb5d7832b7715a3b80806307100cc49e8624d0b93ce829156983ba4"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es435-baseline.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es435.png",
+      "sha256": "7d0cfd54a4b15119dc7862a19d142a0c51308890900ce01d9bd18cce2fe2a4df"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es436-baseline.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es436.png",
+      "sha256": "264fafaaaf73a7e086679ff1e2967f3b51c6e56697e37da45f2b2d424589f04f"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es441-baseline.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es441.png",
+      "sha256": "e7d94a5afd7a75641b2336bd31eb56cbf66091ddfeb12fb707058f03c305f4e5"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es447-baseline.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es447.png",
+      "sha256": "b6008421b907bff9db234454ec0074dbc4e97c59f2bbd7c2b1c2b2046af67230"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es714-baseline.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es714.png",
+      "sha256": "1dec4d29cd97816a51c125a208a405675d58ee187db42ef6296fe02f1374deb9"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es805-baseline.png",
+      "sha256": "37723111664a6a26576c261c9e07e52d835006b3c9dff79b28040dcb79c974c3"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\closure-es805.png",
+      "sha256": "7de6cf9eac8d338d56f1f8ffbdbbc06bcd7280b446119b64ab4d7a4550dffcc5"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\phoenix-group-restored.png",
+      "sha256": "9dc9a9d092199b01498571e7cf92f778902a36a69adf75180a52ee5f1b74b030"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\phoenix-self-dialog.png",
+      "sha256": "9a7f7e154b3f763c037c5fcadaffbe52b67d997316b56d88f442f5a8537be808"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\reward-strong-cash-item-hud-icon-hidden.png",
+      "sha256": "1f79a5329dc0e2d930ff80a0b6a452e35565fb9e111cb2c2e1616e21a78e0bcf"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\reward-strong-cash-item-hud.png",
+      "sha256": "5e441e1f5fe93669afa576e1f1b7ccfec10d3950dc05c2afa6c5b6c4e757e113"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\reward-strong-cash-item-stack.png",
+      "sha256": "32465d513e2f82ae45ba02c74bc75e2eb82ce45daa3e44627491d117d5a70693"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\reward-surviving-nano-hud-icon-hidden.png",
+      "sha256": "b0e92f8713a5202843c48ea7520781be3682827d4345a9af1e8561ee0e967061"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\reward-surviving-nano-hud.png",
+      "sha256": "de6401cdf5bd7c698625ab27cdf0b23f052c2cb14d173c827435180cba1b1a02"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\reward-surviving-nano-stack.png",
+      "sha256": "a454e0f35a902976bbaa7668e5aa6f7620049ebba70121bd93c83e33d38c1aa8"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\server-hostile-10-es366.png",
+      "sha256": "2f53cdec0e9790466e98436ee1c106eac798403f91a614ad9236995d9d8ea4c7"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\server-hostile-11-es435.png",
+      "sha256": "71aad79e9653093f0952dc6f6038b78e9d3ce639b20419fcdba330f7386d3d33"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\server-hostile-19-es441.png",
+      "sha256": "228c58ecd834a74dd5bb1b690a0b26f9b3c35f5ecab4ff61edbe918c865f1749"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\server-hostile-8-es370.png",
+      "sha256": "24fe1694890cc9b0a81502e6f7911fb9843bcd2ad01258620ec1a422e7c9f067"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\server-passive-instant-1-es368.png",
+      "sha256": "b79dd8ab95a5697d91115f5b9e31f58c1a71760043ff633023650426b76b8aec"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\server-passive-instant-13-es714.png",
+      "sha256": "d74e23d6d5d44e740b2db1f524255f42037490fa6ee18297da79305ee15aa43b"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\server-passive-instant-14-es436.png",
+      "sha256": "a14c63b47a37243871a49b8887890729f09ecbb0c168c86db35c1eccfb368809"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\server-passive-instant-15-es412.png",
+      "sha256": "5b6c3da56b43afece479f01350250ec29948918e36f3f1eb4254c96231cffaed"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\server-passive-instant-16-es412.png",
+      "sha256": "7162e4c03216deeca64f4023dd1b37d25569d43eec4db29110a574a167c37ba9"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\server-passive-instant-18-es805.png",
+      "sha256": "d5f1904a603a1d93ffee848d080720b2fd46f320bdef9c4faa15f179e5f733fc"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\server-passive-instant-3-es429.png",
+      "sha256": "8f2baf41fe33da3621dce1e27c9a9bcea3597c5d5f0cde59829460b877cdf8a9"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\server-passive-instant-4-es447.png",
+      "sha256": "5e583600f3f7bf2f4d8bc2cc02724213f5f93346b3b6807f0dee25ade11f80d4"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\server-passive-instant-5-es431.png",
+      "sha256": "911453cf4aa6844e0e675a1bacfbcaea13ac32afcb1c4b0204e5b06a0b4ce118"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\server-passive-instant-6-es411.png",
+      "sha256": "bedc2c0ea5514ef92357ba56c6c862db94b7893a261b6a13af5f729898cc3006"
+    },
+    {
+      "run": "buffs",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-buffs-20261017-112106-6ba0fe\\buff-profile\\server-passive-instant-7-es434.png",
+      "sha256": "6911974d0588d5ef0b32a888aa7b12c9e4a026e075a3f0cd00ed3a2771f537ad"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\bank-locked.png",
+      "sha256": "e77045b1e91707cc0c6c1089a421e264a283b27567230dc442b6bc1a0d534ede"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\bank.png",
+      "sha256": "bec161123b78b069198df8aabfb6aa35800df64e762512663f971bc8353a0bc1"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\board_vehicle.png",
+      "sha256": "3a5e19779dc48292882ad0089b793552b173eadb9ce159acd0a2ff5d098601ab"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\croc-pot.png",
+      "sha256": "d0ea61ad153030bf05750c6b112132d73b5eebbf9e1cc5294751b1eec9aa32b6"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\croc-result.png",
+      "sha256": "6f00446ee6bc98479430c14d5f14260113276f63f0b36671582eaf5833650420"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\death.png",
+      "sha256": "429188fae39a8867d25e15b557ff53dda1f906ef797ff4b3912c62866b615f2d"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\friends.png",
+      "sha256": "bd0381a6d91cec1ce266dcd535f9b059188a3d78e486b2febe0d1d889e751d85"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\group-npc.png",
+      "sha256": "62f4a5ed59c61ab0429a0d47de73717176dd38025bfbcfca2404782338fe9752"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\group.png",
+      "sha256": "c7a43f1cd49d942c14557209c75e65129a50325cc9c3f722bd3badb41f2c3bee"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\hud.png",
+      "sha256": "96577192d117d501e3f223c42dd3535a489108a146d6780733a5582342c6f200"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\instance-75.png",
+      "sha256": "fc7fce326c7aeef52b6ea538b3a64fb03c1ce8025fa7afcfddf8f29b4ffc0a63"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\instance-hud.png",
+      "sha256": "aba292a6131f29783ceb200fa59aad3bc469475170ab328b82d7dc98b3a42312"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\inventory.png",
+      "sha256": "69ad09da88737ccd1e61755369f57882e9290a7d160f72821e432776b0fec9dc"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\journal.png",
+      "sha256": "88f356ca20c68c2ccade8733bea14c27a51bcd4d7b56b585660d9f0a2f31e8de"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\mail-compose.png",
+      "sha256": "54485ab7e14e29703e0fa42c3f601d88965aa4b266596a1c72f85883f1412117"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\mail-read.png",
+      "sha256": "94bc4e6f3743239ed2e991a59d14b787acbbe51adcc2c1695664ad69049b639b"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\recall-point-446.png",
+      "sha256": "685649971a54fb5b1669077138170d507c9efd57e1a779da4754a8593e95a707"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\recall-point-811-registered.png",
+      "sha256": "2fe81b02fa631efe3ee80437ddd129307558ce90010a275b63e9468318d39790"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\recall-registration.png",
+      "sha256": "2e008ef14f2c53e0206e4a5d11f355510ceb0d6d2a934d1e90dbdcc8a7473fc6"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\revived.png",
+      "sha256": "54ae5e69279a92c12dcf80ec4c8506871c4b86869aa2405b0d93a029c999352c"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\scooter_vehicle.png",
+      "sha256": "7cdcf84685179cc48c6490f744f990f0be244f19148c66a7d2c7332df592aa5a"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\skyway-arrival.png",
+      "sha256": "06e43c8ce402b506474063d78d1bc63c8efabee9865b3d07a818d087bc694392"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\slider-riding.png",
+      "sha256": "fbe54c0a36941f6303d8cd6166f2ccaaf7ef0f2f161953b813f2bb9975a2f28a"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\transport.png",
+      "sha256": "3bdf37e705d7628aaf1a044b7ab3ec9504bd279afffcea0c0808f0188c895608"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\vendor.png",
+      "sha256": "d7dfddee03ca7367621322eca5ab57c9da99a63c418aec7c890469c89b7b72e5"
+    },
+    {
+      "run": "gameplay",
+      "path": "D:\\CodexProject\\FusionFallProject\\RustyFusion\\target\\unity-gameplay-20261017-113337-5852ac\\player-profile\\world.png",
+      "sha256": "3953cdc72aee44e6ece2e1b79613aef609c0b0e4ae584cc3046a6f971cb56a87"
+    },
+    {
+      "run": "frontend",
+      "path": "D:\\CodexProject\\FusionFallProject\\FFOneUnity\\Logs\\FrontendFullHd\\1920x1080\\login.png",
+      "sha256": "9f4164c8648bd63c737c8110738859f1cf7db3cb83e8576f1dae21d88f0e3652"
+    },
+    {
+      "run": "frontend",
+      "path": "D:\\CodexProject\\FusionFallProject\\FFOneUnity\\Logs\\FrontendFullHd\\1920x1080\\selection.png",
+      "sha256": "d92c8b30224b9a211b9ff12102d9e195c5adb91e6ff3160f7037e3b683fa2b06"
+    },
+    {
+      "run": "frontend",
+      "path": "D:\\CodexProject\\FusionFallProject\\FFOneUnity\\Logs\\FrontendFullHd\\1920x1080\\selection-occupied.png",
+      "sha256": "4b646ec3428ea324034111b7c175f0bc37ddbf8d71d7cce460befcbd027aa4b0"
+    },
+    {
+      "run": "frontend",
+      "path": "D:\\CodexProject\\FusionFallProject\\FFOneUnity\\Logs\\FrontendFullHd\\1920x1080\\delete-character.png",
+      "sha256": "cca6cc522f82565309991635863d394210eac91f59f169677cb834a5a3ff43ad"
+    },
+    {
+      "run": "frontend",
+      "path": "D:\\CodexProject\\FusionFallProject\\FFOneUnity\\Logs\\FrontendFullHd\\1920x1080\\generated-name.png",
+      "sha256": "f6bacd052f50f86f6e61f4bcfa6915957e0c8323fde5f9677c869bc87e0d243a"
+    },
+    {
+      "run": "frontend",
+      "path": "D:\\CodexProject\\FusionFallProject\\FFOneUnity\\Logs\\FrontendFullHd\\1920x1080\\custom-name.png",
+      "sha256": "30f7a29e895bfa2d5a5ceb4faa20506633d3bc333bae1e9d4569278b34374920"
+    },
+    {
+      "run": "frontend",
+      "path": "D:\\CodexProject\\FusionFallProject\\FFOneUnity\\Logs\\FrontendFullHd\\1920x1080\\appearance.png",
+      "sha256": "54ebb8a905b310c4a8549e241814494eca7cd553cb4d18dcc78fac9620b18ccc"
+    },
+    {
+      "run": "frontend",
+      "path": "D:\\CodexProject\\FusionFallProject\\FFOneUnity\\Logs\\FrontendFullHd\\1920x1080\\appearance-girl.png",
+      "sha256": "5b9bbbcade3cbbcd33f9b987aa5d559163a10b3e13874c3696229b497b64c80d"
+    },
+    {
+      "run": "frontend",
+      "path": "D:\\CodexProject\\FusionFallProject\\FFOneUnity\\Logs\\FrontendFullHd\\1920x1080\\quit.png",
+      "sha256": "7dfce5f408c4faa055703cabd5aeb988df44a3d970b38dd6a748b748aa8c8318"
+    },
+    {
+      "run": "frontend",
+      "path": "D:\\CodexProject\\FusionFallProject\\FFOneUnity\\Logs\\FrontendFullHd\\1920x1200\\login.png",
+      "sha256": "6524ef09b4db2c45b9cb006a8c3db6ad04b8bd830526776951545d201822a556"
+    },
+    {
+      "run": "frontend",
+      "path": "D:\\CodexProject\\FusionFallProject\\FFOneUnity\\Logs\\FrontendFullHd\\1920x1200\\selection.png",
+      "sha256": "de1a2c6e5965435abcacc458471e7f9e88dff80e2d76a35046caf8ebb2571b45"
+    },
+    {
+      "run": "frontend",
+      "path": "D:\\CodexProject\\FusionFallProject\\FFOneUnity\\Logs\\FrontendFullHd\\1920x1200\\selection-occupied.png",
+      "sha256": "cd807886c15aa628a42c6153a0f0e0cfb498bf0b03ecd3433c284204c7bca235"
+    },
+    {
+      "run": "frontend",
+      "path": "D:\\CodexProject\\FusionFallProject\\FFOneUnity\\Logs\\FrontendFullHd\\1920x1200\\delete-character.png",
+      "sha256": "4ab4f871a85f996f8d2e8f3d3289634a24bf8d054a83fbac53031b19dc10a9db"
+    },
+    {
+      "run": "frontend",
+      "path": "D:\\CodexProject\\FusionFallProject\\FFOneUnity\\Logs\\FrontendFullHd\\1920x1200\\generated-name.png",
+      "sha256": "8156cd10bc668d8f4252331d3d4148b7f045a39b681e432c236390c04ca95921"
+    },
+    {
+      "run": "frontend",
+      "path": "D:\\CodexProject\\FusionFallProject\\FFOneUnity\\Logs\\FrontendFullHd\\1920x1200\\custom-name.png",
+      "sha256": "402f6cbb7296cceacb63f8a85f5f61aab4aa17e37a29f208954162c277607f60"
+    },
+    {
+      "run": "frontend",
+      "path": "D:\\CodexProject\\FusionFallProject\\FFOneUnity\\Logs\\FrontendFullHd\\1920x1200\\appearance.png",
+      "sha256": "3a6188c8b0fa3ff44710e21948673cccd3dbaf71bfc3d886a0b173076895005b"
+    },
+    {
+      "run": "frontend",
+      "path": "D:\\CodexProject\\FusionFallProject\\FFOneUnity\\Logs\\FrontendFullHd\\1920x1200\\appearance-girl.png",
+      "sha256": "f8218133b73a79660ecbb72ce19b90059b485b395dd69278725480f92eb0b772"
+    },
+    {
+      "run": "frontend",
+      "path": "D:\\CodexProject\\FusionFallProject\\FFOneUnity\\Logs\\FrontendFullHd\\1920x1200\\quit.png",
+      "sha256": "cd2d431bbb8c901854e986fd91bbe78342df0be76a737cbb793d6b39f05b61b5"
+    }
+  ],
+  "limitations": [
+    "Normal account PvP is denied; the local original server allows the character-attack path only through GM30 or higher privilege.",
+    "Primary BulletTable has rows 0..169; positive weapon effect references 170..174 have no source row and no substituted effect.",
+    "Grenade collision uses the current Unity raycast reconstruction; original physics timing is not proven.",
+    "Player group-aura source ownership is covered; native group-NPC passive aura ownership still requires coordinated integration.",
+    "Unproved original skill and item consumers are separately classified in RustyFusion/docs/skill-effect-coverage.json; expected rejection does not establish recovered original behavior."
+  ]
+}

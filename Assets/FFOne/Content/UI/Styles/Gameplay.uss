@@ -1,0 +1,73 @@
+.gameplay-prompt { position:absolute; left:0; top:0; right:0; bottom:0; align-items:center; justify-content:center; background-color:rgba(0,0,0,.55); }
+.gameplay-prompt-panel { width:430px; max-width:90%; padding:24px; background-color:rgb(7,25,32); border-width:1px; border-color:rgb(58,169,180); }
+.gameplay-prompt-title { color:white; font-size:20px; margin-bottom:16px; white-space:normal; }
+.gameplay-prompt-body { color:rgb(222,238,242); white-space:normal; margin-bottom:20px; }
+.gameplay-prompt-actions { flex-direction:row; justify-content:space-between; margin-top:20px; }
+.gameplay-prompt-actions > Button { width:46%; height:32px; }
+
+/* Shared UI Toolkit scrollbar adapter. Uses the accepted option-screen artwork;
+   imported IMGUI screen geometry and GUISkin selectors stay in Retrobution.uss. */
+.retro-screen .unity-scroller--vertical { width:17px; margin:0; padding:0; }
+.retro-screen .unity-scroller--vertical .unity-base-slider__tracker {
+    background-color:transparent; border-width:0; border-radius:0;
+    background-image:url("../Artwork/en/option/scroll-bar.png");
+    -unity-background-scale-mode:stretch-to-fill;
+}
+.retro-screen .unity-scroller--vertical .unity-base-slider__dragger {
+    background-color:transparent; border-width:0; border-radius:0;
+    background-image:url("../Artwork/en/option/scroll-thumb.png");
+    -unity-background-scale-mode:stretch-to-fill;
+}
+.retro-screen .unity-scroller__low-button, .retro-screen .unity-scroller__high-button { display:none; }
+.retro-screen TextField > .unity-base-text-field__input {
+    margin:0; padding:0; border-width:0; border-radius:0; background-color:transparent; color:white;
+}
+
+/* Inventory and mail share the original five-column equipment cabinet. */
+.inventory-copy { margin:0; padding:0; white-space:nowrap; overflow:hidden; -unity-text-align:middle-left; }
+.inventory-screen Button:disabled { opacity:1; }
+.inventory-screen .inventory-tab > .retro-background { background-image:none; }
+.inventory-screen .inventory-tab { background-color:transparent; -unity-background-scale-mode:stretch-to-fill; }
+.inventory-screen .inventory-equipment-tab { background-image:url('../Artwork/en/user-equip/item-tab.png'); }
+.inventory-screen .inventory-nanos-tab { background-image:url('../Artwork/en/user-equip/nano-tab.png'); }
+.inventory-screen .inventory-equipment-tab.inventory-tab-selected { background-image:url('../Artwork/en/user-equip/item-tab.png'); }
+.inventory-screen .inventory-nanos-tab.inventory-tab-selected { background-image:url('../Artwork/en/user-equip/nano-tab.png'); }
+.inventory-screen .inventory-tab > .retro-text { top:5px; bottom:9px; color:rgb(203,255,255); -unity-text-align:upper-left; }
+.inventory-screen .inventory-equipment-tab > .retro-text { left:10px; right:27px; }
+.inventory-screen .inventory-nanos-tab > .retro-text { left:39px; right:30px; }
+.inventory-screen .inventory-tab-selected > .retro-text { color:white; }
+.inventory-screen .inventory-tab:hover > .retro-text { color:white; }
+.inventory-screen .inventory-redeem, .mail-button {
+    margin:0; padding:0 6px; border-width:0; border-radius:0; color:rgb(203,255,255);
+    background-color:transparent; background-image:url('../Artwork/en/email/next.png');
+    -unity-background-scale-mode:stretch-to-fill; -unity-slice-left:6; -unity-slice-right:6; -unity-slice-top:5; -unity-slice-bottom:5;
+    -unity-text-align:middle-center; white-space:nowrap; overflow:hidden;
+}
+.mail-button:hover, .mail-button:focus { background-image:url('../Artwork/en/email/next-hover.png'); color:white; }
+.mail-button:disabled { color:rgb(89,142,167); }
+.inventory-screen .unity-scroller--vertical { width:17px; }
+.inventory-screen .unity-scroller--vertical .unity-base-slider__tracker { background-image:url('../Artwork/en/user-equip/scroll-track.png'); -unity-slice-top:4; -unity-slice-bottom:4; }
+.inventory-screen .unity-scroller--vertical .unity-base-slider__dragger { background-image:url('../Artwork/en/user-equip/scroll-thumb.png'); -unity-slice-top:5; -unity-slice-bottom:5; }
+.inventory-screen .unity-scroller__low-button, .inventory-screen .unity-scroller__high-button { display:flex; margin:0; padding:0; width:17px; height:12px; min-height:12px; border-width:0; background-color:transparent; -unity-background-scale-mode:stretch-to-fill; }
+.inventory-screen .unity-scroller__low-button { background-image:url('../Artwork/en/user-equip/scroll-up.png'); }
+.inventory-screen .unity-scroller__high-button { background-image:url('../Artwork/en/user-equip/scroll-down.png'); }
+.inventory-screen .unity-scroller__low-button:disabled, .inventory-screen .unity-scroller__high-button:disabled { opacity:1; -unity-background-image-tint-color:white; }
+.inventory-screen .unity-base-slider__dragger-border { display:none; }
+.mail-content { background-image:url('../Artwork/en/email/frame.png'); -unity-background-scale-mode:stretch-to-fill; -unity-slice-left:4; -unity-slice-right:4; -unity-slice-top:4; -unity-slice-bottom:4; }
+.mail-tab { margin:0; padding:0 12px 3px 12px; border-width:0; border-radius:0; background-color:transparent; color:rgb(203,255,255); -unity-background-scale-mode:stretch-to-fill; -unity-text-align:middle-left; }
+.mail-guide-tab { background-image:url('../Artwork/en/email/guide-tab.png'); }
+.mail-player-tab { background-image:url('../Artwork/en/email/player-tab.png'); }
+.mail-guide-tab.mail-tab-selected { background-image:url('../Artwork/en/email/guide-tab.png'); color:white; }
+.mail-player-tab.mail-tab-selected { background-image:url('../Artwork/en/email/player-tab.png'); color:white; }
+.mail-detail { background-color:rgb(2,41,72); border-width:2px; border-color:rgb(68,151,168); border-radius:9px; }
+.mail-paper { background-color:rgb(158,250,250); border-width:2px; border-color:rgb(0,195,207); padding:12px; }
+.mail-body-copy { margin:0; padding:0; white-space:normal; color:rgb(18,54,57); }
+.mail-sender-symbol { background-color:rgb(0,15,26); border-width:1px; border-color:rgb(0,225,229); -unity-text-align:middle-center; }
+.mail-row { margin:0; padding:0; border-width:0; border-radius:0; height:28px; min-height:28px; flex-shrink:0; background-color:black; }
+.mail-row:hover { background-color:rgb(2,52,72); }
+.mail-row-selected { background-color:rgb(190,255,255); }
+.mail-row-selected .inventory-copy { color:rgb(61,145,244); }
+.mail-trash { margin:0; padding:0; border-width:0; border-radius:0; background-color:transparent; background-image:url('../Artwork/en/user-equip/trash.png'); -unity-background-scale-mode:stretch-to-fill; }
+.mail-trash:hover { background-image:url('../Artwork/en/user-equip/trash-hover.png'); }
+.mail-trash:disabled { opacity:.55; }
+.mail-item-attached { border-width:2px; border-color:rgb(255,241,0); }

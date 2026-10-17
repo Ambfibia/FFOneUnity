@@ -1,0 +1,5326 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 617e8d72d56a8fd48b19c97e00b5a0ae, type: 3}
+  m_Name: WorldDefinition
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.World.WorldCatalog
+  Tiles:
+  - Id: map_00_00
+    Resource: World/Tiles/map_00_00/Content
+    SceneAddress: ffone/2d753b402fc886f4bbcf4ebe9018d322
+    X: 0
+    Z: 0
+    Minimum: {x: 0, y: -10000, z: 0}
+    Maximum: {x: 512, y: 10000, z: 512}
+    Visuals: 0
+    Colliders: 0
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 0
+    OverflowCenters: []
+  - Id: map_00_01
+    Resource: World/Tiles/map_00_01/Content
+    SceneAddress: ffone/aa6f30ddb4620c540a5b6888749883f5
+    X: 0
+    Z: 1
+    Minimum: {x: 0, y: -10000, z: 512}
+    Maximum: {x: 512, y: 10000, z: 1024}
+    Visuals: 13
+    Colliders: 7
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 13
+    OverflowCenters:
+    - {x: 519.57434, y: 679.2682}
+    - {x: 519.57434, y: 679.2682}
+  - Id: map_00_02
+    Resource: World/Tiles/map_00_02/Content
+    SceneAddress: ffone/9e5895f27cbcbe7449a6f33d0743f225
+    X: 0
+    Z: 2
+    Minimum: {x: 0, y: -10000, z: 1024}
+    Maximum: {x: 512, y: 10000, z: 1536}
+    Visuals: 1
+    Colliders: 1
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 1
+    OverflowCenters: []
+  - Id: map_01_00
+    Resource: World/Tiles/map_01_00/Content
+    SceneAddress: ffone/a89416fb4ced1154dabab10aae1f497a
+    X: 1
+    Z: 0
+    Minimum: {x: 512, y: -10000, z: 0}
+    Maximum: {x: 1024, y: 10000, z: 512}
+    Visuals: 10
+    Colliders: 4
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 10
+    OverflowCenters: []
+  - Id: map_01_01
+    Resource: World/Tiles/map_01_01/Content
+    SceneAddress: ffone/0d5d2b7164ae3924d850382f5ef7ac02
+    X: 1
+    Z: 1
+    Minimum: {x: 512, y: -10000, z: 512}
+    Maximum: {x: 1024, y: 10000, z: 1024}
+    Visuals: 959
+    Colliders: 441
+    Animations: 105
+    Effects: 24
+    SourceVisuals: 1043
+    OverflowCenters:
+    - {x: 510.88037, y: 648.8082}
+    - {x: 510.88037, y: 648.8082}
+    - {x: 511.45135, y: 647.94714}
+    - {x: 510.88037, y: 648.8082}
+    - {x: 511.78452, y: 647.2736}
+    - {x: 511.78452, y: 647.2736}
+    - {x: 511.78452, y: 647.2736}
+    - {x: 506.18582, y: 730.1951}
+    - {x: 506.18582, y: 730.1951}
+    - {x: 488.86502, y: 648.6724}
+    - {x: 488.86502, y: 648.6724}
+  - Id: map_01_02
+    Resource: World/Tiles/map_01_02/Content
+    SceneAddress: ffone/46c37712036376e489220f0108331e67
+    X: 1
+    Z: 2
+    Minimum: {x: 512, y: -10000, z: 1024}
+    Maximum: {x: 1024, y: 10000, z: 1536}
+    Visuals: 1
+    Colliders: 1
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 1
+    OverflowCenters: []
+  - Id: map_02_00
+    Resource: World/Tiles/map_02_00/Content
+    SceneAddress: ffone/0985db4a87041ab4fb34f4320f9245e2
+    X: 2
+    Z: 0
+    Minimum: {x: 1024, y: -10000, z: 0}
+    Maximum: {x: 1536, y: 10000, z: 512}
+    Visuals: 1
+    Colliders: 1
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 1
+    OverflowCenters: []
+  - Id: map_02_01
+    Resource: World/Tiles/map_02_01/Content
+    SceneAddress: ffone/463297a2d9333fd4aade30a2ea527b0e
+    X: 2
+    Z: 1
+    Minimum: {x: 1024, y: -10000, z: 512}
+    Maximum: {x: 1536, y: 10000, z: 1024}
+    Visuals: 19
+    Colliders: 7
+    Animations: 0
+    Effects: 1
+    SourceVisuals: 19
+    OverflowCenters: []
+  - Id: map_02_02
+    Resource: World/Tiles/map_02_02/Content
+    SceneAddress: ffone/818eb740a8de82e4d884420359cd5f7b
+    X: 2
+    Z: 2
+    Minimum: {x: 1024, y: -10000, z: 1024}
+    Maximum: {x: 1536, y: 10000, z: 1536}
+    Visuals: 1
+    Colliders: 1
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 1
+    OverflowCenters: []
+  - Id: map_00_09
+    Resource: World/Tiles/map_00_09/Content
+    SceneAddress: ffone/a0ddfdb984a7b6e4480671771fc886a9
+    X: 0
+    Z: 9
+    Minimum: {x: 0, y: -10000, z: 4608}
+    Maximum: {x: 512, y: 10000, z: 5120}
+    Visuals: 349
+    Colliders: 120
+    Animations: 55
+    Effects: 86
+    SourceVisuals: 349
+    OverflowCenters: []
+  - Id: map_01_03
+    Resource: World/Tiles/map_01_03/Content
+    SceneAddress: ffone/d9e1c0f7418975b4c9ea50e2693a7b08
+    X: 1
+    Z: 3
+    Minimum: {x: 512, y: -10000, z: 1536}
+    Maximum: {x: 1024, y: 10000, z: 2048}
+    Visuals: 85
+    Colliders: 1
+    Animations: 42
+    Effects: 0
+    SourceVisuals: 85
+    OverflowCenters: []
+  - Id: map_01_04
+    Resource: World/Tiles/map_01_04/Content
+    SceneAddress: ffone/8c411eb08318a3046b39deda8ff1eb9e
+    X: 1
+    Z: 4
+    Minimum: {x: 512, y: -10000, z: 2048}
+    Maximum: {x: 1024, y: 10000, z: 2560}
+    Visuals: 1
+    Colliders: 1
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 1
+    OverflowCenters: []
+  - Id: map_01_11
+    Resource: World/Tiles/map_01_11/Content
+    SceneAddress: ffone/047d82a90f6acff43bb9cf65da59bb77
+    X: 1
+    Z: 11
+    Minimum: {x: 512, y: -10000, z: 5632}
+    Maximum: {x: 1024, y: 10000, z: 6144}
+    Visuals: 175
+    Colliders: 5
+    Animations: 87
+    Effects: 6
+    SourceVisuals: 179
+    OverflowCenters: []
+  - Id: map_01_12
+    Resource: World/Tiles/map_01_12/Content
+    SceneAddress: ffone/f3865fe8bc319a346a8daa6bb1617611
+    X: 1
+    Z: 12
+    Minimum: {x: 512, y: -10000, z: 6144}
+    Maximum: {x: 1024, y: 10000, z: 6656}
+    Visuals: 29
+    Colliders: 6
+    Animations: 14
+    Effects: 0
+    SourceVisuals: 34
+    OverflowCenters: []
+  - Id: map_01_13
+    Resource: World/Tiles/map_01_13/Content
+    SceneAddress: ffone/dec34c1b4eb86204a9265f6a06a8bb1a
+    X: 1
+    Z: 13
+    Minimum: {x: 512, y: -10000, z: 6656}
+    Maximum: {x: 1024, y: 10000, z: 7168}
+    Visuals: 0
+    Colliders: 1
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 1
+    OverflowCenters: []
+  - Id: map_01_14
+    Resource: World/Tiles/map_01_14/Content
+    SceneAddress: ffone/4a5850c27f5373a48a28bc9b13402029
+    X: 1
+    Z: 14
+    Minimum: {x: 512, y: -10000, z: 7168}
+    Maximum: {x: 1024, y: 10000, z: 7680}
+    Visuals: 0
+    Colliders: 0
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 0
+    OverflowCenters: []
+  - Id: map_02_03
+    Resource: World/Tiles/map_02_03/Content
+    SceneAddress: ffone/4029392827520814c8aaaa15ea3a5e4b
+    X: 2
+    Z: 3
+    Minimum: {x: 1024, y: -10000, z: 1536}
+    Maximum: {x: 1536, y: 10000, z: 2048}
+    Visuals: 383
+    Colliders: 9
+    Animations: 184
+    Effects: 0
+    SourceVisuals: 385
+    OverflowCenters: []
+  - Id: map_02_04
+    Resource: World/Tiles/map_02_04/Content
+    SceneAddress: ffone/d576de15c58033c4ea56bc44de560f36
+    X: 2
+    Z: 4
+    Minimum: {x: 1024, y: -10000, z: 2048}
+    Maximum: {x: 1536, y: 10000, z: 2560}
+    Visuals: 2184
+    Colliders: 844
+    Animations: 196
+    Effects: 278
+    SourceVisuals: 2207
+    OverflowCenters:
+    - {x: 1178.1002, y: 2597.2893}
+    - {x: 1178.1002, y: 2597.2893}
+  - Id: map_02_05
+    Resource: World/Tiles/map_02_05/Content
+    SceneAddress: ffone/3ec09f30fae27904883e2ceb6c21228f
+    X: 2
+    Z: 5
+    Minimum: {x: 1024, y: -10000, z: 2560}
+    Maximum: {x: 1536, y: 10000, z: 3072}
+    Visuals: 6
+    Colliders: 3
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 7
+    OverflowCenters: []
+  - Id: map_02_11
+    Resource: World/Tiles/map_02_11/Content
+    SceneAddress: ffone/ee19a870f79fe3c4f8ddb69d897a6931
+    X: 2
+    Z: 11
+    Minimum: {x: 1024, y: -10000, z: 5632}
+    Maximum: {x: 1536, y: 10000, z: 6144}
+    Visuals: 931
+    Colliders: 67
+    Animations: 247
+    Effects: 23
+    SourceVisuals: 932
+    OverflowCenters:
+    - {x: 1373.9269, y: 6144.6167}
+    - {x: 1364.1855, y: 6146.4316}
+  - Id: map_02_12
+    Resource: World/Tiles/map_02_12/Content
+    SceneAddress: ffone/065f4442e13b6ef4f9ff8311f14f4ec3
+    X: 2
+    Z: 12
+    Minimum: {x: 1024, y: -10000, z: 6144}
+    Maximum: {x: 1536, y: 10000, z: 6656}
+    Visuals: 3341
+    Colliders: 288
+    Animations: 420
+    Effects: 207
+    SourceVisuals: 3372
+    OverflowCenters: []
+  - Id: map_02_13
+    Resource: World/Tiles/map_02_13/Content
+    SceneAddress: ffone/c5c97ad252144bf46be6dad7c4384cc7
+    X: 2
+    Z: 13
+    Minimum: {x: 1024, y: -10000, z: 6656}
+    Maximum: {x: 1536, y: 10000, z: 7168}
+    Visuals: 2512
+    Colliders: 311
+    Animations: 348
+    Effects: 61
+    SourceVisuals: 2512
+    OverflowCenters: []
+  - Id: map_02_14
+    Resource: World/Tiles/map_02_14/Content
+    SceneAddress: ffone/d1420e540e4b42248ba63c63b8adf158
+    X: 2
+    Z: 14
+    Minimum: {x: 1024, y: -10000, z: 7168}
+    Maximum: {x: 1536, y: 10000, z: 7680}
+    Visuals: 1
+    Colliders: 2
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 2
+    OverflowCenters: []
+  - Id: map_03_01
+    Resource: World/Tiles/map_03_01/Content
+    SceneAddress: ffone/0ae50041bee8a8142915c5d212c1f8f6
+    X: 3
+    Z: 1
+    Minimum: {x: 1536, y: -10000, z: 512}
+    Maximum: {x: 2048, y: 10000, z: 1024}
+    Visuals: 1
+    Colliders: 2
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 2
+    OverflowCenters: []
+  - Id: map_03_02
+    Resource: World/Tiles/map_03_02/Content
+    SceneAddress: ffone/f519e3c09e626854bb8e08e28f2c8591
+    X: 3
+    Z: 2
+    Minimum: {x: 1536, y: -10000, z: 1024}
+    Maximum: {x: 2048, y: 10000, z: 1536}
+    Visuals: 1
+    Colliders: 2
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 2
+    OverflowCenters: []
+  - Id: map_03_03
+    Resource: World/Tiles/map_03_03/Content
+    SceneAddress: ffone/a0a9481412cd9c940b3605805974bd4e
+    X: 3
+    Z: 3
+    Minimum: {x: 1536, y: -10000, z: 1536}
+    Maximum: {x: 2048, y: 10000, z: 2048}
+    Visuals: 463
+    Colliders: 2
+    Animations: 231
+    Effects: 0
+    SourceVisuals: 464
+    OverflowCenters: []
+  - Id: map_03_04
+    Resource: World/Tiles/map_03_04/Content
+    SceneAddress: ffone/ee38eea42a61a284e8fa22e5734c8f6d
+    X: 3
+    Z: 4
+    Minimum: {x: 1536, y: -10000, z: 2048}
+    Maximum: {x: 2048, y: 10000, z: 2560}
+    Visuals: 1986
+    Colliders: 936
+    Animations: 246
+    Effects: 90
+    SourceVisuals: 1986
+    OverflowCenters:
+    - {x: 1650.5156, y: 1961.6472}
+    - {x: 1650.5156, y: 1961.6472}
+    - {x: 1938.5297, y: 2560.8276}
+    - {x: 1938.5297, y: 2560.8276}
+    - {x: 1996.7771, y: 2566.5212}
+    - {x: 1996.7771, y: 2566.5212}
+    - {x: 1934.5004, y: 2044.5933}
+    - {x: 1934.5002, y: 2045.7657}
+    - {x: 1934.5286, y: 2046.3408}
+    - {x: 1802.7798, y: 2562.882}
+    - {x: 1802.8232, y: 2563.3235}
+    - {x: 1802.7643, y: 2562.8958}
+    - {x: 1802.8076, y: 2563.3386}
+    - {x: 1761.8619, y: 2563.0488}
+    - {x: 1761.9099, y: 2562.7588}
+    - {x: 1761.8467, y: 2563.0417}
+    - {x: 1761.8945, y: 2562.7512}
+    - {x: 1802.8027, y: 2563.101}
+    - {x: 1802.8673, y: 2562.9885}
+    - {x: 1761.8872, y: 2562.87}
+    - {x: 1761.9506, y: 2562.7363}
+    - {x: 1806.317, y: 2571.785}
+    - {x: 1858.0013, y: 2571.6995}
+    - {x: 1831.447, y: 2571.0981}
+    - {x: 1750.4358, y: 2565.606}
+    - {x: 1750.4358, y: 2565.606}
+    - {x: 1750.4326, y: 2565.6042}
+    - {x: 1751.7721, y: 2567.8809}
+    - {x: 1751.7721, y: 2567.8809}
+  - Id: map_03_05
+    Resource: World/Tiles/map_03_05/Content
+    SceneAddress: ffone/0f405cd86bf3ea646b40910ef88a3567
+    X: 3
+    Z: 5
+    Minimum: {x: 1536, y: -10000, z: 2560}
+    Maximum: {x: 2048, y: 10000, z: 3072}
+    Visuals: 1079
+    Colliders: 643
+    Animations: 94
+    Effects: 3
+    SourceVisuals: 1083
+    OverflowCenters:
+    - {x: 1512.3741, y: 2623.691}
+    - {x: 1512.3741, y: 2623.691}
+    - {x: 2068.4604, y: 2784.7}
+    - {x: 2068.4604, y: 2784.7}
+  - Id: map_03_06
+    Resource: World/Tiles/map_03_06/Content
+    SceneAddress: ffone/8fac16e6ba2321848bbf0e69f02d215f
+    X: 3
+    Z: 6
+    Minimum: {x: 1536, y: -10000, z: 3072}
+    Maximum: {x: 2048, y: 10000, z: 3584}
+    Visuals: 2218
+    Colliders: 852
+    Animations: 238
+    Effects: 164
+    SourceVisuals: 2265
+    OverflowCenters: []
+  - Id: map_03_11
+    Resource: World/Tiles/map_03_11/Content
+    SceneAddress: ffone/b4b9717a0d8ccc64d9129b605fd0a2fb
+    X: 3
+    Z: 11
+    Minimum: {x: 1536, y: -10000, z: 5632}
+    Maximum: {x: 2048, y: 10000, z: 6144}
+    Visuals: 262
+    Colliders: 10
+    Animations: 102
+    Effects: 3
+    SourceVisuals: 264
+    OverflowCenters: []
+  - Id: map_03_12
+    Resource: World/Tiles/map_03_12/Content
+    SceneAddress: ffone/4c367828bd605a24280640339d82d81d
+    X: 3
+    Z: 12
+    Minimum: {x: 1536, y: -10000, z: 6144}
+    Maximum: {x: 2048, y: 10000, z: 6656}
+    Visuals: 1763
+    Colliders: 606
+    Animations: 182
+    Effects: 73
+    SourceVisuals: 1765
+    OverflowCenters:
+    - {x: 1534.8773, y: 6213.6665}
+    - {x: 1763.658, y: 6656.137}
+    - {x: 1763.658, y: 6656.137}
+  - Id: map_03_13
+    Resource: World/Tiles/map_03_13/Content
+    SceneAddress: ffone/22d71a6c51411c9498769434675950fd
+    X: 3
+    Z: 13
+    Minimum: {x: 1536, y: -10000, z: 6656}
+    Maximum: {x: 2048, y: 10000, z: 7168}
+    Visuals: 1930
+    Colliders: 424
+    Animations: 164
+    Effects: 75
+    SourceVisuals: 1932
+    OverflowCenters: []
+  - Id: map_03_14
+    Resource: World/Tiles/map_03_14/Content
+    SceneAddress: ffone/24b6af6f2b6ea9c47b7f349169956d14
+    X: 3
+    Z: 14
+    Minimum: {x: 1536, y: -10000, z: 7168}
+    Maximum: {x: 2048, y: 10000, z: 7680}
+    Visuals: 1
+    Colliders: 1
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 1
+    OverflowCenters: []
+  - Id: map_04_01
+    Resource: World/Tiles/map_04_01/Content
+    SceneAddress: ffone/d9fefdf07747187469f8bd127a16421f
+    X: 4
+    Z: 1
+    Minimum: {x: 2048, y: -10000, z: 512}
+    Maximum: {x: 2560, y: 10000, z: 1024}
+    Visuals: 4
+    Colliders: 4
+    Animations: 0
+    Effects: 1
+    SourceVisuals: 5
+    OverflowCenters: []
+  - Id: map_04_02
+    Resource: World/Tiles/map_04_02/Content
+    SceneAddress: ffone/532015a04839d0a40b1cd83808d553c7
+    X: 4
+    Z: 2
+    Minimum: {x: 2048, y: -10000, z: 1024}
+    Maximum: {x: 2560, y: 10000, z: 1536}
+    Visuals: 3283
+    Colliders: 1216
+    Animations: 611
+    Effects: 120
+    SourceVisuals: 3295
+    OverflowCenters:
+    - {x: 2301.0447, y: 1538.67}
+    - {x: 2301.0447, y: 1538.67}
+    - {x: 2561.179, y: 1309.2538}
+    - {x: 2033.1742, y: 1011.8453}
+    - {x: 1982.3259, y: 1124.0634}
+    - {x: 2041.7563, y: 1180.823}
+    - {x: 2041.7563, y: 1180.823}
+    - {x: 2041.7563, y: 1180.823}
+    - {x: 2035.2722, y: 1315.0632}
+    - {x: 2035.2722, y: 1315.0632}
+    - {x: 2035.2722, y: 1315.0632}
+    - {x: 2227.6682, y: 983.1609}
+    - {x: 2227.6682, y: 983.1609}
+    - {x: 2227.6682, y: 983.1609}
+    - {x: 2515.0183, y: 1021.71423}
+    - {x: 2472.7131, y: 1014.2898}
+    - {x: 2436.1733, y: 1017.90356}
+    - {x: 2502.4873, y: 991.1555}
+    - {x: 2502.4873, y: 990.1754}
+    - {x: 2409.6365, y: 1016.43524}
+    - {x: 2409.5442, y: 1015.45953}
+    - {x: 2383.4565, y: 1012.335}
+    - {x: 2560.218, y: 1033.7003}
+    - {x: 2560.1667, y: 1032.8873}
+  - Id: map_04_03
+    Resource: World/Tiles/map_04_03/Content
+    SceneAddress: ffone/ae05da71752a1134c9a52397d4245fe1
+    X: 4
+    Z: 3
+    Minimum: {x: 2048, y: -10000, z: 1536}
+    Maximum: {x: 2560, y: 10000, z: 2048}
+    Visuals: 2673
+    Colliders: 1024
+    Animations: 389
+    Effects: 210
+    SourceVisuals: 2695
+    OverflowCenters:
+    - {x: 2181.2659, y: 2057.661}
+    - {x: 2181.2024, y: 2049.6877}
+    - {x: 2181.3208, y: 2065.539}
+    - {x: 2409.376, y: 1535.0277}
+    - {x: 2409.376, y: 1535.0277}
+  - Id: map_04_04
+    Resource: World/Tiles/map_04_04/Content
+    SceneAddress: ffone/57274c837bfa224448736e22684f6f90
+    X: 4
+    Z: 4
+    Minimum: {x: 2048, y: -10000, z: 2048}
+    Maximum: {x: 2560, y: 10000, z: 2560}
+    Visuals: 2061
+    Colliders: 557
+    Animations: 269
+    Effects: 125
+    SourceVisuals: 2061
+    OverflowCenters:
+    - {x: 2279.592, y: 2021.4814}
+    - {x: 2279.592, y: 2016.7971}
+    - {x: 2284.2139, y: 2021.4772}
+    - {x: 2284.2139, y: 2016.782}
+    - {x: 2168.592, y: 2001.4814}
+    - {x: 2168.592, y: 1996.7971}
+    - {x: 2173.2139, y: 2001.4772}
+    - {x: 2173.2139, y: 1996.782}
+    - {x: 2507.0198, y: 2047.0966}
+    - {x: 2543.2576, y: 2046.8622}
+    - {x: 2543.2524, y: 2047.3221}
+    - {x: 2543.2524, y: 2047.3221}
+    - {x: 2293.2437, y: 2561.6274}
+    - {x: 2293.2437, y: 2561.6274}
+    - {x: 2447.9082, y: 2581.1863}
+    - {x: 2447.9082, y: 2581.1863}
+    - {x: 2046.1243, y: 2061.954}
+    - {x: 2358.8018, y: 2582.8257}
+    - {x: 2284.6082, y: 2022.1259}
+    - {x: 2284.6082, y: 2022.1259}
+    - {x: 2279.325, y: 2022.1259}
+    - {x: 2279.325, y: 2022.1259}
+    - {x: 2284.6082, y: 2016.0159}
+    - {x: 2284.6082, y: 2016.0159}
+    - {x: 2279.325, y: 2016.0159}
+    - {x: 2279.325, y: 2016.0159}
+    - {x: 2279.6765, y: 2016.8029}
+    - {x: 2279.6765, y: 2016.8029}
+    - {x: 2281.9612, y: 2016.8029}
+    - {x: 2281.9612, y: 2016.8029}
+    - {x: 2281.9724, y: 2016.8029}
+    - {x: 2281.9724, y: 2016.8029}
+    - {x: 2284.257, y: 2016.8029}
+    - {x: 2284.257, y: 2016.8029}
+    - {x: 2284.257, y: 2021.4689}
+    - {x: 2279.6765, y: 2021.4689}
+    - {x: 2279.6765, y: 2021.4689}
+    - {x: 2281.9612, y: 2021.4689}
+    - {x: 2281.9612, y: 2021.4689}
+    - {x: 2281.9724, y: 2021.4689}
+    - {x: 2281.9724, y: 2021.4689}
+    - {x: 2284.257, y: 2021.4689}
+    - {x: 2279.5073, y: 2027.4324}
+    - {x: 2279.5073, y: 2027.4324}
+    - {x: 2173.6082, y: 2002.1259}
+    - {x: 2173.6082, y: 2002.1259}
+    - {x: 2168.325, y: 2002.1259}
+    - {x: 2168.325, y: 2002.1259}
+    - {x: 2173.6082, y: 1996.0159}
+    - {x: 2173.6082, y: 1996.0159}
+    - {x: 2168.325, y: 1996.0159}
+    - {x: 2168.325, y: 1996.0159}
+    - {x: 2168.6765, y: 1996.8029}
+    - {x: 2168.6765, y: 1996.8029}
+    - {x: 2170.9612, y: 1996.8029}
+    - {x: 2170.9612, y: 1996.8029}
+    - {x: 2170.9724, y: 1996.8029}
+    - {x: 2170.9724, y: 1996.8029}
+    - {x: 2173.257, y: 1996.8029}
+    - {x: 2173.257, y: 1996.8029}
+    - {x: 2173.257, y: 2001.4689}
+    - {x: 2168.6765, y: 2001.4689}
+    - {x: 2168.6765, y: 2001.4689}
+    - {x: 2170.9612, y: 2001.4689}
+    - {x: 2170.9612, y: 2001.4689}
+    - {x: 2170.9724, y: 2001.4689}
+    - {x: 2170.9724, y: 2001.4689}
+    - {x: 2173.257, y: 2001.4689}
+    - {x: 2168.5073, y: 2007.4324}
+    - {x: 2168.5073, y: 2007.4324}
+    - {x: 2204.493, y: 2032.159}
+  - Id: map_04_05
+    Resource: World/Tiles/map_04_05/Content
+    SceneAddress: ffone/285571dc006a13e458636632ad75225d
+    X: 4
+    Z: 5
+    Minimum: {x: 2048, y: -10000, z: 2560}
+    Maximum: {x: 2560, y: 10000, z: 3072}
+    Visuals: 1756
+    Colliders: 638
+    Animations: 182
+    Effects: 227
+    SourceVisuals: 1774
+    OverflowCenters:
+    - {x: 2104.2156, y: 2556.327}
+    - {x: 2104.2156, y: 2556.327}
+    - {x: 2195.9678, y: 3269.509}
+    - {x: 2181.1353, y: 2546.0308}
+    - {x: 2181.1353, y: 2546.0308}
+  - Id: map_04_06
+    Resource: World/Tiles/map_04_06/Content
+    SceneAddress: ffone/d730403b2e915d142aca9e2354b431bc
+    X: 4
+    Z: 6
+    Minimum: {x: 2048, y: -10000, z: 3072}
+    Maximum: {x: 2560, y: 10000, z: 3584}
+    Visuals: 1902
+    Colliders: 873
+    Animations: 261
+    Effects: 51
+    SourceVisuals: 1908
+    OverflowCenters:
+    - {x: 2189.3184, y: 3596.8333}
+    - {x: 2189.3184, y: 3596.8333}
+    - {x: 2223.501, y: 3592.404}
+    - {x: 2223.501, y: 3592.404}
+    - {x: 2043.7081, y: 3569.5293}
+    - {x: 2043.7081, y: 3569.5293}
+    - {x: 2812.1187, y: 3518.707}
+    - {x: 2348.8284, y: 3043.4695}
+    - {x: 2354.4028, y: 3049.04}
+    - {x: 2359.9888, y: 3054.652}
+    - {x: 2365.5857, y: 3060.2043}
+    - {x: 2560.9285, y: 3230.9077}
+  - Id: map_04_07
+    Resource: World/Tiles/map_04_07/Content
+    SceneAddress: ffone/2b4b1b1784bca52409ab839eb2104ac0
+    X: 4
+    Z: 7
+    Minimum: {x: 2048, y: -10000, z: 3584}
+    Maximum: {x: 2560, y: 10000, z: 4096}
+    Visuals: 2370
+    Colliders: 652
+    Animations: 267
+    Effects: 300
+    SourceVisuals: 2407
+    OverflowCenters:
+    - {x: 2044.5577, y: 3709.442}
+    - {x: 2496.2043, y: 4099.6973}
+    - {x: 2496.2043, y: 4099.6973}
+    - {x: 2496.188, y: 4099.6973}
+    - {x: 2035.8448, y: 3710.648}
+    - {x: 2035.8448, y: 3710.648}
+    - {x: 2035.8446, y: 3710.6313}
+    - {x: 2558.871, y: 3578.6182}
+  - Id: map_04_08
+    Resource: World/Tiles/map_04_08/Content
+    SceneAddress: ffone/f98163d2e71a5ce45b20ae6eaa32b7ba
+    X: 4
+    Z: 8
+    Minimum: {x: 2048, y: -10000, z: 4096}
+    Maximum: {x: 2560, y: 10000, z: 4608}
+    Visuals: 0
+    Colliders: 0
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 0
+    OverflowCenters: []
+  - Id: map_04_09
+    Resource: World/Tiles/map_04_09/Content
+    SceneAddress: ffone/c30231f39c1c12949a8a253e46507f41
+    X: 4
+    Z: 9
+    Minimum: {x: 2048, y: -10000, z: 4608}
+    Maximum: {x: 2560, y: 10000, z: 5120}
+    Visuals: 1
+    Colliders: 1
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 1
+    OverflowCenters: []
+  - Id: map_04_10
+    Resource: World/Tiles/map_04_10/Content
+    SceneAddress: ffone/c8c609008d859134997b9f9043a88997
+    X: 4
+    Z: 10
+    Minimum: {x: 2048, y: -10000, z: 5120}
+    Maximum: {x: 2560, y: 10000, z: 5632}
+    Visuals: 0
+    Colliders: 0
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 0
+    OverflowCenters: []
+  - Id: map_04_11
+    Resource: World/Tiles/map_04_11/Content
+    SceneAddress: ffone/6bd25f7cbe488a141a9c44301f52d128
+    X: 4
+    Z: 11
+    Minimum: {x: 2048, y: -10000, z: 5632}
+    Maximum: {x: 2560, y: 10000, z: 6144}
+    Visuals: 0
+    Colliders: 0
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 0
+    OverflowCenters: []
+  - Id: map_04_12
+    Resource: World/Tiles/map_04_12/Content
+    SceneAddress: ffone/0cc3049fca269504abff7c7cf5fc1745
+    X: 4
+    Z: 12
+    Minimum: {x: 2048, y: -10000, z: 6144}
+    Maximum: {x: 2560, y: 10000, z: 6656}
+    Visuals: 1623
+    Colliders: 1064
+    Animations: 21
+    Effects: 125
+    SourceVisuals: 1658
+    OverflowCenters: []
+  - Id: map_04_13
+    Resource: World/Tiles/map_04_13/Content
+    SceneAddress: ffone/6ebbd961c54fb8140981f24457b250bb
+    X: 4
+    Z: 13
+    Minimum: {x: 2048, y: -10000, z: 6656}
+    Maximum: {x: 2560, y: 10000, z: 7168}
+    Visuals: 2759
+    Colliders: 868
+    Animations: 219
+    Effects: 399
+    SourceVisuals: 2849
+    OverflowCenters:
+    - {x: 2493.2588, y: 6650.306}
+    - {x: 2493.2588, y: 6650.306}
+  - Id: map_04_14
+    Resource: World/Tiles/map_04_14/Content
+    SceneAddress: ffone/6af278f1a0a2fc34e9c9c672740eae71
+    X: 4
+    Z: 14
+    Minimum: {x: 2048, y: -10000, z: 7168}
+    Maximum: {x: 2560, y: 10000, z: 7680}
+    Visuals: 25
+    Colliders: 13
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 25
+    OverflowCenters: []
+  - Id: map_05_01
+    Resource: World/Tiles/map_05_01/Content
+    SceneAddress: ffone/f4ac8f40869c6954982e0664d77f92c8
+    X: 5
+    Z: 1
+    Minimum: {x: 2560, y: -10000, z: 512}
+    Maximum: {x: 3072, y: 10000, z: 1024}
+    Visuals: 29
+    Colliders: 20
+    Animations: 0
+    Effects: 4
+    SourceVisuals: 31
+    OverflowCenters: []
+  - Id: map_05_02
+    Resource: World/Tiles/map_05_02/Content
+    SceneAddress: ffone/cedda46c96b06aa4dbf5570015cabff2
+    X: 5
+    Z: 2
+    Minimum: {x: 2560, y: -10000, z: 1024}
+    Maximum: {x: 3072, y: 10000, z: 1536}
+    Visuals: 3014
+    Colliders: 1085
+    Animations: 449
+    Effects: 269
+    SourceVisuals: 3049
+    OverflowCenters:
+    - {x: 2786.3525, y: 1020.3092}
+    - {x: 2924.8545, y: 1021.2944}
+    - {x: 2924.8545, y: 1021.2944}
+    - {x: 2924.8545, y: 1021.2944}
+    - {x: 2870.9392, y: 1023.50116}
+    - {x: 3037.734, y: 1023.17645}
+    - {x: 3031.4282, y: 1022.6386}
+    - {x: 2963.7112, y: 1008.7496}
+    - {x: 2963.5881, y: 1006.79425}
+    - {x: 2951.5615, y: 1012.49414}
+    - {x: 2951.5615, y: 1010.41516}
+    - {x: 2609.4487, y: 1007.66534}
+    - {x: 2644.265, y: 1019.97266}
+    - {x: 2633.6355, y: 1020.4406}
+    - {x: 2677.9968, y: 1012.8817}
+    - {x: 2668.6824, y: 1001.1709}
+    - {x: 2695.5425, y: 1017.42487}
+    - {x: 2645.3699, y: 1002.02106}
+    - {x: 2896.0808, y: 992.147}
+    - {x: 2919.6143, y: 1001.72974}
+    - {x: 2928.7786, y: 1013.58624}
+    - {x: 2860.3801, y: 1008.40063}
+    - {x: 2816.9663, y: 972.45337}
+    - {x: 2815.9321, y: 1000.98364}
+    - {x: 2781.2654, y: 988.70703}
+    - {x: 2767.7024, y: 994.16675}
+    - {x: 2623.6707, y: 968.31024}
+    - {x: 2623.6707, y: 966.23126}
+    - {x: 2792.0415, y: 1010.72455}
+    - {x: 2791.9185, y: 1008.7692}
+    - {x: 2748.1082, y: 969.83093}
+    - {x: 2748.0056, y: 968.2015}
+    - {x: 2712.2373, y: 1001.5805}
+    - {x: 2712.2373, y: 999.82825}
+    - {x: 2889.1262, y: 1016.1006}
+    - {x: 2889.1262, y: 1014.3483}
+    - {x: 2585.31, y: 981.00604}
+    - {x: 2585.2185, y: 979.5494}
+    - {x: 2956.561, y: 970.4883}
+    - {x: 2738.6667, y: 1020.5319}
+    - {x: 2799.5425, y: 1013.9578}
+  - Id: map_05_03
+    Resource: World/Tiles/map_05_03/Content
+    SceneAddress: ffone/006ff1a310564194bb23120bdece88b8
+    X: 5
+    Z: 3
+    Minimum: {x: 2560, y: -10000, z: 1536}
+    Maximum: {x: 3072, y: 10000, z: 2048}
+    Visuals: 2314
+    Colliders: 1021
+    Animations: 267
+    Effects: 188
+    SourceVisuals: 2334
+    OverflowCenters:
+    - {x: 2748.4302, y: 2061.9253}
+    - {x: 2957.0645, y: 2049.0942}
+    - {x: 2957.0645, y: 2049.0942}
+  - Id: map_05_04
+    Resource: World/Tiles/map_05_04/Content
+    SceneAddress: ffone/a2c7f3eeb07a83f47814954dc2551d85
+    X: 5
+    Z: 4
+    Minimum: {x: 2560, y: -10000, z: 2048}
+    Maximum: {x: 3072, y: 10000, z: 2560}
+    Visuals: 1840
+    Colliders: 778
+    Animations: 248
+    Effects: 36
+    SourceVisuals: 1840
+    OverflowCenters:
+    - {x: 3114.8079, y: 2080.3967}
+    - {x: 3140.5168, y: 2080.3293}
+  - Id: map_05_05
+    Resource: World/Tiles/map_05_05/Content
+    SceneAddress: ffone/601e3b1c63922b6438d9a505ac4a99c9
+    X: 5
+    Z: 5
+    Minimum: {x: 2560, y: -10000, z: 2560}
+    Maximum: {x: 3072, y: 10000, z: 3072}
+    Visuals: 2571
+    Colliders: 1027
+    Animations: 310
+    Effects: 236
+    SourceVisuals: 2605
+    OverflowCenters: []
+  - Id: map_05_06
+    Resource: World/Tiles/map_05_06/Content
+    SceneAddress: ffone/0118aa4d51ad96a42899299fb1672c54
+    X: 5
+    Z: 6
+    Minimum: {x: 2560, y: -10000, z: 3072}
+    Maximum: {x: 3072, y: 10000, z: 3584}
+    Visuals: 801
+    Colliders: 469
+    Animations: 21
+    Effects: 5
+    SourceVisuals: 808
+    OverflowCenters: []
+  - Id: map_05_07
+    Resource: World/Tiles/map_05_07/Content
+    SceneAddress: ffone/181e7bbf838f62e4e8c5c123ed20e9ab
+    X: 5
+    Z: 7
+    Minimum: {x: 2560, y: -10000, z: 3584}
+    Maximum: {x: 3072, y: 10000, z: 4096}
+    Visuals: 2016
+    Colliders: 489
+    Animations: 163
+    Effects: 262
+    SourceVisuals: 2076
+    OverflowCenters:
+    - {x: 3091.1846, y: 3756.8462}
+    - {x: 3091.1846, y: 3756.8462}
+    - {x: 2665.1965, y: 4111.577}
+    - {x: 2665.1965, y: 4111.577}
+  - Id: map_05_09
+    Resource: World/Tiles/map_05_09/Content
+    SceneAddress: ffone/7793f8ff10b80a04ba4963d0d46171c6
+    X: 5
+    Z: 9
+    Minimum: {x: 2560, y: -10000, z: 4608}
+    Maximum: {x: 3072, y: 10000, z: 5120}
+    Visuals: 112
+    Colliders: 20
+    Animations: 43
+    Effects: 0
+    SourceVisuals: 116
+    OverflowCenters:
+    - {x: 2807.4514, y: 5132.6904}
+    - {x: 2807.4514, y: 5132.6904}
+    - {x: 2781.501, y: 5129.4844}
+    - {x: 2781.501, y: 5129.4844}
+    - {x: 2779.1648, y: 5124.7227}
+    - {x: 2779.1648, y: 5124.7227}
+    - {x: 2868.9688, y: 5128.588}
+    - {x: 2868.9688, y: 5126.233}
+    - {x: 2557.2075, y: 4797.77}
+    - {x: 2557.7043, y: 4794.6914}
+  - Id: map_05_10
+    Resource: World/Tiles/map_05_10/Content
+    SceneAddress: ffone/a001f7148db06c7458cfd9b29580791b
+    X: 5
+    Z: 10
+    Minimum: {x: 2560, y: -10000, z: 5120}
+    Maximum: {x: 3072, y: 10000, z: 5632}
+    Visuals: 1820
+    Colliders: 537
+    Animations: 133
+    Effects: 170
+    SourceVisuals: 1841
+    OverflowCenters:
+    - {x: 2953.4436, y: 5636.473}
+    - {x: 2953.4436, y: 5636.473}
+  - Id: map_05_11
+    Resource: World/Tiles/map_05_11/Content
+    SceneAddress: ffone/0a64c3e78ee9e304ea7e7c4824d953ae
+    X: 5
+    Z: 11
+    Minimum: {x: 2560, y: -10000, z: 5632}
+    Maximum: {x: 3072, y: 10000, z: 6144}
+    Visuals: 1096
+    Colliders: 631
+    Animations: 57
+    Effects: 139
+    SourceVisuals: 1098
+    OverflowCenters:
+    - {x: 2967.5122, y: 6144.3413}
+    - {x: 2940.1064, y: 5631.9365}
+    - {x: 2937.7917, y: 5631.983}
+  - Id: map_05_12
+    Resource: World/Tiles/map_05_12/Content
+    SceneAddress: ffone/1fad0ba7af7322143ae9229d5e2689a2
+    X: 5
+    Z: 12
+    Minimum: {x: 2560, y: -10000, z: 6144}
+    Maximum: {x: 3072, y: 10000, z: 6656}
+    Visuals: 1817
+    Colliders: 522
+    Animations: 215
+    Effects: 367
+    SourceVisuals: 1858
+    OverflowCenters: []
+  - Id: map_05_13
+    Resource: World/Tiles/map_05_13/Content
+    SceneAddress: ffone/9063c5723d7e84b47aae181e2a0942b2
+    X: 5
+    Z: 13
+    Minimum: {x: 2560, y: -10000, z: 6656}
+    Maximum: {x: 3072, y: 10000, z: 7168}
+    Visuals: 0
+    Colliders: 0
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 0
+    OverflowCenters: []
+  - Id: map_05_14
+    Resource: World/Tiles/map_05_14/Content
+    SceneAddress: ffone/eeb9a77dc8042c24a89fcb35d01e08ed
+    X: 5
+    Z: 14
+    Minimum: {x: 2560, y: -10000, z: 7168}
+    Maximum: {x: 3072, y: 10000, z: 7680}
+    Visuals: 0
+    Colliders: 0
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 0
+    OverflowCenters: []
+  - Id: map_06_01
+    Resource: World/Tiles/map_06_01/Content
+    SceneAddress: ffone/ade4bc7191200334cbe7bd8e704bd626
+    X: 6
+    Z: 1
+    Minimum: {x: 3072, y: -10000, z: 512}
+    Maximum: {x: 3584, y: 10000, z: 1024}
+    Visuals: 1
+    Colliders: 1
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 1
+    OverflowCenters: []
+  - Id: map_06_02
+    Resource: World/Tiles/map_06_02/Content
+    SceneAddress: ffone/ebb0a4790344b2f4aae637c8335dbddd
+    X: 6
+    Z: 2
+    Minimum: {x: 3072, y: -10000, z: 1024}
+    Maximum: {x: 3584, y: 10000, z: 1536}
+    Visuals: 1
+    Colliders: 1
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 1
+    OverflowCenters: []
+  - Id: map_06_03
+    Resource: World/Tiles/map_06_03/Content
+    SceneAddress: ffone/38002e69860275f4999bc5a968f072a4
+    X: 6
+    Z: 3
+    Minimum: {x: 3072, y: -10000, z: 1536}
+    Maximum: {x: 3584, y: 10000, z: 2048}
+    Visuals: 3352
+    Colliders: 941
+    Animations: 533
+    Effects: 437
+    SourceVisuals: 3393
+    OverflowCenters:
+    - {x: 3097.2502, y: 2068.0662}
+    - {x: 3097.2502, y: 2068.0662}
+    - {x: 3519.8694, y: 1519.8671}
+  - Id: map_06_04
+    Resource: World/Tiles/map_06_04/Content
+    SceneAddress: ffone/8237fff8e5d3f1a42909ecfe14b30ec7
+    X: 6
+    Z: 4
+    Minimum: {x: 3072, y: -10000, z: 2048}
+    Maximum: {x: 3584, y: 10000, z: 2560}
+    Visuals: 3976
+    Colliders: 1865
+    Animations: 446
+    Effects: 44
+    SourceVisuals: 3977
+    OverflowCenters:
+    - {x: 3592.0303, y: 2119.326}
+    - {x: 3592.0303, y: 2119.326}
+  - Id: map_06_05
+    Resource: World/Tiles/map_06_05/Content
+    SceneAddress: ffone/dc6b3c915a7da45499ecc1408c5fc81d
+    X: 6
+    Z: 5
+    Minimum: {x: 3072, y: -10000, z: 2560}
+    Maximum: {x: 3584, y: 10000, z: 3072}
+    Visuals: 3019
+    Colliders: 1590
+    Animations: 369
+    Effects: 38
+    SourceVisuals: 3020
+    OverflowCenters: []
+  - Id: map_06_06
+    Resource: World/Tiles/map_06_06/Content
+    SceneAddress: ffone/d2fababdcd790424fbf253418e8572ad
+    X: 6
+    Z: 6
+    Minimum: {x: 3072, y: -10000, z: 3072}
+    Maximum: {x: 3584, y: 10000, z: 3584}
+    Visuals: 1687
+    Colliders: 741
+    Animations: 142
+    Effects: 198
+    SourceVisuals: 1719
+    OverflowCenters:
+    - {x: 3194.151, y: 3007.518}
+    - {x: 3059.9954, y: 3250.7136}
+    - {x: 3052.1013, y: 3250.756}
+    - {x: 3064.7458, y: 3260.7493}
+  - Id: map_06_09
+    Resource: World/Tiles/map_06_09/Content
+    SceneAddress: ffone/6c300e5355b20274b982bb35cb671e0c
+    X: 6
+    Z: 9
+    Minimum: {x: 3072, y: -10000, z: 4608}
+    Maximum: {x: 3584, y: 10000, z: 5120}
+    Visuals: 6
+    Colliders: 2
+    Animations: 5
+    Effects: 0
+    SourceVisuals: 7
+    OverflowCenters: []
+  - Id: map_06_10
+    Resource: World/Tiles/map_06_10/Content
+    SceneAddress: ffone/d89d2936beddb0443812b0ffa4ae8bcb
+    X: 6
+    Z: 10
+    Minimum: {x: 3072, y: -10000, z: 5120}
+    Maximum: {x: 3584, y: 10000, z: 5632}
+    Visuals: 655
+    Colliders: 289
+    Animations: 23
+    Effects: 11
+    SourceVisuals: 658
+    OverflowCenters:
+    - {x: 3352, y: 5080}
+    - {x: 3352, y: 5080}
+    - {x: 3323.3877, y: 5071.0547}
+    - {x: 3368.9675, y: 5084.8853}
+    - {x: 3352, y: 5080}
+  - Id: map_06_11
+    Resource: World/Tiles/map_06_11/Content
+    SceneAddress: ffone/d897114f20ea0d34f9546e6b642b8876
+    X: 6
+    Z: 11
+    Minimum: {x: 3072, y: -10000, z: 5632}
+    Maximum: {x: 3584, y: 10000, z: 6144}
+    Visuals: 0
+    Colliders: 0
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 0
+    OverflowCenters: []
+  - Id: map_06_12
+    Resource: World/Tiles/map_06_12/Content
+    SceneAddress: ffone/a4dc23fd32bb1cc4eadd723148a88f6c
+    X: 6
+    Z: 12
+    Minimum: {x: 3072, y: -10000, z: 6144}
+    Maximum: {x: 3584, y: 10000, z: 6656}
+    Visuals: 0
+    Colliders: 0
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 0
+    OverflowCenters: []
+  - Id: map_06_13
+    Resource: World/Tiles/map_06_13/Content
+    SceneAddress: ffone/91e80a8ab5933df448b628d166eed291
+    X: 6
+    Z: 13
+    Minimum: {x: 3072, y: -10000, z: 6656}
+    Maximum: {x: 3584, y: 10000, z: 7168}
+    Visuals: 0
+    Colliders: 0
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 0
+    OverflowCenters: []
+  - Id: map_06_14
+    Resource: World/Tiles/map_06_14/Content
+    SceneAddress: ffone/3417767b2fcd93d44b3591d1d5584c1d
+    X: 6
+    Z: 14
+    Minimum: {x: 3072, y: -10000, z: 7168}
+    Maximum: {x: 3584, y: 10000, z: 7680}
+    Visuals: 79
+    Colliders: 66
+    Animations: 1
+    Effects: 20
+    SourceVisuals: 79
+    OverflowCenters: []
+  - Id: map_07_03
+    Resource: World/Tiles/map_07_03/Content
+    SceneAddress: ffone/91e927861ed9d984a876a0b7ffda3938
+    X: 7
+    Z: 3
+    Minimum: {x: 3584, y: -10000, z: 1536}
+    Maximum: {x: 4096, y: 10000, z: 2048}
+    Visuals: 1
+    Colliders: 1
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 1
+    OverflowCenters: []
+  - Id: map_07_04
+    Resource: World/Tiles/map_07_04/Content
+    SceneAddress: ffone/d1ddcd6042da773409bd2b157a6013e7
+    X: 7
+    Z: 4
+    Minimum: {x: 3584, y: -10000, z: 2048}
+    Maximum: {x: 4096, y: 10000, z: 2560}
+    Visuals: 1
+    Colliders: 1
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 1
+    OverflowCenters: []
+  - Id: map_07_05
+    Resource: World/Tiles/map_07_05/Content
+    SceneAddress: ffone/d88ad7f260d636f47be296dd470f67a9
+    X: 7
+    Z: 5
+    Minimum: {x: 3584, y: -10000, z: 2560}
+    Maximum: {x: 4096, y: 10000, z: 3072}
+    Visuals: 6
+    Colliders: 7
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 9
+    OverflowCenters:
+    - {x: 3572.971, y: 2779.9443}
+    - {x: 3572.971, y: 2779.9443}
+    - {x: 3572.848, y: 2779.9597}
+  - Id: map_07_06
+    Resource: World/Tiles/map_07_06/Content
+    SceneAddress: ffone/be8c1826db9e2ac488154458b6572098
+    X: 7
+    Z: 6
+    Minimum: {x: 3584, y: -10000, z: 3072}
+    Maximum: {x: 4096, y: 10000, z: 3584}
+    Visuals: 1137
+    Colliders: 589
+    Animations: 179
+    Effects: 3
+    SourceVisuals: 1160
+    OverflowCenters:
+    - {x: 3780.3342, y: 3599.5088}
+    - {x: 3785.7578, y: 3605.2546}
+    - {x: 3774.9934, y: 3593.6697}
+    - {x: 3769.5894, y: 3588.014}
+    - {x: 3791.1707, y: 3610.7795}
+    - {x: 3796.069, y: 3615.7969}
+    - {x: 3573.804, y: 3358.8738}
+    - {x: 3583.3286, y: 3401.2205}
+    - {x: 3568.263, y: 3353.2607}
+    - {x: 4105.9673, y: 3418.9146}
+    - {x: 4105.9673, y: 3418.9146}
+    - {x: 3923.0066, y: 3598.8806}
+    - {x: 3923.0066, y: 3598.8806}
+  - Id: map_07_07
+    Resource: World/Tiles/map_07_07/Content
+    SceneAddress: ffone/bb32a597ccd7cdf46a0deb52e716675b
+    X: 7
+    Z: 7
+    Minimum: {x: 3584, y: -10000, z: 3584}
+    Maximum: {x: 4096, y: 10000, z: 4096}
+    Visuals: 2113
+    Colliders: 786
+    Animations: 281
+    Effects: 223
+    SourceVisuals: 2148
+    OverflowCenters:
+    - {x: 3860.3992, y: 3464.7935}
+    - {x: 3860.3992, y: 3464.7935}
+    - {x: 4110.504, y: 3907.6218}
+  - Id: map_07_08
+    Resource: World/Tiles/map_07_08/Content
+    SceneAddress: ffone/fcc8de1e9d707d344bef7251439a5155
+    X: 7
+    Z: 8
+    Minimum: {x: 3584, y: -10000, z: 4096}
+    Maximum: {x: 4096, y: 10000, z: 4608}
+    Visuals: 1545
+    Colliders: 901
+    Animations: 131
+    Effects: 23
+    SourceVisuals: 1571
+    OverflowCenters: []
+  - Id: map_07_09
+    Resource: World/Tiles/map_07_09/Content
+    SceneAddress: ffone/77418d4468fcba9489daf8bd371b00f1
+    X: 7
+    Z: 9
+    Minimum: {x: 3584, y: -10000, z: 4608}
+    Maximum: {x: 4096, y: 10000, z: 5120}
+    Visuals: 11
+    Colliders: 3
+    Animations: 5
+    Effects: 0
+    SourceVisuals: 13
+    OverflowCenters: []
+  - Id: map_07_10
+    Resource: World/Tiles/map_07_10/Content
+    SceneAddress: ffone/efdcc89996d51be40bc014cfb552ae5b
+    X: 7
+    Z: 10
+    Minimum: {x: 3584, y: -10000, z: 5120}
+    Maximum: {x: 4096, y: 10000, z: 5632}
+    Visuals: 13
+    Colliders: 1
+    Animations: 6
+    Effects: 0
+    SourceVisuals: 13
+    OverflowCenters: []
+  - Id: map_07_13
+    Resource: World/Tiles/map_07_13/Content
+    SceneAddress: ffone/77cf5db320d21264aaa5b2988bcf296e
+    X: 7
+    Z: 13
+    Minimum: {x: 3584, y: -10000, z: 6656}
+    Maximum: {x: 4096, y: 10000, z: 7168}
+    Visuals: 68
+    Colliders: 11
+    Animations: 30
+    Effects: 0
+    SourceVisuals: 71
+    OverflowCenters: []
+  - Id: map_07_14
+    Resource: World/Tiles/map_07_14/Content
+    SceneAddress: ffone/a0b7f67ec1d6e3b4cba48ce0c730f189
+    X: 7
+    Z: 14
+    Minimum: {x: 3584, y: -10000, z: 7168}
+    Maximum: {x: 4096, y: 10000, z: 7680}
+    Visuals: 50
+    Colliders: 20
+    Animations: 18
+    Effects: 0
+    SourceVisuals: 54
+    OverflowCenters: []
+  - Id: map_08_05
+    Resource: World/Tiles/map_08_05/Content
+    SceneAddress: ffone/e6f6e5c6bfc28ca4da5f4b5d163089e2
+    X: 8
+    Z: 5
+    Minimum: {x: 4096, y: -10000, z: 2560}
+    Maximum: {x: 4608, y: 10000, z: 3072}
+    Visuals: 1
+    Colliders: 2
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 2
+    OverflowCenters: []
+  - Id: map_08_06
+    Resource: World/Tiles/map_08_06/Content
+    SceneAddress: ffone/0014d9ecd26137b43857fb3384de906c
+    X: 8
+    Z: 6
+    Minimum: {x: 4096, y: -10000, z: 3072}
+    Maximum: {x: 4608, y: 10000, z: 3584}
+    Visuals: 1793
+    Colliders: 706
+    Animations: 250
+    Effects: 146
+    SourceVisuals: 1825
+    OverflowCenters:
+    - {x: 4375, y: 3031}
+    - {x: 4306, y: 3040}
+    - {x: 4338, y: 3052}
+    - {x: 4436.092, y: 3031.9792}
+    - {x: 4186.092, y: 3031.9792}
+    - {x: 4266.092, y: 2981.9792}
+    - {x: 4266.092, y: 2981.9792}
+    - {x: 4436.092, y: 3031.9792}
+    - {x: 4338, y: 3052}
+  - Id: map_08_07
+    Resource: World/Tiles/map_08_07/Content
+    SceneAddress: ffone/fe610eda4bd5a624fbbecd1fd970def8
+    X: 8
+    Z: 7
+    Minimum: {x: 4096, y: -10000, z: 3584}
+    Maximum: {x: 4608, y: 10000, z: 4096}
+    Visuals: 1720
+    Colliders: 1005
+    Animations: 206
+    Effects: 11
+    SourceVisuals: 1733
+    OverflowCenters: []
+  - Id: map_08_08
+    Resource: World/Tiles/map_08_08/Content
+    SceneAddress: ffone/43467ac738b98f14c884b74614198702
+    X: 8
+    Z: 8
+    Minimum: {x: 4096, y: -10000, z: 4096}
+    Maximum: {x: 4608, y: 10000, z: 4608}
+    Visuals: 0
+    Colliders: 0
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 0
+    OverflowCenters: []
+  - Id: map_08_09
+    Resource: World/Tiles/map_08_09/Content
+    SceneAddress: ffone/2a717eb62aade7e4ea46bc6ea07869f3
+    X: 8
+    Z: 9
+    Minimum: {x: 4096, y: -10000, z: 4608}
+    Maximum: {x: 4608, y: 10000, z: 5120}
+    Visuals: 0
+    Colliders: 0
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 0
+    OverflowCenters: []
+  - Id: map_08_10
+    Resource: World/Tiles/map_08_10/Content
+    SceneAddress: ffone/40b7e5dbb38842046adf4af40e6dcb49
+    X: 8
+    Z: 10
+    Minimum: {x: 4096, y: -10000, z: 5120}
+    Maximum: {x: 4608, y: 10000, z: 5632}
+    Visuals: 0
+    Colliders: 0
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 0
+    OverflowCenters: []
+  - Id: map_08_11
+    Resource: World/Tiles/map_08_11/Content
+    SceneAddress: ffone/2c426cf5a169bba4d808d233d4757612
+    X: 8
+    Z: 11
+    Minimum: {x: 4096, y: -10000, z: 5632}
+    Maximum: {x: 4608, y: 10000, z: 6144}
+    Visuals: 1
+    Colliders: 1
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 1
+    OverflowCenters: []
+  - Id: map_08_12
+    Resource: World/Tiles/map_08_12/Content
+    SceneAddress: ffone/9f72a7b8d025e5541928a5a992b9d1df
+    X: 8
+    Z: 12
+    Minimum: {x: 4096, y: -10000, z: 6144}
+    Maximum: {x: 4608, y: 10000, z: 6656}
+    Visuals: 0
+    Colliders: 0
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 0
+    OverflowCenters: []
+  - Id: map_08_13
+    Resource: World/Tiles/map_08_13/Content
+    SceneAddress: ffone/df952b37839589f449be941d78f3f257
+    X: 8
+    Z: 13
+    Minimum: {x: 4096, y: -10000, z: 6656}
+    Maximum: {x: 4608, y: 10000, z: 7168}
+    Visuals: 1045
+    Colliders: 304
+    Animations: 75
+    Effects: 257
+    SourceVisuals: 1083
+    OverflowCenters:
+    - {x: 4696.945, y: 7032.52}
+    - {x: 4696.945, y: 7032.52}
+  - Id: map_08_14
+    Resource: World/Tiles/map_08_14/Content
+    SceneAddress: ffone/8460501fbf6702846b194d10c7e2408f
+    X: 8
+    Z: 14
+    Minimum: {x: 4096, y: -10000, z: 7168}
+    Maximum: {x: 4608, y: 10000, z: 7680}
+    Visuals: 264
+    Colliders: 135
+    Animations: 42
+    Effects: 27
+    SourceVisuals: 266
+    OverflowCenters:
+    - {x: 4093.6091, y: 7205.147}
+    - {x: 4093.598, y: 7179.2544}
+    - {x: 4081.0596, y: 7157.539}
+    - {x: 4086.703, y: 7203.1543}
+  - Id: map_09_06
+    Resource: World/Tiles/map_09_06/Content
+    SceneAddress: ffone/7362eedfcfc63944f8876aaf17fcf977
+    X: 9
+    Z: 6
+    Minimum: {x: 4608, y: -10000, z: 3072}
+    Maximum: {x: 5120, y: 10000, z: 3584}
+    Visuals: 2242
+    Colliders: 901
+    Animations: 157
+    Effects: 463
+    SourceVisuals: 2305
+    OverflowCenters: []
+  - Id: map_09_07
+    Resource: World/Tiles/map_09_07/Content
+    SceneAddress: ffone/1f17e3eb3432a6a45a1d91a6551b4804
+    X: 9
+    Z: 7
+    Minimum: {x: 4608, y: -10000, z: 3584}
+    Maximum: {x: 5120, y: 10000, z: 4096}
+    Visuals: 1593
+    Colliders: 741
+    Animations: 135
+    Effects: 157
+    SourceVisuals: 1637
+    OverflowCenters:
+    - {x: 4560.2295, y: 4113.669}
+    - {x: 4560.2295, y: 4113.669}
+    - {x: 4587.9375, y: 4010.3865}
+    - {x: 4587.9375, y: 4010.3865}
+    - {x: 4605.2354, y: 4076.1074}
+    - {x: 4605.2354, y: 4076.1074}
+  - Id: map_09_08
+    Resource: World/Tiles/map_09_08/Content
+    SceneAddress: ffone/1950eea5f3e41254d90252d3864139cd
+    X: 9
+    Z: 8
+    Minimum: {x: 4608, y: -10000, z: 4096}
+    Maximum: {x: 5120, y: 10000, z: 4608}
+    Visuals: 1394
+    Colliders: 789
+    Animations: 101
+    Effects: 3
+    SourceVisuals: 1436
+    OverflowCenters:
+    - {x: 5125.918, y: 4443.705}
+    - {x: 5125.918, y: 4443.705}
+    - {x: 4705.5996, y: 4632.257}
+    - {x: 4705.5996, y: 4632.257}
+  - Id: map_09_09
+    Resource: World/Tiles/map_09_09/Content
+    SceneAddress: ffone/b45be1d52fe20dc46b61e9e3c78b1d15
+    X: 9
+    Z: 9
+    Minimum: {x: 4608, y: -10000, z: 4608}
+    Maximum: {x: 5120, y: 10000, z: 5120}
+    Visuals: 567
+    Colliders: 412
+    Animations: 16
+    Effects: 22
+    SourceVisuals: 586
+    OverflowCenters:
+    - {x: 4934.661, y: 5157.754}
+    - {x: 4934.6587, y: 5157.807}
+    - {x: 5120.793, y: 5029.4336}
+    - {x: 5120.793, y: 5029.4336}
+    - {x: 5120.343, y: 5028.035}
+    - {x: 5120.2896, y: 5027.755}
+    - {x: 4849.4463, y: 5136.6963}
+    - {x: 4849.4463, y: 5136.6963}
+    - {x: 5065.645, y: 5128.835}
+    - {x: 5065.645, y: 5128.835}
+  - Id: map_09_10
+    Resource: World/Tiles/map_09_10/Content
+    SceneAddress: ffone/ca9a9e0d08bd70040b499f832ce527fd
+    X: 9
+    Z: 10
+    Minimum: {x: 4608, y: -10000, z: 5120}
+    Maximum: {x: 5120, y: 10000, z: 5632}
+    Visuals: 642
+    Colliders: 420
+    Animations: 4
+    Effects: 23
+    SourceVisuals: 652
+    OverflowCenters:
+    - {x: 5147.198, y: 5487.44}
+    - {x: 5147.198, y: 5487.44}
+  - Id: map_09_11
+    Resource: World/Tiles/map_09_11/Content
+    SceneAddress: ffone/d2e42d996b40af8468f8813c93132836
+    X: 9
+    Z: 11
+    Minimum: {x: 4608, y: -10000, z: 5632}
+    Maximum: {x: 5120, y: 10000, z: 6144}
+    Visuals: 1901
+    Colliders: 525
+    Animations: 115
+    Effects: 211
+    SourceVisuals: 1946
+    OverflowCenters:
+    - {x: 4758.3115, y: 6176.687}
+    - {x: 4758.3115, y: 6176.687}
+    - {x: 5248.534, y: 5803.891}
+    - {x: 5248.559, y: 5803.905}
+  - Id: map_09_12
+    Resource: World/Tiles/map_09_12/Content
+    SceneAddress: ffone/1cb83a5db9861fb49963de6599f2818a
+    X: 9
+    Z: 12
+    Minimum: {x: 4608, y: -10000, z: 6144}
+    Maximum: {x: 5120, y: 10000, z: 6656}
+    Visuals: 1051
+    Colliders: 441
+    Animations: 99
+    Effects: 31
+    SourceVisuals: 1054
+    OverflowCenters:
+    - {x: 5096.074, y: 6746.733}
+    - {x: 5096.074, y: 6746.733}
+    - {x: 5093.8804, y: 6743.131}
+    - {x: 5094.0645, y: 6743.4453}
+    - {x: 5093.2734, y: 6742.271}
+    - {x: 5093.09, y: 6741.956}
+    - {x: 5094.9487, y: 6744.76}
+    - {x: 5094.765, y: 6744.4453}
+    - {x: 4793.232, y: 6143.892}
+    - {x: 4849.2954, y: 6143.989}
+    - {x: 5053.304, y: 6143.919}
+    - {x: 5121.083, y: 6148.642}
+    - {x: 4602.5376, y: 6546.4736}
+    - {x: 4602.5376, y: 6546.4736}
+    - {x: 4599.675, y: 6520.5757}
+    - {x: 4599.675, y: 6520.5757}
+    - {x: 4606.1694, y: 6530.365}
+    - {x: 4606.1694, y: 6530.365}
+    - {x: 5121.055, y: 6159.4756}
+    - {x: 5121.055, y: 6159.4756}
+    - {x: 5121.055, y: 6159.4756}
+    - {x: 5121.055, y: 6159.4756}
+    - {x: 5121.055, y: 6159.4756}
+  - Id: map_09_13
+    Resource: World/Tiles/map_09_13/Content
+    SceneAddress: ffone/8d564b1b579821e4b8151b2dbd00a280
+    X: 9
+    Z: 13
+    Minimum: {x: 4608, y: -10000, z: 6656}
+    Maximum: {x: 5120, y: 10000, z: 7168}
+    Visuals: 440
+    Colliders: 172
+    Animations: 7
+    Effects: 25
+    SourceVisuals: 441
+    OverflowCenters:
+    - {x: 4821.6255, y: 6493.3438}
+    - {x: 4821.6255, y: 6493.3438}
+    - {x: 4780.1187, y: 6498.976}
+    - {x: 4780.1187, y: 6498.976}
+    - {x: 4701.851, y: 6483.828}
+    - {x: 4728.6167, y: 6508.291}
+    - {x: 4725.1763, y: 6482.0596}
+  - Id: map_09_14
+    Resource: World/Tiles/map_09_14/Content
+    SceneAddress: ffone/b75b42ae13629a449837cbe6854dd99a
+    X: 9
+    Z: 14
+    Minimum: {x: 4608, y: -10000, z: 7168}
+    Maximum: {x: 5120, y: 10000, z: 7680}
+    Visuals: 212
+    Colliders: 134
+    Animations: 24
+    Effects: 16
+    SourceVisuals: 214
+    OverflowCenters:
+    - {x: 4861.659, y: 7155.9263}
+    - {x: 5116.9897, y: 7166.6904}
+    - {x: 5121.4414, y: 7181.8545}
+    - {x: 4607.943, y: 7182.947}
+  - Id: map_10_00
+    Resource: World/Tiles/map_10_00/Content
+    SceneAddress: ffone/4ba7f3ae04275a34f806f3a768e98db6
+    X: 10
+    Z: 0
+    Minimum: {x: 5120, y: -10000, z: 0}
+    Maximum: {x: 5632, y: 10000, z: 512}
+    Visuals: 4
+    Colliders: 2
+    Animations: 1
+    Effects: 0
+    SourceVisuals: 4
+    OverflowCenters: []
+  - Id: map_10_01
+    Resource: World/Tiles/map_10_01/Content
+    SceneAddress: ffone/3af7f4d6e09df954e88bd2ccd06dc106
+    X: 10
+    Z: 1
+    Minimum: {x: 5120, y: -10000, z: 512}
+    Maximum: {x: 5632, y: 10000, z: 1024}
+    Visuals: 2
+    Colliders: 2
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 2
+    OverflowCenters: []
+  - Id: map_10_02
+    Resource: World/Tiles/map_10_02/Content
+    SceneAddress: ffone/f482be252d49e344481f10734e511b6b
+    X: 10
+    Z: 2
+    Minimum: {x: 5120, y: -10000, z: 1024}
+    Maximum: {x: 5632, y: 10000, z: 1536}
+    Visuals: 4
+    Colliders: 2
+    Animations: 1
+    Effects: 0
+    SourceVisuals: 4
+    OverflowCenters: []
+  - Id: map_10_07
+    Resource: World/Tiles/map_10_07/Content
+    SceneAddress: ffone/d451a0c1c4b0f9c4bab4613d10fc76b7
+    X: 10
+    Z: 7
+    Minimum: {x: 5120, y: -10000, z: 3584}
+    Maximum: {x: 5632, y: 10000, z: 4096}
+    Visuals: 8
+    Colliders: 9
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 13
+    OverflowCenters:
+    - {x: 5595.2285, y: 4102.202}
+    - {x: 5595.2285, y: 4102.202}
+    - {x: 5539.5684, y: 4104.3877}
+    - {x: 5539.5684, y: 4104.3877}
+  - Id: map_10_08
+    Resource: World/Tiles/map_10_08/Content
+    SceneAddress: ffone/1479f8ee9fa6d5d479f62246ee29fa8d
+    X: 10
+    Z: 8
+    Minimum: {x: 5120, y: -10000, z: 4096}
+    Maximum: {x: 5632, y: 10000, z: 4608}
+    Visuals: 775
+    Colliders: 480
+    Animations: 8
+    Effects: 22
+    SourceVisuals: 807
+    OverflowCenters:
+    - {x: 5454.308, y: 4610.998}
+    - {x: 5454.3423, y: 4611.048}
+    - {x: 5422.8096, y: 4635.197}
+    - {x: 5422.837, y: 4635.2236}
+  - Id: map_10_09
+    Resource: World/Tiles/map_10_09/Content
+    SceneAddress: ffone/7fbac70b812d26445a9cbe0bee7da7c2
+    X: 10
+    Z: 9
+    Minimum: {x: 5120, y: -10000, z: 4608}
+    Maximum: {x: 5632, y: 10000, z: 5120}
+    Visuals: 1599
+    Colliders: 530
+    Animations: 64
+    Effects: 151
+    SourceVisuals: 1633
+    OverflowCenters:
+    - {x: 5113.852, y: 4737.644}
+    - {x: 5113.852, y: 4737.644}
+  - Id: map_10_10
+    Resource: World/Tiles/map_10_10/Content
+    SceneAddress: ffone/998907e4c4af8f64e862fff3338ad6fc
+    X: 10
+    Z: 10
+    Minimum: {x: 5120, y: -10000, z: 5120}
+    Maximum: {x: 5632, y: 10000, z: 5632}
+    Visuals: 1747
+    Colliders: 774
+    Animations: 111
+    Effects: 193
+    SourceVisuals: 1766
+    OverflowCenters:
+    - {x: 5373.4326, y: 5705.9062}
+    - {x: 5373.4243, y: 5705.876}
+    - {x: 5402.282, y: 5911.24}
+    - {x: 5402.2993, y: 5911.427}
+    - {x: 5402.218, y: 5910.85}
+    - {x: 5402.201, y: 5910.6636}
+    - {x: 5402.39, y: 5912.0723}
+    - {x: 5402.373, y: 5911.8857}
+    - {x: 5448.0776, y: 5099.4717}
+    - {x: 5448.029, y: 5099.4688}
+    - {x: 5580.899, y: 4838.291}
+    - {x: 5581.0195, y: 4838.047}
+    - {x: 5580.647, y: 4838.781}
+    - {x: 5580.526, y: 4839.025}
+    - {x: 5581.437, y: 4837.226}
+    - {x: 5581.3164, y: 4837.47}
+  - Id: map_10_11
+    Resource: World/Tiles/map_10_11/Content
+    SceneAddress: ffone/d3356dbe6efb44b46a03149bd82cf444
+    X: 10
+    Z: 11
+    Minimum: {x: 5120, y: -10000, z: 5632}
+    Maximum: {x: 5632, y: 10000, z: 6144}
+    Visuals: 1069
+    Colliders: 553
+    Animations: 61
+    Effects: 14
+    SourceVisuals: 1070
+    OverflowCenters: []
+  - Id: map_10_12
+    Resource: World/Tiles/map_10_12/Content
+    SceneAddress: ffone/755d607627fb5804ca4634bd17ecc114
+    X: 10
+    Z: 12
+    Minimum: {x: 5120, y: -10000, z: 6144}
+    Maximum: {x: 5632, y: 10000, z: 6656}
+    Visuals: 0
+    Colliders: 0
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 0
+    OverflowCenters: []
+  - Id: map_10_13
+    Resource: World/Tiles/map_10_13/Content
+    SceneAddress: ffone/91fc887d26ac43743b9220637eda022f
+    X: 10
+    Z: 13
+    Minimum: {x: 5120, y: -10000, z: 6656}
+    Maximum: {x: 5632, y: 10000, z: 7168}
+    Visuals: 1
+    Colliders: 5
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 5
+    OverflowCenters: []
+  - Id: map_10_14
+    Resource: World/Tiles/map_10_14/Content
+    SceneAddress: ffone/a9a0472d5fc1c214ebd6a8fc73b43d48
+    X: 10
+    Z: 14
+    Minimum: {x: 5120, y: -10000, z: 7168}
+    Maximum: {x: 5632, y: 10000, z: 7680}
+    Visuals: 96
+    Colliders: 31
+    Animations: 9
+    Effects: 0
+    SourceVisuals: 98
+    OverflowCenters:
+    - {x: 5493.1377, y: 7161.8677}
+  - Id: map_11_00
+    Resource: World/Tiles/map_11_00/Content
+    SceneAddress: ffone/4be66edfe98489148b50f056ea4a4327
+    X: 11
+    Z: 0
+    Minimum: {x: 5632, y: -10000, z: 0}
+    Maximum: {x: 6144, y: 10000, z: 512}
+    Visuals: 4
+    Colliders: 2
+    Animations: 1
+    Effects: 0
+    SourceVisuals: 4
+    OverflowCenters: []
+  - Id: map_11_01
+    Resource: World/Tiles/map_11_01/Content
+    SceneAddress: ffone/c56cbba0ffbca7e41a832017a2010f87
+    X: 11
+    Z: 1
+    Minimum: {x: 5632, y: -10000, z: 512}
+    Maximum: {x: 6144, y: 10000, z: 1024}
+    Visuals: 2157
+    Colliders: 757
+    Animations: 124
+    Effects: 104
+    SourceVisuals: 2282
+    OverflowCenters:
+    - {x: 6174.6484, y: 884.08594}
+    - {x: 6174.6484, y: 884.08594}
+  - Id: map_11_02
+    Resource: World/Tiles/map_11_02/Content
+    SceneAddress: ffone/b1f530ebe16090945ab727e0c16459d0
+    X: 11
+    Z: 2
+    Minimum: {x: 5632, y: -10000, z: 1024}
+    Maximum: {x: 6144, y: 10000, z: 1536}
+    Visuals: 4
+    Colliders: 2
+    Animations: 1
+    Effects: 0
+    SourceVisuals: 4
+    OverflowCenters: []
+  - Id: map_11_03
+    Resource: World/Tiles/map_11_03/Content
+    SceneAddress: ffone/fd73e4dae1fe369449d1d250e6e332b1
+    X: 11
+    Z: 3
+    Minimum: {x: 5632, y: -10000, z: 1536}
+    Maximum: {x: 6144, y: 10000, z: 2048}
+    Visuals: 4
+    Colliders: 2
+    Animations: 1
+    Effects: 0
+    SourceVisuals: 4
+    OverflowCenters: []
+  - Id: map_11_04
+    Resource: World/Tiles/map_11_04/Content
+    SceneAddress: ffone/d705bdcd31eb2dd46b142ba41882c4cc
+    X: 11
+    Z: 4
+    Minimum: {x: 5632, y: -10000, z: 2048}
+    Maximum: {x: 6144, y: 10000, z: 2560}
+    Visuals: 4
+    Colliders: 2
+    Animations: 1
+    Effects: 0
+    SourceVisuals: 4
+    OverflowCenters: []
+  - Id: map_11_06
+    Resource: World/Tiles/map_11_06/Content
+    SceneAddress: ffone/b55da863de9301f47b663367bc77c307
+    X: 11
+    Z: 6
+    Minimum: {x: 5632, y: -10000, z: 3072}
+    Maximum: {x: 6144, y: 10000, z: 3584}
+    Visuals: 0
+    Colliders: 1
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 1
+    OverflowCenters: []
+  - Id: map_11_07
+    Resource: World/Tiles/map_11_07/Content
+    SceneAddress: ffone/33c2507d0fe0cd642819a0720a44a16f
+    X: 11
+    Z: 7
+    Minimum: {x: 5632, y: -10000, z: 3584}
+    Maximum: {x: 6144, y: 10000, z: 4096}
+    Visuals: 344
+    Colliders: 202
+    Animations: 4
+    Effects: 22
+    SourceVisuals: 345
+    OverflowCenters: []
+  - Id: map_11_08
+    Resource: World/Tiles/map_11_08/Content
+    SceneAddress: ffone/f1ab4c46901ec6b489a2c0a3e8e0478a
+    X: 11
+    Z: 8
+    Minimum: {x: 5632, y: -10000, z: 4096}
+    Maximum: {x: 6144, y: 10000, z: 4608}
+    Visuals: 524
+    Colliders: 342
+    Animations: 4
+    Effects: 7
+    SourceVisuals: 524
+    OverflowCenters:
+    - {x: 5792.371, y: 4093.919}
+    - {x: 5792.371, y: 4093.919}
+  - Id: map_11_09
+    Resource: World/Tiles/map_11_09/Content
+    SceneAddress: ffone/22a39c8ad17ca2f439c5c31d07746f70
+    X: 11
+    Z: 9
+    Minimum: {x: 5632, y: -10000, z: 4608}
+    Maximum: {x: 6144, y: 10000, z: 5120}
+    Visuals: 740
+    Colliders: 369
+    Animations: 2
+    Effects: 16
+    SourceVisuals: 741
+    OverflowCenters:
+    - {x: 6145.466, y: 4966.0776}
+    - {x: 5630.595, y: 5120.546}
+  - Id: map_11_10
+    Resource: World/Tiles/map_11_10/Content
+    SceneAddress: ffone/23e9838c04e507046be3cd31e4d889bb
+    X: 11
+    Z: 10
+    Minimum: {x: 5632, y: -10000, z: 5120}
+    Maximum: {x: 6144, y: 10000, z: 5632}
+    Visuals: 1155
+    Colliders: 563
+    Animations: 2
+    Effects: 27
+    SourceVisuals: 1155
+    OverflowCenters:
+    - {x: 6010.1763, y: 5806.625}
+    - {x: 6010.195, y: 5806.6587}
+  - Id: map_11_11
+    Resource: World/Tiles/map_11_11/Content
+    SceneAddress: ffone/0eb0853bb0df2a14e9a75a2895c1762f
+    X: 11
+    Z: 11
+    Minimum: {x: 5632, y: -10000, z: 5632}
+    Maximum: {x: 6144, y: 10000, z: 6144}
+    Visuals: 1740
+    Colliders: 550
+    Animations: 106
+    Effects: 176
+    SourceVisuals: 1766
+    OverflowCenters:
+    - {x: 5507.8545, y: 5581.94}
+    - {x: 5507.822, y: 5581.911}
+    - {x: 5858.0127, y: 5631.1797}
+    - {x: 5733.4185, y: 5631.886}
+    - {x: 5726.4634, y: 5631.0723}
+    - {x: 6044.7188, y: 5631.607}
+    - {x: 5627.1763, y: 5631.779}
+    - {x: 5628.683, y: 5630.3916}
+  - Id: map_11_12
+    Resource: World/Tiles/map_11_12/Content
+    SceneAddress: ffone/78b91ba156a16c2459cb07c4ae1c6a96
+    X: 11
+    Z: 12
+    Minimum: {x: 5632, y: -10000, z: 6144}
+    Maximum: {x: 6144, y: 10000, z: 6656}
+    Visuals: 0
+    Colliders: 0
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 0
+    OverflowCenters: []
+  - Id: map_12_00
+    Resource: World/Tiles/map_12_00/Content
+    SceneAddress: ffone/2cf2a24b07445a449833136c2ef02d3f
+    X: 12
+    Z: 0
+    Minimum: {x: 6144, y: -10000, z: 0}
+    Maximum: {x: 6656, y: 10000, z: 512}
+    Visuals: 4
+    Colliders: 2
+    Animations: 1
+    Effects: 0
+    SourceVisuals: 4
+    OverflowCenters: []
+  - Id: map_12_01
+    Resource: World/Tiles/map_12_01/Content
+    SceneAddress: ffone/31f1cf35752378f47b923379e3ca51f8
+    X: 12
+    Z: 1
+    Minimum: {x: 6144, y: -10000, z: 512}
+    Maximum: {x: 6656, y: 10000, z: 1024}
+    Visuals: 1303
+    Colliders: 723
+    Animations: 189
+    Effects: 17
+    SourceVisuals: 1367
+    OverflowCenters:
+    - {x: 6664.8335, y: 858.9144}
+    - {x: 6664.8335, y: 858.9144}
+    - {x: 6639.4985, y: 1055.5897}
+    - {x: 6639.4985, y: 1055.5897}
+    - {x: 6483.9443, y: 1024.0449}
+  - Id: map_12_02
+    Resource: World/Tiles/map_12_02/Content
+    SceneAddress: ffone/d3a6c27c44b7e6b45a7ee84e2f602f14
+    X: 12
+    Z: 2
+    Minimum: {x: 6144, y: -10000, z: 1024}
+    Maximum: {x: 6656, y: 10000, z: 1536}
+    Visuals: 1752
+    Colliders: 768
+    Animations: 259
+    Effects: 107
+    SourceVisuals: 1818
+    OverflowCenters:
+    - {x: 6419.9907, y: 904.96533}
+    - {x: 6419.9907, y: 904.96533}
+  - Id: map_12_03
+    Resource: World/Tiles/map_12_03/Content
+    SceneAddress: ffone/8717b2991b04643429898655c17aa57e
+    X: 12
+    Z: 3
+    Minimum: {x: 6144, y: -10000, z: 1536}
+    Maximum: {x: 6656, y: 10000, z: 2048}
+    Visuals: 1625
+    Colliders: 824
+    Animations: 256
+    Effects: 54
+    SourceVisuals: 1727
+    OverflowCenters: []
+  - Id: map_12_04
+    Resource: World/Tiles/map_12_04/Content
+    SceneAddress: ffone/d5722c056a72fd74cb50b3c3192aeaf5
+    X: 12
+    Z: 4
+    Minimum: {x: 6144, y: -10000, z: 2048}
+    Maximum: {x: 6656, y: 10000, z: 2560}
+    Visuals: 4
+    Colliders: 2
+    Animations: 1
+    Effects: 0
+    SourceVisuals: 4
+    OverflowCenters: []
+  - Id: map_12_07
+    Resource: World/Tiles/map_12_07/Content
+    SceneAddress: ffone/c4d4f1d7f72b3974693d096b6582e57e
+    X: 12
+    Z: 7
+    Minimum: {x: 6144, y: -10000, z: 3584}
+    Maximum: {x: 6656, y: 10000, z: 4096}
+    Visuals: 0
+    Colliders: 1
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 1
+    OverflowCenters: []
+  - Id: map_12_08
+    Resource: World/Tiles/map_12_08/Content
+    SceneAddress: ffone/58a632a60bcca344aa2c83efb9512a90
+    X: 12
+    Z: 8
+    Minimum: {x: 6144, y: -10000, z: 4096}
+    Maximum: {x: 6656, y: 10000, z: 4608}
+    Visuals: 100
+    Colliders: 55
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 102
+    OverflowCenters:
+    - {x: 6122.232, y: 4388.7163}
+    - {x: 6122.232, y: 4388.7163}
+  - Id: map_12_09
+    Resource: World/Tiles/map_12_09/Content
+    SceneAddress: ffone/668d8cef54e52254d88f9505bc0588d5
+    X: 12
+    Z: 9
+    Minimum: {x: 6144, y: -10000, z: 4608}
+    Maximum: {x: 6656, y: 10000, z: 5120}
+    Visuals: 480
+    Colliders: 266
+    Animations: 5
+    Effects: 5
+    SourceVisuals: 480
+    OverflowCenters:
+    - {x: 5960.475, y: 4798.319}
+    - {x: 5960.442, y: 4798.3}
+  - Id: map_12_10
+    Resource: World/Tiles/map_12_10/Content
+    SceneAddress: ffone/6da61d694239ef846bacde1c334c4cc8
+    X: 12
+    Z: 10
+    Minimum: {x: 6144, y: -10000, z: 5120}
+    Maximum: {x: 6656, y: 10000, z: 5632}
+    Visuals: 1552
+    Colliders: 348
+    Animations: 154
+    Effects: 228
+    SourceVisuals: 1580
+    OverflowCenters:
+    - {x: 6031.668, y: 5280.635}
+    - {x: 6031.6494, y: 5280.6387}
+    - {x: 6139.166, y: 5347.0376}
+    - {x: 6133.2393, y: 5349.8335}
+    - {x: 6139.421, y: 5348.552}
+    - {x: 6128.3906, y: 5343.7114}
+  - Id: map_12_11
+    Resource: World/Tiles/map_12_11/Content
+    SceneAddress: ffone/6af9a26db45e990419a3c8a67dfdf513
+    X: 12
+    Z: 11
+    Minimum: {x: 6144, y: -10000, z: 5632}
+    Maximum: {x: 6656, y: 10000, z: 6144}
+    Visuals: 67
+    Colliders: 2
+    Animations: 33
+    Effects: 0
+    SourceVisuals: 68
+    OverflowCenters:
+    - {x: 6219.454, y: 5625.1997}
+    - {x: 6220.241, y: 5626.479}
+  - Id: map_12_12
+    Resource: World/Tiles/map_12_12/Content
+    SceneAddress: ffone/b3ae6a7430a957040950348157d8b78b
+    X: 12
+    Z: 12
+    Minimum: {x: 6144, y: -10000, z: 6144}
+    Maximum: {x: 6656, y: 10000, z: 6656}
+    Visuals: 37
+    Colliders: 2
+    Animations: 18
+    Effects: 0
+    SourceVisuals: 38
+    OverflowCenters:
+    - {x: 6219.454, y: 6137.1997}
+    - {x: 6220.241, y: 6138.479}
+  - Id: map_12_13
+    Resource: World/Tiles/map_12_13/Content
+    SceneAddress: ffone/82437b63ed7092544b433f93faeb6a57
+    X: 12
+    Z: 13
+    Minimum: {x: 6144, y: -10000, z: 6656}
+    Maximum: {x: 6656, y: 10000, z: 7168}
+    Visuals: 2719
+    Colliders: 1301
+    Animations: 472
+    Effects: 3
+    SourceVisuals: 2738
+    OverflowCenters:
+    - {x: 6034.6, y: 6519.84}
+    - {x: 6157.626, y: 6131.6523}
+    - {x: 6164.2144, y: 6208.1406}
+    - {x: 5788.483, y: 6229.627}
+    - {x: 5822.8335, y: 6222.5913}
+  - Id: map_12_14
+    Resource: World/Tiles/map_12_14/Content
+    SceneAddress: ffone/69f704f6a036b0345959029b35011699
+    X: 12
+    Z: 14
+    Minimum: {x: 6144, y: -10000, z: 7168}
+    Maximum: {x: 6656, y: 10000, z: 7680}
+    Visuals: 728
+    Colliders: 341
+    Animations: 113
+    Effects: 1
+    SourceVisuals: 736
+    OverflowCenters: []
+  - Id: map_12_15
+    Resource: World/Tiles/map_12_15/Content
+    SceneAddress: ffone/eb57f10261d89d44eacfded4a3e824da
+    X: 12
+    Z: 15
+    Minimum: {x: 6144, y: -10000, z: 7680}
+    Maximum: {x: 6656, y: 10000, z: 8192}
+    Visuals: 357
+    Colliders: 123
+    Animations: 55
+    Effects: 87
+    SourceVisuals: 357
+    OverflowCenters: []
+  - Id: map_13_00
+    Resource: World/Tiles/map_13_00/Content
+    SceneAddress: ffone/5e0025f37db11f8449194520b591c200
+    X: 13
+    Z: 0
+    Minimum: {x: 6656, y: -10000, z: 0}
+    Maximum: {x: 7168, y: 10000, z: 512}
+    Visuals: 4
+    Colliders: 2
+    Animations: 1
+    Effects: 0
+    SourceVisuals: 4
+    OverflowCenters: []
+  - Id: map_13_01
+    Resource: World/Tiles/map_13_01/Content
+    SceneAddress: ffone/6eeeb629e149a6a4f9fde8ca1ecc6eb9
+    X: 13
+    Z: 1
+    Minimum: {x: 6656, y: -10000, z: 512}
+    Maximum: {x: 7168, y: 10000, z: 1024}
+    Visuals: 820
+    Colliders: 483
+    Animations: 138
+    Effects: 10
+    SourceVisuals: 921
+    OverflowCenters: []
+  - Id: map_13_02
+    Resource: World/Tiles/map_13_02/Content
+    SceneAddress: ffone/ca5ac711cab768c4fafafacdd45e7336
+    X: 13
+    Z: 2
+    Minimum: {x: 6656, y: -10000, z: 1024}
+    Maximum: {x: 7168, y: 10000, z: 1536}
+    Visuals: 1364
+    Colliders: 891
+    Animations: 153
+    Effects: 15
+    SourceVisuals: 1448
+    OverflowCenters:
+    - {x: 7175.8203, y: 1109.5118}
+    - {x: 7175.8203, y: 1109.5118}
+    - {x: 7175.8203, y: 1109.5118}
+    - {x: 6646.4824, y: 1106.8832}
+    - {x: 6646.3716, y: 1079.8815}
+    - {x: 6651.291, y: 1057.0424}
+    - {x: 6798.7705, y: 1015.79663}
+    - {x: 6715.3887, y: 990.1145}
+    - {x: 6715.3887, y: 990.1145}
+  - Id: map_13_03
+    Resource: World/Tiles/map_13_03/Content
+    SceneAddress: ffone/2dced8f0d2e867d41b2acd39a8258785
+    X: 13
+    Z: 3
+    Minimum: {x: 6656, y: -10000, z: 1536}
+    Maximum: {x: 7168, y: 10000, z: 2048}
+    Visuals: 4
+    Colliders: 2
+    Animations: 1
+    Effects: 0
+    SourceVisuals: 4
+    OverflowCenters: []
+  - Id: map_13_04
+    Resource: World/Tiles/map_13_04/Content
+    SceneAddress: ffone/3c9c5b5037d858c4e8ec4a925462bd5f
+    X: 13
+    Z: 4
+    Minimum: {x: 6656, y: -10000, z: 2048}
+    Maximum: {x: 7168, y: 10000, z: 2560}
+    Visuals: 4
+    Colliders: 2
+    Animations: 1
+    Effects: 0
+    SourceVisuals: 4
+    OverflowCenters: []
+  - Id: map_13_08
+    Resource: World/Tiles/map_13_08/Content
+    SceneAddress: ffone/57754569fa8ca25439f229b8e569923a
+    X: 13
+    Z: 8
+    Minimum: {x: 6656, y: -10000, z: 4096}
+    Maximum: {x: 7168, y: 10000, z: 4608}
+    Visuals: 0
+    Colliders: 1
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 1
+    OverflowCenters: []
+  - Id: map_13_09
+    Resource: World/Tiles/map_13_09/Content
+    SceneAddress: ffone/fe8ad9fe83238124e95bef85d58a0e04
+    X: 13
+    Z: 9
+    Minimum: {x: 6656, y: -10000, z: 4608}
+    Maximum: {x: 7168, y: 10000, z: 5120}
+    Visuals: 41
+    Colliders: 35
+    Animations: 0
+    Effects: 0
+    SourceVisuals: 42
+    OverflowCenters: []
+  - Id: map_13_10
+    Resource: World/Tiles/map_13_10/Content
+    SceneAddress: ffone/7e6f0f4700ca69146b6708f0653fc400
+    X: 13
+    Z: 10
+    Minimum: {x: 6656, y: -10000, z: 5120}
+    Maximum: {x: 7168, y: 10000, z: 5632}
+    Visuals: 152
+    Colliders: 22
+    Animations: 68
+    Effects: 0
+    SourceVisuals: 153
+    OverflowCenters: []
+  - Id: map_13_11
+    Resource: World/Tiles/map_13_11/Content
+    SceneAddress: ffone/14d3af3f795d50f4390455704a9eaffd
+    X: 13
+    Z: 11
+    Minimum: {x: 6656, y: -10000, z: 5632}
+    Maximum: {x: 7168, y: 10000, z: 6144}
+    Visuals: 53
+    Colliders: 2
+    Animations: 26
+    Effects: 0
+    SourceVisuals: 54
+    OverflowCenters: []
+  - Id: map_13_13
+    Resource: World/Tiles/map_13_13/Content
+    SceneAddress: ffone/496a650e3041570428a820d2a487f13b
+    X: 13
+    Z: 13
+    Minimum: {x: 6656, y: -10000, z: 6656}
+    Maximum: {x: 7168, y: 10000, z: 7168}
+    Visuals: 2685
+    Colliders: 1303
+    Animations: 467
+    Effects: 4
+    SourceVisuals: 2721
+    OverflowCenters: []
+  - Id: map_13_14
+    Resource: World/Tiles/map_13_14/Content
+    SceneAddress: ffone/027e56f7873250947bf3e6a0b9770654
+    X: 13
+    Z: 14
+    Minimum: {x: 6656, y: -10000, z: 7168}
+    Maximum: {x: 7168, y: 10000, z: 7680}
+    Visuals: 728
+    Colliders: 341
+    Animations: 113
+    Effects: 0
+    SourceVisuals: 736
+    OverflowCenters: []
+  - Id: map_13_15
+    Resource: World/Tiles/map_13_15/Content
+    SceneAddress: ffone/4cc2b04cf31afc642b17f0054b119701
+    X: 13
+    Z: 15
+    Minimum: {x: 6656, y: -10000, z: 7680}
+    Maximum: {x: 7168, y: 10000, z: 8192}
+    Visuals: 728
+    Colliders: 341
+    Animations: 113
+    Effects: 0
+    SourceVisuals: 736
+    OverflowCenters: []
+  - Id: map_14_00
+    Resource: World/Tiles/map_14_00/Content
+    SceneAddress: ffone/70c486ad26147c1498286226ec5c3950
+    X: 14
+    Z: 0
+    Minimum: {x: 7168, y: -10000, z: 0}
+    Maximum: {x: 7680, y: 10000, z: 512}
+    Visuals: 4
+    Colliders: 2
+    Animations: 1
+    Effects: 0
+    SourceVisuals: 4
+    OverflowCenters: []
+  - Id: map_14_01
+    Resource: World/Tiles/map_14_01/Content
+    SceneAddress: ffone/b49757d051421154db841d4d12ab324f
+    X: 14
+    Z: 1
+    Minimum: {x: 7168, y: -10000, z: 512}
+    Maximum: {x: 7680, y: 10000, z: 1024}
+    Visuals: 1770
+    Colliders: 688
+    Animations: 147
+    Effects: 171
+    SourceVisuals: 1861
+    OverflowCenters:
+    - {x: 7429.874, y: 447.113}
+  - Id: map_14_02
+    Resource: World/Tiles/map_14_02/Content
+    SceneAddress: ffone/24ee1b0a9d783b54da1831a2b95d1bcf
+    X: 14
+    Z: 2
+    Minimum: {x: 7168, y: -10000, z: 1024}
+    Maximum: {x: 7680, y: 10000, z: 1536}
+    Visuals: 1604
+    Colliders: 737
+    Animations: 139
+    Effects: 143
+    SourceVisuals: 1692
+    OverflowCenters:
+    - {x: 7461.5703, y: 947.3077}
+    - {x: 7299.4824, y: 951.97546}
+    - {x: 7305.6587, y: 959.4527}
+    - {x: 7305.6587, y: 959.4527}
+    - {x: 7167.971, y: 1500.7942}
+    - {x: 7167.971, y: 1500.7942}
+  - Id: map_14_03
+    Resource: World/Tiles/map_14_03/Content
+    SceneAddress: ffone/9d8a96b39389f1a41ab89e931c97ed9c
+    X: 14
+    Z: 3
+    Minimum: {x: 7168, y: -10000, z: 1536}
+    Maximum: {x: 7680, y: 10000, z: 2048}
+    Visuals: 4
+    Colliders: 2
+    Animations: 1
+    Effects: 0
+    SourceVisuals: 4
+    OverflowCenters: []
+  - Id: map_14_07
+    Resource: World/Tiles/map_14_07/Content
+    SceneAddress: ffone/a7febad633f0d584ea85caa9fc7b2236
+    X: 14
+    Z: 7
+    Minimum: {x: 7168, y: -10000, z: 3584}
+    Maximum: {x: 7680, y: 10000, z: 4096}
+    Visuals: 469
+    Colliders: 194
+    Animations: 60
+    Effects: 119
+    SourceVisuals: 469
+    OverflowCenters: []
+  - Id: map_14_12
+    Resource: World/Tiles/map_14_12/Content
+    SceneAddress: ffone/8f098d54ddc44f74697d0de0472de282
+    X: 14
+    Z: 12
+    Minimum: {x: 7168, y: -10000, z: 6144}
+    Maximum: {x: 7680, y: 10000, z: 6656}
+    Visuals: 727
+    Colliders: 343
+    Animations: 117
+    Effects: 1
+    SourceVisuals: 733
+    OverflowCenters: []
+  - Id: map_14_13
+    Resource: World/Tiles/map_14_13/Content
+    SceneAddress: ffone/032ddd4d1dc40b84884f9ab7c09bf087
+    X: 14
+    Z: 13
+    Minimum: {x: 7168, y: -10000, z: 6656}
+    Maximum: {x: 7680, y: 10000, z: 7168}
+    Visuals: 2720
+    Colliders: 1304
+    Animations: 472
+    Effects: 2
+    SourceVisuals: 2742
+    OverflowCenters:
+    - {x: 7058.6, y: 6519.84}
+    - {x: 7181.626, y: 6131.6523}
+    - {x: 7188.2144, y: 6208.1406}
+    - {x: 6812.483, y: 6229.627}
+    - {x: 6846.8335, y: 6222.5913}
+  - Id: map_14_14
+    Resource: World/Tiles/map_14_14/Content
+    SceneAddress: ffone/d16756f76dcad9147a1d107fe9329ed2
+    X: 14
+    Z: 14
+    Minimum: {x: 7168, y: -10000, z: 7168}
+    Maximum: {x: 7680, y: 10000, z: 7680}
+    Visuals: 741
+    Colliders: 342
+    Animations: 114
+    Effects: 0
+    SourceVisuals: 749
+    OverflowCenters: []
+  - Id: map_14_15
+    Resource: World/Tiles/map_14_15/Content
+    SceneAddress: ffone/3007742e67b4f5a4c9c35aab9e82233a
+    X: 14
+    Z: 15
+    Minimum: {x: 7168, y: -10000, z: 7680}
+    Maximum: {x: 7680, y: 10000, z: 8192}
+    Visuals: 2685
+    Colliders: 1286
+    Animations: 467
+    Effects: 0
+    SourceVisuals: 2703
+    OverflowCenters: []
+  - Id: map_15_00
+    Resource: World/Tiles/map_15_00/Content
+    SceneAddress: ffone/483526bee429bc94393e5c8d0c7c905c
+    X: 15
+    Z: 0
+    Minimum: {x: 7680, y: -10000, z: 0}
+    Maximum: {x: 8192, y: 10000, z: 512}
+    Visuals: 4
+    Colliders: 2
+    Animations: 1
+    Effects: 0
+    SourceVisuals: 4
+    OverflowCenters: []
+  - Id: map_15_01
+    Resource: World/Tiles/map_15_01/Content
+    SceneAddress: ffone/6ac545cd6dabe114590bc743e3152121
+    X: 15
+    Z: 1
+    Minimum: {x: 7680, y: -10000, z: 512}
+    Maximum: {x: 8192, y: 10000, z: 1024}
+    Visuals: 4
+    Colliders: 2
+    Animations: 1
+    Effects: 0
+    SourceVisuals: 4
+    OverflowCenters: []
+  - Id: map_15_02
+    Resource: World/Tiles/map_15_02/Content
+    SceneAddress: ffone/91216e4ea215e2b4dae8414bbb38f78b
+    X: 15
+    Z: 2
+    Minimum: {x: 7680, y: -10000, z: 1024}
+    Maximum: {x: 8192, y: 10000, z: 1536}
+    Visuals: 4
+    Colliders: 2
+    Animations: 1
+    Effects: 0
+    SourceVisuals: 4
+    OverflowCenters: []
+  - Id: map_15_03
+    Resource: World/Tiles/map_15_03/Content
+    SceneAddress: ffone/d240bf5121b0fe441af087ce9f4a6d81
+    X: 15
+    Z: 3
+    Minimum: {x: 7680, y: -10000, z: 1536}
+    Maximum: {x: 8192, y: 10000, z: 2048}
+    Visuals: 4
+    Colliders: 2
+    Animations: 1
+    Effects: 0
+    SourceVisuals: 4
+    OverflowCenters: []
+  - Id: map_15_09
+    Resource: World/Tiles/map_15_09/Content
+    SceneAddress: ffone/c63bd5dc8e09975488c308635eeea164
+    X: 15
+    Z: 9
+    Minimum: {x: 7680, y: -10000, z: 4608}
+    Maximum: {x: 8192, y: 10000, z: 5120}
+    Visuals: 2919
+    Colliders: 1098
+    Animations: 842
+    Effects: 231
+    SourceVisuals: 2936
+    OverflowCenters: []
+  - Id: map_15_10
+    Resource: World/Tiles/map_15_10/Content
+    SceneAddress: ffone/0d92e915cad0fbd41a4d29a7374fe585
+    X: 15
+    Z: 10
+    Minimum: {x: 7680, y: -10000, z: 5120}
+    Maximum: {x: 8192, y: 10000, z: 5632}
+    Visuals: 612
+    Colliders: 584
+    Animations: 0
+    Effects: 80
+    SourceVisuals: 680
+    OverflowCenters:
+    - {x: 7758.4106, y: 5634.703}
+    - {x: 7857.985, y: 5636.927}
+    - {x: 7856.523, y: 5634.848}
+    - {x: 7859.996, y: 5654.454}
+  - Id: map_15_11
+    Resource: World/Tiles/map_15_11/Content
+    SceneAddress: ffone/06c2accfcf48c844580e7c273b9d5ef2
+    X: 15
+    Z: 11
+    Minimum: {x: 7680, y: -10000, z: 5632}
+    Maximum: {x: 8192, y: 10000, z: 6144}
+    Visuals: 914
+    Colliders: 647
+    Animations: 2
+    Effects: 95
+    SourceVisuals: 962
+    OverflowCenters:
+    - {x: 7860.3633, y: 5561.957}
+    - {x: 7853.1807, y: 5596.69}
+    - {x: 7862.196, y: 5561.556}
+    - {x: 8075.2866, y: 5566.326}
+    - {x: 8067.695, y: 5591.2207}
+    - {x: 8097.8486, y: 5562.6636}
+  - Id: map_15_12
+    Resource: World/Tiles/map_15_12/Content
+    SceneAddress: ffone/aa36012517b961f4aa2ee461f5aac009
+    X: 15
+    Z: 12
+    Minimum: {x: 7680, y: -10000, z: 6144}
+    Maximum: {x: 8192, y: 10000, z: 6656}
+    Visuals: 2696
+    Colliders: 1314
+    Animations: 462
+    Effects: 5
+    SourceVisuals: 2732
+    OverflowCenters:
+    - {x: 7700.2144, y: 5696.1406}
+    - {x: 7324.483, y: 5717.627}
+    - {x: 7358.8335, y: 5710.5913}
+    - {x: 7570.6, y: 6007.84}
+    - {x: 7693.626, y: 5619.6523}
+  - Id: map_15_13
+    Resource: World/Tiles/map_15_13/Content
+    SceneAddress: ffone/6bf99a6bbc601fd42aecd0d77bf2b50b
+    X: 15
+    Z: 13
+    Minimum: {x: 7680, y: -10000, z: 6656}
+    Maximum: {x: 8192, y: 10000, z: 7168}
+    Visuals: 2700
+    Colliders: 1315
+    Animations: 469
+    Effects: 3
+    SourceVisuals: 2736
+    OverflowCenters:
+    - {x: 7570.6, y: 6519.84}
+    - {x: 7693.626, y: 6131.6523}
+    - {x: 7700.2144, y: 6208.1406}
+    - {x: 7324.483, y: 6229.627}
+    - {x: 7358.8335, y: 6222.5913}
+  - Id: map_15_14
+    Resource: World/Tiles/map_15_14/Content
+    SceneAddress: ffone/e0a40e018ec04094d971ea952e4131cf
+    X: 15
+    Z: 14
+    Minimum: {x: 7680, y: -10000, z: 7168}
+    Maximum: {x: 8192, y: 10000, z: 7680}
+    Visuals: 2716
+    Colliders: 1312
+    Animations: 471
+    Effects: 3
+    SourceVisuals: 2749
+    OverflowCenters:
+    - {x: 7700.2144, y: 6720.1406}
+    - {x: 7324.483, y: 6741.627}
+    - {x: 7358.8335, y: 6734.5913}
+    - {x: 7570.6, y: 7031.84}
+    - {x: 7693.626, y: 6643.6523}
+  - Id: map_15_15
+    Resource: World/Tiles/map_15_15/Content
+    SceneAddress: ffone/1e882b55d45fff34297f5dd7c8ceb865
+    X: 15
+    Z: 15
+    Minimum: {x: 7680, y: -10000, z: 7680}
+    Maximum: {x: 8192, y: 10000, z: 8192}
+    Visuals: 2709
+    Colliders: 1314
+    Animations: 470
+    Effects: 3
+    SourceVisuals: 2742
+    OverflowCenters:
+    - {x: 7570.6, y: 7543.84}
+    - {x: 7693.626, y: 7155.6523}
+    - {x: 7700.2144, y: 7232.1406}
+    - {x: 7324.483, y: 7253.627}
+    - {x: 7358.8335, y: 7246.5913}
+  SourceCatalogSha256: 29109dc5fef84527cfefd3ec3f54b9ad9d7dca08ceb28aecf49d926c7410ad71
+  SourceBytes: 1952567907
+  SourceFiles: 37779
+  Atmospheres:
+  - Grid: {x: 0, y: 0}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 0, y: 1}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 0, y: 2}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 1, y: 0}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 1, y: 1}
+    FogDepth: 0.81
+    Fog: {r: 0, g: 0.2509804, b: 0, a: 1}
+    Sky: {r: 0, g: 0.73333335, b: 0, a: 1}
+    Light: {r: 0.6509804, g: 1, b: 0.6509804, a: 1}
+  - Grid: {x: 1, y: 2}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 2, y: 0}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 2, y: 1}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0.08627451, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 2, y: 2}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 0, y: 9}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 1, y: 3}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 1, y: 4}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 1, y: 11}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 1, y: 12}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 1, y: 13}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 1, y: 14}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 2, y: 3}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 2, y: 4}
+    FogDepth: 1
+    Fog: {r: 0, g: 0.2509804, b: 0, a: 1}
+    Sky: {r: 0, g: 0.5019608, b: 0, a: 1}
+    Light: {r: 0.78431374, g: 1, b: 0.78431374, a: 1}
+  - Grid: {x: 2, y: 5}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 2, y: 11}
+    FogDepth: 0.89
+    Fog: {r: 0.7529412, g: 0.8901961, b: 0.87058824, a: 1}
+    Sky: {r: 0.6, g: 0.9019608, b: 0.84705883, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 2, y: 12}
+    FogDepth: 1
+    Fog: {r: 0, g: 0.39215687, b: 0, a: 1}
+    Sky: {r: 0.38431373, g: 1, b: 0.38431373, a: 1}
+    Light: {r: 0.8235294, g: 1, b: 0.8235294, a: 1}
+  - Grid: {x: 2, y: 13}
+    FogDepth: 1
+    Fog: {r: 0, g: 0.45882353, b: 0, a: 1}
+    Sky: {r: 0, g: 0.6509804, b: 0.3254902, a: 1}
+    Light: {r: 0.6392157, g: 0.8627451, b: 0.7882353, a: 1}
+  - Grid: {x: 2, y: 14}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 3, y: 1}
+    FogDepth: 1
+    Fog: {r: 0.25, g: 0.55, b: 1, a: 1}
+    Sky: {r: 0, g: 0, b: 0.85, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 3, y: 2}
+    FogDepth: 1
+    Fog: {r: 0.25, g: 0.55, b: 1, a: 1}
+    Sky: {r: 0, g: 0, b: 0.85, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 3, y: 3}
+    FogDepth: 1
+    Fog: {r: 0.25, g: 0.55, b: 1, a: 1}
+    Sky: {r: 0, g: 0, b: 0.85, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 3, y: 4}
+    FogDepth: 0.79999995
+    Fog: {r: 0, g: 0.49019608, b: 0.9843137, a: 1}
+    Sky: {r: 0, g: 0, b: 0.85882354, a: 1}
+    Light: {r: 0.9843137, g: 1, b: 0.7490196, a: 1}
+  - Grid: {x: 3, y: 5}
+    FogDepth: 0.88
+    Fog: {r: 0.13333334, g: 0.5529412, b: 0.6901961, a: 1}
+    Sky: {r: 0, g: 0.39607844, b: 0.6901961, a: 1}
+    Light: {r: 1, g: 1, b: 0.75686276, a: 1}
+  - Grid: {x: 3, y: 6}
+    FogDepth: 1
+    Fog: {r: 0, g: 0.8509804, b: 0.42352942, a: 1}
+    Sky: {r: 0.007843138, g: 0.78431374, b: 0.627451, a: 1}
+    Light: {r: 0.6431373, g: 1, b: 0.85882354, a: 1}
+  - Grid: {x: 3, y: 11}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 3, y: 12}
+    FogDepth: 1
+    Fog: {r: 0, g: 0.48235294, b: 0, a: 1}
+    Sky: {r: 0, g: 0.2509804, b: 0, a: 1}
+    Light: {r: 0.67058825, g: 0.84705883, b: 0.78039217, a: 1}
+  - Grid: {x: 3, y: 13}
+    FogDepth: 0.89
+    Fog: {r: 0, g: 0.42352942, b: 0, a: 1}
+    Sky: {r: 0, g: 0.6509804, b: 0, a: 1}
+    Light: {r: 0.654902, g: 0.8392157, b: 0.7176471, a: 1}
+  - Grid: {x: 3, y: 14}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 4, y: 1}
+    FogDepth: 0.8
+    Fog: {r: 0.25, g: 0.55, b: 1, a: 1}
+    Sky: {r: 0, g: 0, b: 0.85, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 4, y: 2}
+    FogDepth: 0.77
+    Fog: {r: 0.38431373, g: 0.6901961, b: 1, a: 1}
+    Sky: {r: 0, g: 0, b: 0.85882354, a: 1}
+    Light: {r: 0.75686276, g: 1, b: 1, a: 1}
+  - Grid: {x: 4, y: 3}
+    FogDepth: 0.83
+    Fog: {r: 0.3254902, g: 0.6627451, b: 1, a: 1}
+    Sky: {r: 0.02745098, g: 0.26666668, b: 0.89411765, a: 1}
+    Light: {r: 1, g: 1, b: 0.70980394, a: 1}
+  - Grid: {x: 4, y: 4}
+    FogDepth: 0.78999996
+    Fog: {r: 0.15294118, g: 0.5882353, b: 0.7529412, a: 1}
+    Sky: {r: 0.22352941, g: 0.5921569, b: 0.80784315, a: 1}
+    Light: {r: 0.6901961, g: 0.9019608, b: 1, a: 1}
+  - Grid: {x: 4, y: 5}
+    FogDepth: 1
+    Fog: {r: 0.3, g: 0.3, b: 0.35, a: 1}
+    Sky: {r: 0.6, g: 0.2, b: 0.3, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 4, y: 6}
+    FogDepth: 2
+    Fog: {r: 0.2, g: 0.35, b: 0.1, a: 1}
+    Sky: {r: 0.7529412, g: 0.7529412, b: 0.7529412, a: 1}
+    Light: {r: 0.3, g: 0.3, b: 0.15, a: 1}
+  - Grid: {x: 4, y: 7}
+    FogDepth: 1
+    Fog: {r: 0, g: 0.22352941, b: 0, a: 1}
+    Sky: {r: 0.7529412, g: 0.7529412, b: 0.7529412, a: 1}
+    Light: {r: 0.2509804, g: 0.2509804, b: 0, a: 1}
+  - Grid: {x: 4, y: 8}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 4, y: 9}
+    FogDepth: 1
+    Fog: {r: 0.5019608, g: 0.7490196, b: 1, a: 1}
+    Sky: {r: 0, g: 0, b: 0.5019608, a: 1}
+    Light: {r: 1, g: 1, b: 0.9254902, a: 1}
+  - Grid: {x: 4, y: 10}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 4, y: 11}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 4, y: 12}
+    FogDepth: 0.90999997
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 0, g: 0, b: 0, a: 1}
+    Light: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
+  - Grid: {x: 4, y: 13}
+    FogDepth: 0.84
+    Fog: {r: 0, g: 0.53333336, b: 0, a: 1}
+    Sky: {r: 0.3254902, g: 0.7921569, b: 0.38431373, a: 1}
+    Light: {r: 0.76862746, g: 1, b: 0.76862746, a: 1}
+  - Grid: {x: 4, y: 14}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 5, y: 1}
+    FogDepth: 0.8
+    Fog: {r: 0.25, g: 0.55, b: 1, a: 1}
+    Sky: {r: 0, g: 0, b: 0.85, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 5, y: 2}
+    FogDepth: 1
+    Fog: {r: 0.21568628, g: 0.60784316, b: 1, a: 1}
+    Sky: {r: 0, g: 0.37254903, b: 0.7411765, a: 1}
+    Light: {r: 0.53333336, g: 0.75686276, b: 0.9843137, a: 1}
+  - Grid: {x: 5, y: 3}
+    FogDepth: 0.65
+    Fog: {r: 1, g: 0.4, b: 0.35, a: 1}
+    Sky: {r: 1, g: 0.5, b: 0.25, a: 1}
+    Light: {r: 1, g: 0.8, b: 0.4, a: 1}
+  - Grid: {x: 5, y: 4}
+    FogDepth: 1
+    Fog: {r: 0.6313726, g: 0.6313726, b: 0.6313726, a: 1}
+    Sky: {r: 0.039215688, g: 0.4, b: 0.7607843, a: 1}
+    Light: {r: 0.8509804, g: 0.99215686, b: 0.5568628, a: 1}
+  - Grid: {x: 5, y: 5}
+    FogDepth: 1
+    Fog: {r: 0.1, g: 0.25, b: 0.25, a: 1}
+    Sky: {r: 0, g: 0.4509804, b: 0, a: 1}
+    Light: {r: 0.9, g: 1, b: 1, a: 1}
+  - Grid: {x: 5, y: 6}
+    FogDepth: 1.75
+    Fog: {r: 0.3, g: 0.3, b: 0.3, a: 1}
+    Sky: {r: 0, g: 0, b: 0, a: 1}
+    Light: {r: 0.65, g: 0.65, b: 0.75, a: 1}
+  - Grid: {x: 5, y: 7}
+    FogDepth: 1.5
+    Fog: {r: 0.2, g: 0.475, b: 0.35, a: 1}
+    Sky: {r: 0.075, g: 0.2, b: 0.1, a: 1}
+    Light: {r: 0.3, g: 0.7, b: 0.7, a: 1}
+  - Grid: {x: 5, y: 9}
+    FogDepth: 1
+    Fog: {r: 0.4745098, g: 0.7372549, b: 1, a: 1}
+    Sky: {r: 0, g: 0, b: 0.5019608, a: 1}
+    Light: {r: 1, g: 1, b: 0.9098039, a: 1}
+  - Grid: {x: 5, y: 10}
+    FogDepth: 1
+    Fog: {r: 0.14901961, g: 0.5764706, b: 1, a: 1}
+    Sky: {r: 0.45882353, g: 1, b: 1, a: 1}
+    Light: {r: 0.84313726, g: 1, b: 1, a: 1}
+  - Grid: {x: 5, y: 11}
+    FogDepth: 0.98999995
+    Fog: {r: 1, g: 0, b: 0, a: 1}
+    Sky: {r: 0.6666667, g: 0.33333334, b: 0.33333334, a: 1}
+    Light: {r: 1, g: 1, b: 0.5019608, a: 1}
+  - Grid: {x: 5, y: 12}
+    FogDepth: 1
+    Fog: {r: 0.80784315, g: 0, b: 0, a: 1}
+    Sky: {r: 0.5019608, g: 0.2509804, b: 0.2509804, a: 1}
+    Light: {r: 1, g: 1, b: 0.5019608, a: 1}
+  - Grid: {x: 5, y: 13}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 5, y: 14}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 6, y: 1}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 6, y: 2}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 6, y: 3}
+    FogDepth: 0.9
+    Fog: {r: 0.55, g: 0.5, b: 1, a: 1}
+    Sky: {r: 0, g: 0.34901962, b: 0.6666667, a: 1}
+    Light: {r: 1, g: 0.9, b: 0.9, a: 1}
+  - Grid: {x: 6, y: 4}
+    FogDepth: 1.2
+    Fog: {r: 0.2, g: 0.3, b: 0.15, a: 1}
+    Sky: {r: 0, g: 0.4745098, b: 0, a: 1}
+    Light: {r: 0.75, g: 0.75, b: 0.75, a: 1}
+  - Grid: {x: 6, y: 5}
+    FogDepth: 0.69
+    Fog: {r: 0.13333334, g: 0.5254902, b: 0.75686276, a: 1}
+    Sky: {r: 0.11764706, g: 0.5137255, b: 0.5686275, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 6, y: 6}
+    FogDepth: 0.90999997
+    Fog: {r: 0.35686275, g: 0.8352941, b: 0.99215686, a: 1}
+    Sky: {r: 0.003921569, g: 0.972549, b: 0.99607843, a: 1}
+    Light: {r: 0.53333336, g: 0.88235295, b: 1, a: 1}
+  - Grid: {x: 6, y: 9}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 6, y: 10}
+    FogDepth: 1
+    Fog: {r: 0.19215687, g: 0.42745098, b: 0.9843137, a: 1}
+    Sky: {r: 0.5921569, g: 1, b: 1, a: 1}
+    Light: {r: 0.78431374, g: 1, b: 1, a: 1}
+  - Grid: {x: 6, y: 11}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 6, y: 12}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 6, y: 13}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 6, y: 14}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 7, y: 3}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 7, y: 4}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 7, y: 5}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 7, y: 6}
+    FogDepth: 0.78999996
+    Fog: {r: 0.23529412, g: 0.6156863, b: 1, a: 1}
+    Sky: {r: 0.6627451, g: 0.9882353, b: 0.92941177, a: 1}
+    Light: {r: 0.6745098, g: 0.8392157, b: 1, a: 1}
+  - Grid: {x: 7, y: 7}
+    FogDepth: 0.83
+    Fog: {r: 0.18431373, g: 0.5921569, b: 1, a: 1}
+    Sky: {r: 0.6666667, g: 1, b: 1, a: 1}
+    Light: {r: 0.72156864, g: 0.88235295, b: 0.98039216, a: 1}
+  - Grid: {x: 7, y: 8}
+    FogDepth: 0.78999996
+    Fog: {r: 0.1764706, g: 0.5882353, b: 1, a: 1}
+    Sky: {r: 0.73333335, g: 1, b: 1, a: 1}
+    Light: {r: 0.7254902, g: 0.8627451, b: 1, a: 1}
+  - Grid: {x: 7, y: 9}
+    FogDepth: 1
+    Fog: {r: 0.45882353, g: 0.7294118, b: 1, a: 1}
+    Sky: {r: 0, g: 0, b: 0.5019608, a: 1}
+    Light: {r: 1, g: 1, b: 0.9019608, a: 1}
+  - Grid: {x: 7, y: 10}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 7, y: 13}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 7, y: 14}
+    FogDepth: 0.5
+    Fog: {r: 0.8156863, g: 0.972549, b: 1, a: 1}
+    Sky: {r: 0.8666667, g: 0.9882353, b: 1, a: 1}
+    Light: {r: 0.9607843, g: 1, b: 0.7490196, a: 1}
+  - Grid: {x: 8, y: 5}
+    FogDepth: 0.85
+    Fog: {r: 0.156, g: 0.58, b: 1, a: 1}
+    Sky: {r: 0.419, g: 0.925, b: 0.996, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 8, y: 6}
+    FogDepth: 0.82
+    Fog: {r: 0, g: 0.7, b: 0.7, a: 1}
+    Sky: {r: 0.7, g: 1, b: 0.875, a: 1}
+    Light: {r: 0.8, g: 1, b: 0.99, a: 1}
+  - Grid: {x: 8, y: 7}
+    FogDepth: 0.87
+    Fog: {r: 0.15686275, g: 0.5803922, b: 1, a: 1}
+    Sky: {r: 0.41960785, g: 0.9254902, b: 0.99607843, a: 1}
+    Light: {r: 0.70980394, g: 0.85490197, b: 1, a: 1}
+  - Grid: {x: 8, y: 8}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 8, y: 9}
+    FogDepth: 0.78999996
+    Fog: {r: 0.80784315, g: 1, b: 0.8745098, a: 1}
+    Sky: {r: 0.73333335, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 8, y: 10}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 8, y: 11}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 8, y: 12}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 8, y: 13}
+    FogDepth: 0.87
+    Fog: {r: 0.48235294, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 0.45882353, b: 0.45882353, a: 1}
+    Light: {r: 1, g: 0.73333335, b: 0.73333335, a: 1}
+  - Grid: {x: 8, y: 14}
+    FogDepth: 1
+    Fog: {r: 0.38431373, g: 0.6156863, b: 1, a: 1}
+    Sky: {r: 0, g: 0.36862746, b: 0.73333335, a: 1}
+    Light: {r: 1, g: 1, b: 0.9098039, a: 1}
+  - Grid: {x: 9, y: 6}
+    FogDepth: 1
+    Fog: {r: 0.25, g: 0.15, b: 0.25, a: 1}
+    Sky: {r: 0.42, g: 0.35, b: 0.26, a: 1}
+    Light: {r: 0.9, g: 1, b: 0.9, a: 1}
+  - Grid: {x: 9, y: 7}
+    FogDepth: 0.79999995
+    Fog: {r: 0.1, g: 0.65, b: 0.65, a: 1}
+    Sky: {r: 0.15, g: 0.55, b: 0.55, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 9, y: 8}
+    FogDepth: 0.82
+    Fog: {r: 0, g: 0.65, b: 0.6, a: 1}
+    Sky: {r: 0.35, g: 0.75, b: 0.625, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 9, y: 9}
+    FogDepth: 0.9
+    Fog: {r: 0.6509434, g: 0.4949541, b: 0.2916963, a: 1}
+    Sky: {r: 0.6117647, g: 0.9490196, b: 0.99607843, a: 1}
+    Light: {r: 0.8, g: 0.90588236, b: 0.99215686, a: 1}
+  - Grid: {x: 9, y: 10}
+    FogDepth: 0.82
+    Fog: {r: 0.9, g: 0.35, b: 0, a: 1}
+    Sky: {r: 0.5764706, g: 1, b: 1, a: 1}
+    Light: {r: 0.7529412, g: 0.8784314, b: 0.99607843, a: 1}
+  - Grid: {x: 9, y: 11}
+    FogDepth: 0.79999995
+    Fog: {r: 0.6, g: 0.225, b: 0.6, a: 1}
+    Sky: {r: 0.6, g: 0.225, b: 0.6, a: 1}
+    Light: {r: 0.95, g: 0.95, b: 0.95, a: 1}
+  - Grid: {x: 9, y: 12}
+    FogDepth: 0.82
+    Fog: {r: 0.1764706, g: 0.5882353, b: 1, a: 1}
+    Sky: {r: 0.4, g: 1, b: 1, a: 1}
+    Light: {r: 0.7372549, g: 0.9254902, b: 0.99607843, a: 1}
+  - Grid: {x: 9, y: 13}
+    FogDepth: 0.85999995
+    Fog: {r: 0.6, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 0.5411765, b: 0.5176471, a: 1}
+    Light: {r: 0.99607843, g: 0.84705883, b: 0.7372549, a: 1}
+  - Grid: {x: 9, y: 14}
+    FogDepth: 1
+    Fog: {r: 0.24313726, g: 0.61960787, b: 1, a: 1}
+    Sky: {r: 0, g: 0.38431373, b: 0.76862746, a: 1}
+    Light: {r: 1, g: 1, b: 0.93333334, a: 1}
+  - Grid: {x: 10, y: 0}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 10, y: 1}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 10, y: 2}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 10, y: 7}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 10, y: 8}
+    FogDepth: 0.85999995
+    Fog: {r: 0, g: 0.54901963, b: 0, a: 1}
+    Sky: {r: 0.2509804, g: 0.8745098, b: 0.06666667, a: 1}
+    Light: {r: 0.8666667, g: 1, b: 0.6666667, a: 1}
+  - Grid: {x: 10, y: 9}
+    FogDepth: 0.87
+    Fog: {r: 0.050980393, g: 0.48235294, b: 0.25490198, a: 1}
+    Sky: {r: 0.24313726, g: 1, b: 0.24313726, a: 1}
+    Light: {r: 0.49019608, g: 1, b: 0.74509805, a: 1}
+  - Grid: {x: 10, y: 10}
+    FogDepth: 0.83
+    Fog: {r: 0, g: 0.50980395, b: 0, a: 1}
+    Sky: {r: 0.3764706, g: 1, b: 0.53333336, a: 1}
+    Light: {r: 0.89411765, g: 0.99607843, b: 0.77254903, a: 1}
+  - Grid: {x: 10, y: 11}
+    FogDepth: 0.77
+    Fog: {r: 0.44705883, g: 0.007843138, b: 0.5254902, a: 1}
+    Sky: {r: 0.8156863, g: 0.27450982, b: 0.93333334, a: 1}
+    Light: {r: 0.99607843, g: 0.827451, b: 0.99215686, a: 1}
+  - Grid: {x: 10, y: 12}
+    FogDepth: 1
+    Fog: {r: 0.5764706, g: 0.7882353, b: 1, a: 1}
+    Sky: {r: 0.6509804, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 0.93333334, a: 1}
+  - Grid: {x: 10, y: 13}
+    FogDepth: 1
+    Fog: {r: 0.38431373, g: 0.6156863, b: 1, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 0.39215687, g: 0.39215687, b: 0, a: 1}
+  - Grid: {x: 10, y: 14}
+    FogDepth: 1
+    Fog: {r: 0.46666667, g: 0.73333335, b: 1, a: 1}
+    Sky: {r: 0.8235294, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 0.9254902, a: 1}
+  - Grid: {x: 11, y: 0}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 11, y: 1}
+    FogDepth: 0.59
+    Fog: {r: 0.42352942, g: 0.6666667, b: 0.33333334, a: 1}
+    Sky: {r: 0, g: 0.5019608, b: 0, a: 1}
+    Light: {r: 0.80784315, g: 0.8666667, b: 0.70980394, a: 1}
+  - Grid: {x: 11, y: 2}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 11, y: 3}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 11, y: 4}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 11, y: 6}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 11, y: 7}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 0, g: 0, b: 0, a: 1}
+    Light: {r: 0, g: 0, b: 0, a: 1}
+  - Grid: {x: 11, y: 8}
+    FogDepth: 1
+    Fog: {r: 0.2509804, g: 0.22352941, b: 0.34117648, a: 1}
+    Sky: {r: 0.15686275, g: 0.2, b: 0.21568628, a: 1}
+    Light: {r: 0, g: 0, b: 0, a: 1}
+  - Grid: {x: 11, y: 9}
+    FogDepth: 0.76
+    Fog: {r: 0.2509804, g: 0, b: 0, a: 1}
+    Sky: {r: 0.7254902, g: 0.4, b: 0.40784314, a: 1}
+    Light: {r: 1, g: 0.88235295, b: 0.8862745, a: 1}
+  - Grid: {x: 11, y: 10}
+    FogDepth: 0.81
+    Fog: {r: 0.43529412, g: 0, b: 0.011764706, a: 1}
+    Sky: {r: 0.80784315, g: 0.46666667, b: 0.49019608, a: 1}
+    Light: {r: 1, g: 0.78431374, b: 0.7882353, a: 1}
+  - Grid: {x: 11, y: 11}
+    FogDepth: 1
+    Fog: {r: 0, g: 0.2509804, b: 0, a: 1}
+    Sky: {r: 0.06666667, g: 1, b: 0.53333336, a: 1}
+    Light: {r: 0.62352943, g: 1, b: 0.6156863, a: 1}
+  - Grid: {x: 11, y: 12}
+    FogDepth: 1
+    Fog: {r: 0, g: 0.2509804, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 0.36862746, g: 0.36862746, b: 0, a: 1}
+  - Grid: {x: 12, y: 0}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 12, y: 1}
+    FogDepth: 0.71999997
+    Fog: {r: 0.05490196, g: 0.5803922, b: 0.31764707, a: 1}
+    Sky: {r: 0.29411766, g: 0.654902, b: 0.41960785, a: 1}
+    Light: {r: 0.7764706, g: 1, b: 0.5921569, a: 1}
+  - Grid: {x: 12, y: 2}
+    FogDepth: 0.91999996
+    Fog: {r: 0.36078432, g: 0.56078434, b: 0.12156863, a: 1}
+    Sky: {r: 0, g: 0.70980394, b: 0.3529412, a: 1}
+    Light: {r: 0.39607844, g: 0.9882353, b: 0.6901961, a: 1}
+  - Grid: {x: 12, y: 3}
+    FogDepth: 0.44
+    Fog: {r: 0.019607844, g: 0.5803922, b: 0.3019608, a: 1}
+    Sky: {r: 0.101960786, g: 0.41568628, b: 0.22352941, a: 1}
+    Light: {r: 0.4, g: 0.7254902, b: 0.5058824, a: 1}
+  - Grid: {x: 12, y: 4}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 12, y: 7}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 12, y: 8}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 12, y: 9}
+    FogDepth: 1
+    Fog: {r: 0, g: 0.5019608, b: 1, a: 1}
+    Sky: {r: 0.5019608, g: 1, b: 1, a: 1}
+    Light: {r: 0.6392157, g: 0.89411765, b: 0.99607843, a: 1}
+  - Grid: {x: 12, y: 10}
+    FogDepth: 1
+    Fog: {r: 0, g: 0.4745098, b: 0.9490196, a: 1}
+    Sky: {r: 0.5019608, g: 1, b: 1, a: 1}
+    Light: {r: 0.6784314, g: 0.8627451, b: 0.9607843, a: 1}
+  - Grid: {x: 12, y: 11}
+    FogDepth: 1
+    Fog: {r: 0, g: 0.5019608, b: 1, a: 1}
+    Sky: {r: 0, g: 0, b: 0.5019608, a: 1}
+    Light: {r: 1, g: 1, b: 0.78431374, a: 1}
+  - Grid: {x: 12, y: 12}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 12, y: 13}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 12, y: 14}
+    FogDepth: 0
+    Fog: {r: 0.4862745, g: 0.74509805, b: 0.74509805, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 12, y: 15}
+    FogDepth: 1.5
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 13, y: 0}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 13, y: 1}
+    FogDepth: 0.68
+    Fog: {r: 0.08627451, g: 0.654902, b: 0.17254902, a: 1}
+    Sky: {r: 0.35686275, g: 0.5568628, b: 0.20784314, a: 1}
+    Light: {r: 0.73333335, g: 0.85882354, b: 0.7019608, a: 1}
+  - Grid: {x: 13, y: 2}
+    FogDepth: 0.74
+    Fog: {r: 0.08235294, g: 0.68235296, b: 0.4, a: 1}
+    Sky: {r: 0.22745098, g: 0.47058824, b: 0.13725491, a: 1}
+    Light: {r: 0.8666667, g: 1, b: 0.75686276, a: 1}
+  - Grid: {x: 13, y: 3}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 13, y: 4}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 13, y: 8}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 13, y: 9}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 13, y: 10}
+    FogDepth: 1
+    Fog: {r: 0.5176471, g: 0.75686276, b: 1, a: 1}
+    Sky: {r: 0, g: 0, b: 0.5019608, a: 1}
+    Light: {r: 1, g: 1, b: 0.93333334, a: 1}
+  - Grid: {x: 13, y: 11}
+    FogDepth: 1
+    Fog: {r: 0.6745098, g: 0.8392157, b: 1, a: 1}
+    Sky: {r: 0, g: 0, b: 0.5019608, a: 1}
+    Light: {r: 1, g: 1, b: 0.9098039, a: 1}
+  - Grid: {x: 13, y: 13}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 13, y: 14}
+    FogDepth: 0
+    Fog: {r: 0.4862745, g: 0.74509805, b: 0.74509805, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 13, y: 15}
+    FogDepth: 0
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 0, g: 0, b: 0, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 14, y: 0}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 14, y: 1}
+    FogDepth: 0.66999996
+    Fog: {r: 0.1764706, g: 0.59607846, b: 0.011764706, a: 1}
+    Sky: {r: 0, g: 0.5019608, b: 0, a: 1}
+    Light: {r: 0.8509804, g: 0.9529412, b: 0.7137255, a: 1}
+  - Grid: {x: 14, y: 2}
+    FogDepth: 0.63
+    Fog: {r: 0.11764706, g: 0.62352943, b: 0.41960785, a: 1}
+    Sky: {r: 0, g: 0.6, b: 0, a: 1}
+    Light: {r: 0.8117647, g: 0.92941177, b: 0.77254903, a: 1}
+  - Grid: {x: 14, y: 3}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 14, y: 7}
+    FogDepth: 1
+    Fog: {r: 0.8745098, g: 1, b: 1, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 0.27450982, g: 0.27450982, b: 1, a: 1}
+  - Grid: {x: 14, y: 12}
+    FogDepth: 0
+    Fog: {r: 0.4862745, g: 0.74509805, b: 0.74509805, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 14, y: 13}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 14, y: 14}
+    FogDepth: 0
+    Fog: {r: 0.4862745, g: 0.74509805, b: 0.74509805, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 14, y: 15}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 15, y: 0}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 15, y: 1}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 15, y: 2}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 15, y: 3}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 15, y: 9}
+    FogDepth: 0.9
+    Fog: {r: 0.015686275, g: 0.93333334, b: 0.07058824, a: 1}
+    Sky: {r: 0, g: 0.36862746, b: 0, a: 1}
+    Light: {r: 0.7490196, g: 1, b: 0.7490196, a: 1}
+  - Grid: {x: 15, y: 10}
+    FogDepth: 0.81
+    Fog: {r: 0.09411765, g: 0, b: 0, a: 1}
+    Sky: {r: 0, g: 0, b: 0, a: 1}
+    Light: {r: 0.7529412, g: 0.7529412, b: 0.7529412, a: 1}
+  - Grid: {x: 15, y: 11}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 0, g: 0, b: 0, a: 1}
+    Light: {r: 0.63529414, g: 0.63529414, b: 0.63529414, a: 1}
+  - Grid: {x: 15, y: 12}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 15, y: 13}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 15, y: 14}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  - Grid: {x: 15, y: 15}
+    FogDepth: 1
+    Fog: {r: 0, g: 0, b: 0, a: 1}
+    Sky: {r: 1, g: 1, b: 1, a: 1}
+    Light: {r: 1, g: 1, b: 1, a: 1}
+  NeighborWater:
+  - Id: map_00_01
+    X: 0
+    Z: 1
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_00_01#101 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0059/visual
+      Position: {x: -0, y: 0, z: 512}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_00_02
+    X: 0
+    Z: 2
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_00_02#23 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0033/visual
+      Position: {x: -0, y: 0, z: 1024}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_01_00
+    X: 1
+    Z: 0
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_01_00#87 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0017/visual
+      Position: {x: 512, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_01_01
+    X: 1
+    Z: 1
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_01_01#5519 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0048/visual
+      Position: {x: 512, y: 0, z: 512}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_01_02
+    X: 1
+    Z: 2
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_01_02#23 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison/visual
+      Position: {x: 512, y: 0, z: 1024}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_02_00
+    X: 2
+    Z: 0
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_02_00#23 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0005/visual
+      Position: {x: 1024, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_02_01
+    X: 2
+    Z: 1
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_02_01#128 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0004/visual
+      Position: {x: 1024, y: 0, z: 512}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_02_02
+    X: 2
+    Z: 2
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_02_02#27 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0029/visual
+      Position: {x: 1024, y: 0, z: 1024}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_01_03
+    X: 1
+    Z: 3
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_01_03#491 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0023/visual
+      Position: {x: 512, y: 0, z: 1536}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_01_04
+    X: 1
+    Z: 4
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_01_04#23 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0017/visual
+      Position: {x: 512, y: 0, z: 2048}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_01_11
+    X: 1
+    Z: 11
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_01_11#1064 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0041/visual
+      Position: {x: 512, y: 0, z: 5632}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_01_12
+    X: 1
+    Z: 12
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_01_12#218 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0013/visual
+      Position: {x: 512, y: 0, z: 6144}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_02_03
+    X: 2
+    Z: 3
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_02_03#2162 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0025/visual
+      Position: {x: 1024, y: 0, z: 1536}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_02_04
+    X: 2
+    Z: 4
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_02_04#19164 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0051/visual
+      Position: {x: 1024, y: 0, z: 2048}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_02_11
+    X: 2
+    Z: 11
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_02_11#4445 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0026/visual
+      Position: {x: 1024, y: 0, z: 5632}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_02_12
+    X: 2
+    Z: 12
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_02_12#16934 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0035/visual
+      Position: {x: 1024, y: 0, z: 6144}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_02_13
+    X: 2
+    Z: 13
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_02_13#9057 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0028/visual
+      Position: {x: 1024, y: 0, z: 6656}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_02_14
+    X: 2
+    Z: 14
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_02_14#37 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0022/visual
+      Position: {x: 1024, y: 0, z: 7168}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_03_01
+    X: 3
+    Z: 1
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_03_01#34 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0061/visual
+      Position: {x: 1536, y: 0, z: 512}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_03_02
+    X: 3
+    Z: 2
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_03_02#34 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0057/visual
+      Position: {x: 1536, y: 0, z: 1024}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_03_03
+    X: 3
+    Z: 3
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_03_03#2573 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0050/visual
+      Position: {x: 1536, y: 0, z: 1536}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_03_05
+    X: 3
+    Z: 5
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_03_05#6429 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0071/visual
+      Position: {x: 1536, y: 0, z: 2560}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_03_06
+    X: 3
+    Z: 6
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_03_06#18351 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0015/visual
+      Position: {x: 1536, y: 0, z: 3072}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_03_11
+    X: 3
+    Z: 11
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_03_11#1315 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0036/visual
+      Position: {x: 1536, y: 0, z: 5632}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_03_12
+    X: 3
+    Z: 12
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_03_12#8595 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0031/visual
+      Position: {x: 1536, y: 0, z: 6144}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_03_13
+    X: 3
+    Z: 13
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_03_13#7975 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0047/visual
+      Position: {x: 1536, y: 0, z: 6656}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_03_14
+    X: 3
+    Z: 14
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_03_14#27 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0060/visual
+      Position: {x: 1536, y: 0, z: 7168}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_04_01
+    X: 4
+    Z: 1
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_04_01#57 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0014/visual
+      Position: {x: 2048, y: 0, z: 512}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_04_02
+    X: 4
+    Z: 2
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_04_02#22033 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0007/visual
+      Position: {x: 2048, y: 0, z: 1024}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_04_03
+    X: 4
+    Z: 3
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_04_03#20067 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0014/visual
+      Position: {x: 2048, y: 0, z: 1536}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+    - Name: 'ffWater [BuildPlayer-Map_04_03#21952 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0075/visual
+      Position: {x: 2048, y: 0, z: 1536}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_04_04
+    X: 4
+    Z: 4
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_04_04#11377 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0015/visual
+      Position: {x: 2048, y: 0, z: 2048}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_04_05
+    X: 4
+    Z: 5
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_04_05#18051 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0019/visual
+      Position: {x: 2048, y: 0, z: 2560}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_04_06
+    X: 4
+    Z: 6
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_04_06#12357 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0004/visual
+      Position: {x: 2048, y: 0, z: 3072}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_04_07
+    X: 4
+    Z: 7
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_04_07#20920 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0031/visual
+      Position: {x: 2048, y: 0, z: 3584}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_04_09
+    X: 4
+    Z: 9
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_04_09#27 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0054/visual
+      Position: {x: 2048, y: 0, z: 4608}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_04_13
+    X: 4
+    Z: 13
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_04_13#24707 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0018/visual
+      Position: {x: 2048, y: 0, z: 6656}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_04_14
+    X: 4
+    Z: 14
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_04_14#182 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0044/visual
+      Position: {x: 2048, y: 0, z: 7168}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_05_01
+    X: 5
+    Z: 1
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_05_01#229 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0024/visual
+      Position: {x: 2560, y: 0, z: 512}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_05_02
+    X: 5
+    Z: 2
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_05_02#27018 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0020/visual
+      Position: {x: 2560, y: 0, z: 1024}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+    - Name: 'ffPoison [BuildPlayer-Map_05_02#27718 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0027/visual
+      Position: {x: 2560, y: 0, z: 1024}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_05_03
+    X: 5
+    Z: 3
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_05_03#20767 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0077/visual
+      Position: {x: 2560, y: 0, z: 1536}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+    - Name: 'ffPoison [BuildPlayer-Map_05_03#20771 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0045/visual
+      Position: {x: 2560, y: 0, z: 1536}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_05_04
+    X: 5
+    Z: 4
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_05_04#12135 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0076/visual
+      Position: {x: 2560, y: 0, z: 2048}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_05_05
+    X: 5
+    Z: 5
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_05_05#22677 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0012/visual
+      Position: {x: 2560, y: 0, z: 2560}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_05_06
+    X: 5
+    Z: 6
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_05_06#5266 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0068/visual
+      Position: {x: 2560, y: 0, z: 3072}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_05_07
+    X: 5
+    Z: 7
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_05_07#16480 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0063/visual
+      Position: {x: 2560, y: 0, z: 3584}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_05_09
+    X: 5
+    Z: 9
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_05_09#771 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater/visual
+      Position: {x: 2560, y: 0, z: 4608}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_05_10
+    X: 5
+    Z: 10
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_05_10#15703 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0022/visual
+      Position: {x: 2560, y: 0, z: 5120}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+    - Name: 'ffPoison [BuildPlayer-Map_05_10#15707 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0058/visual
+      Position: {x: 2560, y: 0, z: 5120}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_05_11
+    X: 5
+    Z: 11
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_05_11#8218 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0045/visual
+      Position: {x: 2560, y: 0, z: 5632}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_06_01
+    X: 6
+    Z: 1
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_06_01#27 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0041/visual
+      Position: {x: 3072, y: 0, z: 512}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_06_02
+    X: 6
+    Z: 2
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_06_02#27 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0003/visual
+      Position: {x: 3072, y: 0, z: 1024}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_06_04
+    X: 6
+    Z: 4
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_06_04#25078 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0007/visual
+      Position: {x: 3072, y: 0, z: 2048}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_06_06
+    X: 6
+    Z: 6
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_06_06#16097 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0055/visual
+      Position: {x: 3072, y: 0, z: 3072}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+    - Name: 'ffWater [BuildPlayer-Map_06_06#16106 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0074/visual
+      Position: {x: 3072, y: 0, z: 3072}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_06_09
+    X: 6
+    Z: 9
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_06_09#55 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0029/visual
+      Position: {x: 3072, y: 0, z: 4608}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_06_10
+    X: 6
+    Z: 10
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_06_10#4176 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0027/visual
+      Position: {x: 3072, y: 0, z: 5120}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_07_03
+    X: 7
+    Z: 3
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_07_03#23 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0030/visual
+      Position: {x: 3584, y: 0, z: 1536}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_07_04
+    X: 7
+    Z: 4
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_07_04#23 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0006/visual
+      Position: {x: 3584, y: 0, z: 2048}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_07_05
+    X: 7
+    Z: 5
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_07_05#77 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0065/visual
+      Position: {x: 3584, y: 0, z: 2560}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_07_06
+    X: 7
+    Z: 6
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_07_06#7226 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0069/visual
+      Position: {x: 3584, y: 0, z: 3072}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_07_07
+    X: 7
+    Z: 7
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_07_07#17903 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0013/visual
+      Position: {x: 3584, y: 0, z: 3584}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+    - Name: 'ffPoison [BuildPlayer-Map_07_07#19762 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0054/visual
+      Position: {x: 3584, y: 0, z: 3584}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_07_08
+    X: 7
+    Z: 8
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_07_08#9657 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0073/visual
+      Position: {x: 3584, y: 0, z: 4096}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_07_09
+    X: 7
+    Z: 9
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_07_09#108 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0028/visual
+      Position: {x: 3584, y: 0, z: 4608}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_07_10
+    X: 7
+    Z: 10
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_07_10#107 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0026/visual
+      Position: {x: 3584, y: 0, z: 5120}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_07_13
+    X: 7
+    Z: 13
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_07_13#506 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0021/visual
+      Position: {x: 3584, y: 0, z: 6656}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_07_14
+    X: 7
+    Z: 14
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_07_14#384 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0044/visual
+      Position: {x: 3584, y: 0, z: 7168}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_08_05
+    X: 8
+    Z: 5
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_08_05#37 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0053/visual
+      Position: {x: 4096, y: 0, z: 2560}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_08_06
+    X: 8
+    Z: 6
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_08_06#12648 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0011/visual
+      Position: {x: 4096, y: 0, z: 3072}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_08_07
+    X: 8
+    Z: 7
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_08_07#12112 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0048/visual
+      Position: {x: 4096, y: 0, z: 3584}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_08_11
+    X: 8
+    Z: 11
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_08_11#23 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0064/visual
+      Position: {x: 4096, y: 0, z: 5632}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_08_13
+    X: 8
+    Z: 13
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_08_13#8179 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0049/visual
+      Position: {x: 4096, y: 0, z: 6656}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_08_14
+    X: 8
+    Z: 14
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_08_14#1734 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0067/visual
+      Position: {x: 4096, y: 0, z: 7168}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_09_06
+    X: 9
+    Z: 6
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_09_06#20335 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0038/visual
+      Position: {x: 4608, y: 0, z: 3072}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+    - Name: 'ffWater [BuildPlayer-Map_09_06#20339 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0056/visual
+      Position: {x: 4608, y: 0, z: 3072}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_09_07
+    X: 9
+    Z: 7
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_09_07#12872 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0009/visual
+      Position: {x: 4608, y: 0, z: 3584}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+    - Name: 'ffPoison [BuildPlayer-Map_09_07#12881 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0016/visual
+      Position: {x: 4608, y: 0, z: 3584}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_09_08
+    X: 9
+    Z: 8
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_09_08#8912 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0039/visual
+      Position: {x: 4608, y: 0, z: 4096}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_09_09
+    X: 9
+    Z: 9
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_09_09#3962 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0002/visual
+      Position: {x: 4608, y: 0, z: 4608}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+    - Name: 'ffWater [BuildPlayer-Map_09_09#4273 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0033/visual
+      Position: {x: 4608, y: 0, z: 4608}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_09_10
+    X: 9
+    Z: 10
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_09_10#4620 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0063/visual
+      Position: {x: 4608, y: 0, z: 5120}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_09_11
+    X: 9
+    Z: 11
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_09_11#13175 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0008/visual
+      Position: {x: 4608, y: 0, z: 5632}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+    - Name: 'ffPoison [BuildPlayer-Map_09_11#14286 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0061/visual
+      Position: {x: 4608, y: 0, z: 5632}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_09_12
+    X: 9
+    Z: 12
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_09_12#6343 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0052/visual
+      Position: {x: 4608, y: 0, z: 6144}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_09_13
+    X: 9
+    Z: 13
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_09_13#2928 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0038/visual
+      Position: {x: 4608, y: 0, z: 6656}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_09_14
+    X: 9
+    Z: 14
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_09_14#1611 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0047/visual
+      Position: {x: 4608, y: 0, z: 7168}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_10_00
+    X: 10
+    Z: 0
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_10_00#48 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0021/visual
+      Position: {x: 5120, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_10_01
+    X: 10
+    Z: 1
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_10_01#30 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0037/visual
+      Position: {x: 5120, y: 0, z: 512}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_10_02
+    X: 10
+    Z: 2
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_10_02#48 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0042/visual
+      Position: {x: 5120, y: 0, z: 1024}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_10_09
+    X: 10
+    Z: 9
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_10_09#11476 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0043/visual
+      Position: {x: 5120, y: 0, z: 4608}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+    - Name: 'ffPoison [BuildPlayer-Map_10_09#12336 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0049/visual
+      Position: {x: 5120, y: 0, z: 4608}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_10_10
+    X: 10
+    Z: 10
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_10_10#17001 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0037/visual
+      Position: {x: 5120, y: 0, z: 5120}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_10_11
+    X: 10
+    Z: 11
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_10_11#7541 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0051/visual
+      Position: {x: 5120, y: 0, z: 5632}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_10_13
+    X: 10
+    Z: 13
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_10_13#58 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0066/visual
+      Position: {x: 5120, y: 0, z: 6656}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_10_14
+    X: 10
+    Z: 14
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_10_14#656 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0040/visual
+      Position: {x: 5120, y: 0, z: 7168}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_11_00
+    X: 11
+    Z: 0
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_11_00#41 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0010/visual
+      Position: {x: 5632, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_11_01
+    X: 11
+    Z: 1
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_11_01#14053 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0039/visual
+      Position: {x: 5632, y: 0, z: 512}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_11_02
+    X: 11
+    Z: 2
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_11_02#48 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0057/visual
+      Position: {x: 5632, y: 0, z: 1024}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_11_03
+    X: 11
+    Z: 3
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_11_03#39 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0032/visual
+      Position: {x: 5632, y: 0, z: 1536}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_11_04
+    X: 11
+    Z: 4
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_11_04#48 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0025/visual
+      Position: {x: 5632, y: 0, z: 2048}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_11_11
+    X: 11
+    Z: 11
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_11_11#13409 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0032/visual
+      Position: {x: 5632, y: 0, z: 5632}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_12_00
+    X: 12
+    Z: 0
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_12_00#44 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0046/visual
+      Position: {x: 6144, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_12_01
+    X: 12
+    Z: 1
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_12_01#8047 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0006/visual
+      Position: {x: 6144, y: 0, z: 512}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_12_02
+    X: 12
+    Z: 2
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_12_02#13114 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0043/visual
+      Position: {x: 6144, y: 0, z: 1024}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_12_03
+    X: 12
+    Z: 3
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_12_03#12438 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0034/visual
+      Position: {x: 6144, y: 0, z: 1536}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_12_04
+    X: 12
+    Z: 4
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_12_04#39 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0030/visual
+      Position: {x: 6144, y: 0, z: 2048}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_12_10
+    X: 12
+    Z: 10
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_12_10#13882 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0034/visual
+      Position: {x: 6144, y: 0, z: 5120}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_12_11
+    X: 12
+    Z: 11
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_12_11#465 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0010/visual
+      Position: {x: 6144, y: 0, z: 5632}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_12_12
+    X: 12
+    Z: 12
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_12_12#307 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0005/visual
+      Position: {x: 6144, y: 0, z: 6144}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_12_13
+    X: 12
+    Z: 13
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_12_13#17671 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0059/visual
+      Position: {x: 6144, y: 0, z: 6656}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_13_00
+    X: 13
+    Z: 0
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_13_00#39 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0050/visual
+      Position: {x: 6656, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_13_01
+    X: 13
+    Z: 1
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_13_01#5484 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0053/visual
+      Position: {x: 6656, y: 0, z: 512}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_13_02
+    X: 13
+    Z: 2
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_13_02#10287 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0072/visual
+      Position: {x: 6656, y: 0, z: 1024}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+    - Name: 'ffPoison [BuildPlayer-Map_13_02#11757 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0011/visual
+      Position: {x: 6656, y: 0, z: 1024}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_13_03
+    X: 13
+    Z: 3
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_13_03#48 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0064/visual
+      Position: {x: 6656, y: 0, z: 1536}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_13_04
+    X: 13
+    Z: 4
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_13_04#39 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0052/visual
+      Position: {x: 6656, y: 0, z: 2048}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_13_10
+    X: 13
+    Z: 10
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_13_10#1054 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0070/visual
+      Position: {x: 6656, y: 0, z: 5120}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_13_11
+    X: 13
+    Z: 11
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_13_11#374 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0058/visual
+      Position: {x: 6656, y: 0, z: 5632}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_13_13
+    X: 13
+    Z: 13
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_13_13#15118 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0055/visual
+      Position: {x: 6656, y: 0, z: 6656}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_14_00
+    X: 14
+    Z: 0
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_14_00#43 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0062/visual
+      Position: {x: 7168, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_14_01
+    X: 14
+    Z: 1
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_14_01#15061 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0020/visual
+      Position: {x: 7168, y: 0, z: 512}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_14_02
+    X: 14
+    Z: 2
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_14_02#12670 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0019/visual
+      Position: {x: 7168, y: 0, z: 1024}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_14_03
+    X: 14
+    Z: 3
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_14_03#41 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0056/visual
+      Position: {x: 7168, y: 0, z: 1536}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_14_13
+    X: 14
+    Z: 13
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_14_13#15217 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0002/visual
+      Position: {x: 7168, y: 0, z: 6656}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_14_15
+    X: 14
+    Z: 15
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_14_15#14985 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0062/visual
+      Position: {x: 7168, y: 0, z: 7680}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_15_00
+    X: 15
+    Z: 0
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_15_00#39 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0009/visual
+      Position: {x: 7680, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_15_01
+    X: 15
+    Z: 1
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_15_01#39 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0024/visual
+      Position: {x: 7680, y: 0, z: 512}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_15_02
+    X: 15
+    Z: 2
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_15_02#48 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0008/visual
+      Position: {x: 7680, y: 0, z: 1024}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_15_03
+    X: 15
+    Z: 3
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_15_03#39 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0023/visual
+      Position: {x: 7680, y: 0, z: 1536}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_15_09
+    X: 15
+    Z: 9
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_15_09#18087 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0040/visual
+      Position: {x: 7680, y: 0, z: 4608}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+    - Name: 'ffWater [BuildPlayer-Map_15_09#18091 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0046/visual
+      Position: {x: 7680, y: 0, z: 4608}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_15_10
+    X: 15
+    Z: 10
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_15_10#4847 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0012/visual
+      Position: {x: 7680, y: 0, z: 5120}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+    - Name: 'ffWater [BuildPlayer-Map_15_10#5748 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0042/visual
+      Position: {x: 7680, y: 0, z: 5120}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_15_11
+    X: 15
+    Z: 11
+    Visuals:
+    - Name: 'ffPoison [BuildPlayer-Map_15_11#6528 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffpoison_variant_0003/visual
+      Position: {x: 7680, y: 0, z: 5632}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+    - Name: 'ffWater [BuildPlayer-Map_15_11#6532 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0016/visual
+      Position: {x: 7680, y: 0, z: 5632}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_15_12
+    X: 15
+    Z: 12
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_15_12#15182 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0060/visual
+      Position: {x: 7680, y: 0, z: 6144}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_15_13
+    X: 15
+    Z: 13
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_15_13#17738 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0036/visual
+      Position: {x: 7680, y: 0, z: 6656}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_15_14
+    X: 15
+    Z: 14
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_15_14#17624 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0035/visual
+      Position: {x: 7680, y: 0, z: 7168}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0
+  - Id: map_15_15
+    X: 15
+    Z: 15
+    Visuals:
+    - Name: 'ffWater [BuildPlayer-Map_15_15#17759 visual]'
+      LegacyId: 
+      SourceNode: 
+      Model: {fileID: 0}
+      ModelResource: objects/unclassified/ffpoison/models/ffwater_variant_0018/visual
+      Position: {x: 7680, y: 0, z: 7680}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: -0, z: -0, w: 1}
+      CpuPresentationEnd: 0

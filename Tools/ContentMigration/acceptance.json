@@ -1,0 +1,82 @@
+{
+  "scope": "Whole-library asset layout migration; gameplay architecture remains partially implemented.",
+  "verification": {
+    "assets": 176190,
+    "errors": []
+  },
+  "sourceReferences": {
+    "models": 12187,
+    "uris": 19722,
+    "errors": [],
+    "unmappedBaselineUris": [],
+    "maximumAssetPath": 190
+  },
+  "addressables": {
+    "report": "Library/com.unity.addressables/BuildReports/buildlayout_2026.10.13.20.45.00.json",
+    "unityVersion": "6000.4.0f1",
+    "packageVersion": "com.unity.addressables: 4.1.1",
+    "buildStarted": "13.10.2026 20:45:00",
+    "durationSeconds": 404.71722389999996,
+    "buildError": "",
+    "duplicatedAssetCount": 0,
+    "bundleCount": 1332,
+    "bundleBytes": 2842934785,
+    "largestBundles": [
+      {
+        "name": "environment-sourcelibrary_assets_all_da0988e5d5575ecb45856746743263e6.bundle",
+        "bytes": 352771588
+      },
+      {
+        "name": "characters-humanoids-equipment_assets_all_3b64a44a9cc2c167f19d9e935b57618a.bundle",
+        "bytes": 241989039
+      },
+      {
+        "name": "audio-voice_assets_all_cd31148e47b5d51223856bee9d0deb27.bundle",
+        "bytes": 168752675
+      },
+      {
+        "name": "characters-nanos-appearances_assets_all_e6c9451f0a16fdaf07c5273256a75b44.bundle",
+        "bytes": 77157060
+      },
+      {
+        "name": "audio-music_assets_all_054aa4188d2b2589e59f5d1cf025c4c6.bundle",
+        "bytes": 64624065
+      }
+    ]
+  },
+  "windowsDevelopmentBuild": {
+    "result": "Succeeded",
+    "bytes": 3058663988,
+    "errors": 0,
+    "warnings": 0
+  },
+  "initialFullEditorTests": {
+    "total": "258",
+    "passed": "256",
+    "failed": "2",
+    "result": "Failed(Child)"
+  },
+  "finalFocusedEditorTests": {
+    "total": "8",
+    "passed": "8",
+    "failed": "0",
+    "result": "Passed"
+  },
+  "testNote": "The two initial EnvironmentSharingTests failures were fixed; their entire fixture and ContentLayoutTests were rerun. The full suite was not rerun after the fixes.",
+  "playerSmoke": {
+    "passed": true,
+    "exitCode": 0,
+    "seconds": 8.27,
+    "errors": [],
+    "knownBaselineDiagnostics": [
+      "ERROR: Shader Hidden/Universal Render Pipeline/DBufferClear shader is not supported on this GPU (none of subshaders/fallbacks are suitable)"
+    ]
+  },
+  "limitations": [
+    "Authored cell scenes do not yet replace WorldTileContent in the runtime streamer.",
+    "NPC/Nano animation state fidelity, typed gameplay definitions, audio events/mixers and trigger semantics remain unfinished.",
+    "Ambiguous content still requires manual classification; mass source deduplication was not performed.",
+    "The player smoke validates loading, not visual fidelity, network gameplay or mobile performance.",
+    "Zero duplicated assets refers to the Addressables Build Layout, not every possible byte duplicate or player/bundle overlap."
+  ]
+}
