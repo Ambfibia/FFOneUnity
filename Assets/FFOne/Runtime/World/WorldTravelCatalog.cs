@@ -6,7 +6,12 @@ using FFOne.Content;
 
 namespace FFOne.World
 {
-    public sealed class TravelLocation { public int Id, Npc, Type, X, Y, Z; public string Name; }
+    public sealed class TravelLocation
+    {
+        public int Id, Npc, Type, X, Y, Z, Icon;
+        public string Name;
+        public bool IsFuture;
+    }
     public sealed class TravelTrip { public int Id, Npc, Type, From, To, Cost; }
     public sealed class NpcWarp
     {
@@ -22,6 +27,8 @@ namespace FFOne.World
         public readonly List<TravelTrip> Trips = new();
         public readonly List<NpcWarp> Warps = new();
         public readonly Dictionary<int, (int X, int Z)> Maps = new();
+        public readonly HashSet<int> EpisodeMaps = new();
+        public readonly HashSet<int> LairMaps = new();
         public readonly Dictionary<int, CrocOdds> Croc = new();
         static WorldTravelCatalog cached;
         public static WorldTravelCatalog Load() => cached ??= ContentAssets.Read<NativeDataDocument, WorldTravelCatalog>(NativeData.Resource("data/tables/xdt"), Read);
@@ -34,21 +41,31 @@ namespace FFOne.World
             int N(int n, string key) => int.TryParse(Text(n, key), NumberStyles.Integer, CultureInfo.InvariantCulture, out int value) ? value : 0;
             float F(int n, string key) => float.TryParse(Text(n, key), NumberStyles.Float, CultureInfo.InvariantCulture, out float value) ? value : 0;
             int t = Child(0, "m_pTransportationTable");
+            var transportIcons = Rows(Child(t, "m_pTransIcon")).ToArray();
             foreach (int type in new[] { 1, 2 })
             {
                 var names = Rows(Child(t, type == 1 ? "m_pTransportationWarpString" : "m_pBroomstickString")).ToArray();
                 foreach (int r in Rows(Child(t, type == 1 ? "m_pTransportationWarpLocation" : "m_pBroomstickLocation")))
                 {
                     int id = N(r, "m_iLocationID"); if (id <= 0) continue;
-                    c.Locations.Add(new TravelLocation { Id = id, Type = type, Npc = N(r, "m_iNPCID"), X = N(r, "m_iXpos"), Y = N(r, "m_iYpos"), Z = N(r, "m_iZpos"),
-                        Name = id < names.Length ? Text(names[id], "m_pstrLocationName") : id.ToString() });
+                    int icon = N(r, "m_iIcon");
+                    c.Locations.Add(new TravelLocation { Id = id, Type = type, Npc = N(r, "m_iNPCID"), X = N(r, "m_iXpos"), Y = N(r, "m_iYpos"), Z = N(r, "m_iZpos"), Icon = icon >= 0 && icon < transportIcons.Length ? N(transportIcons[icon], "m_iIconNumber") : -1,
+                        Name = id < names.Length ? Text(names[id], "m_pstrLocationName") : id.ToString(),
+                        IsFuture = N(r, "m_iZone") == 1 });
                 }
             }
             foreach (int r in Rows(Child(t, "m_pTransportationData")))
                 if (N(r, "m_iVehicleID") > 0 && N(r, "m_iMoveType") is 1 or 2)
                     c.Trips.Add(new TravelTrip { Id = N(r, "m_iVehicleID"), Npc = N(r, "m_iNPCID"), Type = N(r, "m_iMoveType"), From = N(r, "m_iStartLocation"), To = N(r, "m_iEndLocation"), Cost = N(r, "m_iCost") });
             t = Child(0, "m_pInstanceTable"); var warpNames = Rows(Child(t, "m_pWarpNameData")).ToArray();
-            foreach (int r in Rows(Child(t, "m_pInstanceData"))) c.Maps[N(r, "m_iInstanceNameID")] = (N(r, "m_iZoneX"), N(r, "m_iZoneY"));
+            foreach (int r in Rows(Child(t, "m_pInstanceData")))
+            {
+                int id = N(r, "m_iInstanceNameID");
+                c.Maps[id] = (N(r, "m_iZoneX"), N(r, "m_iZoneY"));
+                if (id >= 0 && id < warpNames.Length && Text(warpNames[id], "m_pstrNameString").IndexOf("lair", StringComparison.OrdinalIgnoreCase) >= 0)
+                    c.LairMaps.Add(id);
+                if (N(r, "m_iIsEP") > 0) c.EpisodeMaps.Add(id);
+            }
             foreach (int r in Rows(Child(t, "m_pWarpData")))
             {
                 int id = N(r, "m_iWarpNumber"); if (id <= 0) continue;

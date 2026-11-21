@@ -32,6 +32,7 @@ namespace FFOne.Network
         private bool worldLoaded;
         public bool IsWorldLoaded { get => worldLoaded && IsInWorld; private set => worldLoaded = value; }
         public int SelectedSlot { get; private set; }
+        public int PaymentFlag { get; private set; }
         public WorldEntry World => IsInWorld ? world : null;
         public bool TryDequeueEvent(out NetworkEvent value)
         {
@@ -72,6 +73,7 @@ namespace FFOne.Network
                         int count = (sbyte)response.Payload[0];
                         if (count < 0 || count > 4) throw new ProtocolException("Invalid character count.");
                         SelectedSlot = (sbyte)response.Payload[1];
+                        PaymentFlag = (sbyte)response.Payload[2];
                         ulong key = Protocol0104.DeriveKey(unchecked((ulong)Protocol0104.Read64(response.Payload, 4)), count + 1, SelectedSlot + 1);
                         login.InboundKey = key; login.OutboundKey = key;
                         loginId = Protocol0104.ReadUtf16(response.Payload, 12, 33);

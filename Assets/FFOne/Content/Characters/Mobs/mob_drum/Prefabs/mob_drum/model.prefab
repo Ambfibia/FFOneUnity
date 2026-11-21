@@ -330,7 +330,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4692795599156493595}
-  - component: {fileID: 4425477333063166889}
+  - component: {fileID: 2829225946949470538}
+  - component: {fileID: 4489964135313059370}
+  - component: {fileID: 1181289519686010216}
   m_Layer: 0
   m_Name: model
   m_TagString: Untagged
@@ -354,38 +356,43 @@ Transform:
   - {fileID: 5339744945224001525}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!111 &4425477333063166889
-Animation:
+--- !u!95 &2829225946949470538
+Animator:
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1668904786572774495}
   m_Enabled: 1
-  serializedVersion: 4
-  m_Animation: {fileID: 7400000, guid: 69cf7a650aa53a2479f450fc0094262c, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: 83b4a35645ed8464d82f9c947705c9b0, type: 2}
-  - {fileID: 7400000, guid: 9d72ed14f9283ad468efd69cd594e28a, type: 2}
-  - {fileID: 7400000, guid: 40c5c2b0269825e4194e7d9801321f30, type: 2}
-  - {fileID: 7400000, guid: b9a711b78f0bbfb47967ad5020e00480, type: 2}
-  - {fileID: 7400000, guid: 64a9df8f51d50ae4c989a972a99a9cdf, type: 2}
-  - {fileID: 7400000, guid: 50b08574c337c8b4d869446c008d67b3, type: 2}
-  - {fileID: 7400000, guid: 5526a0180cc6b074f92cd8deef7d0371, type: 2}
-  - {fileID: 7400000, guid: 0484654f266b205449a2a94f4a90bf12, type: 2}
-  - {fileID: 7400000, guid: 0cfceb6363e17574b8e9a0259c7aac3e, type: 2}
-  - {fileID: 7400000, guid: 892021fe58b0a0e47abaf172834cee0f, type: 2}
-  - {fileID: 7400000, guid: 69cf7a650aa53a2479f450fc0094262c, type: 2}
-  - {fileID: 7400000, guid: d34fae4313c9d514398de766a78d1e7b, type: 2}
-  - {fileID: 7400000, guid: 27fbc5a2fef29314c906c29f22419756, type: 2}
-  - {fileID: 7400000, guid: b433697063301d74da2376ccf20da6a6, type: 2}
-  - {fileID: 7400000, guid: f63e2b686bab32e49a35a17322ad8966, type: 2}
-  - {fileID: 7400000, guid: 69cb1cc5d39ec8049b344f4d67743f83, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 098d49918c1475349ab2285926390a67, type: 2}
+  m_CullingMode: 0
   m_UpdateMode: 0
-  m_CullingType: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 1
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &4489964135313059370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1668904786572774495}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b7ac68c382befc4d9fc82662c17e418, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.Content.NativeNpcAnimator
+  animator: {fileID: 2829225946949470538}
+  AnimationSounds: []
+  Faces: []
 --- !u!1 &2091852332644078912
 GameObject:
   m_ObjectHideFlags: 0
@@ -2393,3 +2400,24 @@ Transform:
   - {fileID: 1590413827404166982}
   m_Father: {fileID: 5639211143101191565}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1181289519686010216
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1668904786572774495}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ee3989daf214b8c805f250337cb2f41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.World.WorldNpcSkins
+  surfaces:
+  - Renderer: {fileID: 7547984385160810074}
+    Slot: 0
+    Default: {fileID: 2100000, guid: 1dd572221a5c0c147b19756b6164e789, type: 2}
+    Choices:
+    - Types: aa0000006c010000
+      Material: {fileID: 2100000, guid: 1b93555cbbae5c0d8c6b0fc82950654b, type: 2}
+    - Types: e30100002e020000
+      Material: {fileID: 2100000, guid: 82a53643b907594aa9d280e649efe315, type: 2}

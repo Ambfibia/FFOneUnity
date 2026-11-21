@@ -1,0 +1,47 @@
+{
+  "status": "done",
+  "verification": "passed",
+  "notes": "Обе панели показывают локализованные остановки и регион «Будущее». Каталог ранее сверён для 47 остановок и 113 маршрутов.",
+  "evidence": "Два маршрута будущего, SCAMPER 967 и Skyway 2544. EN/RU, заблокированный выбор до регистрации, подтверждение регистрации, выбор, тариф Turbo, списание Taros и прибытие. Кадры: Logs/Studio/DashboardFive-20261119/validation-harness/live/scamper/, Logs/Studio/DashboardFive-20261119/validation-harness/live/scamper-register/, Logs/Studio/DashboardFive-20261119/validation-harness/live/skyway/, Logs/Studio/DashboardFive-20261119/validation-harness/live/skyway-register/. 19.11.2026. Unity 6000.4.0f1, свежая Windows-сборка со свежим каталогом, реальный изолированный RustyFusion. Протокол: Logs/Studio/DashboardFive-20261119/verification-20261119.json; сборка: Logs/Studio/DashboardFive-20261119/rebuild/unity-build.log; SHA-256: Logs/Studio/DashboardFive-20261119/rebuild/artifact-sha256.json.",
+  "history": [
+    {
+      "time": "2026-11-18T14:16:39+00:00",
+      "changes": {
+        "evidence": "18.11.2026. GameplayTransportation записывает ResolveWorld(destination)?.Zone в transport-route-region через FFStyle.Caption, без подстановки локализованного названия. Проверить соответствующие маршруты СКАМПЕРа и обезьян в RU.",
+        "status": "ready",
+        "verification": "analyzed"
+      }
+    },
+    {
+      "time": "2026-11-19T10:14:09+00:00",
+      "changes": {
+        "status": "active"
+      }
+    },
+    {
+      "time": "2026-11-19T10:46:31+00:00",
+      "changes": {
+        "evidence": "EditMode GameplayTravelTests прошёл. 47 остановок и 113 маршрутов сверены по XDT и сериализованным EN/RU: Logs/Studio/bugs-C345-source-audit-2026-11-19.txt. 19.11.2026. Unity 6000.4.0f1, EditMode 40/40: Logs/Studio/DashboardFive-20261119/tests.xml. Компиляция Runtime Editor и Player через Roslyn: Logs/Studio/DashboardFive-20261119/roslyn-runtime.log, Logs/Studio/DashboardFive-20261119/roslyn-player.log. Сборка Windows прервана при Generate Bundle Packing: Logs/Studio/DashboardFive-20261119/unity-build.log.",
+        "notes": "Названия остановок и регионов локализованы. Будущее берётся из зоны транспорта. Остались RU/EN кадры СКАМПЕРа и обезьян, регистрация, выбор маршрута, Turbo и поездка на изолированном сервере.",
+        "status": "review",
+        "verification": "tested"
+      }
+    },
+    {
+      "time": "2026-11-19T11:10:54+00:00",
+      "changes": {
+        "status": "active"
+      }
+    },
+    {
+      "time": "2026-11-19T11:44:03+00:00",
+      "changes": {
+        "evidence": "Два маршрута будущего, SCAMPER 967 и Skyway 2544. EN/RU, заблокированный выбор до регистрации, подтверждение регистрации, выбор, тариф Turbo, списание Taros и прибытие. Кадры: Logs/Studio/DashboardFive-20261119/validation-harness/live/scamper/, Logs/Studio/DashboardFive-20261119/validation-harness/live/scamper-register/, Logs/Studio/DashboardFive-20261119/validation-harness/live/skyway/, Logs/Studio/DashboardFive-20261119/validation-harness/live/skyway-register/. 19.11.2026. Unity 6000.4.0f1, свежая Windows-сборка со свежим каталогом, реальный изолированный RustyFusion. Протокол: Logs/Studio/DashboardFive-20261119/verification-20261119.json; сборка: Logs/Studio/DashboardFive-20261119/rebuild/unity-build.log; SHA-256: Logs/Studio/DashboardFive-20261119/rebuild/artifact-sha256.json.",
+        "notes": "Обе панели показывают локализованные остановки и регион «Будущее». Каталог ранее сверён для 47 остановок и 113 маршрутов.",
+        "status": "done",
+        "verification": "passed"
+      }
+    }
+  ],
+  "updated": "2026-11-19T11:44:03+00:00"
+}

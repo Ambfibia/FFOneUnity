@@ -22,7 +22,7 @@ namespace FFOne.UI
         public void ConfigureVehicle(FusionClient client, CancellationToken token, Func<bool> worldGate)
         {
             vehicleClient = client; vehicleToken = token; vehicleWorldGate = worldGate;
-            vehicleButton = ServiceButton(parent, "vehicle-toggle", "VEHICLE", 18, 210, 200, () => _ = ToggleVehicle());
+            vehicleButton = ServiceButton(layers.Host(UiLayer.Hud), "vehicle-toggle", "VEHICLE", 18, 210, 200, () => _ = ToggleVehicle());
             RefreshVehicle();
         }
         bool VehicleAvailable => vehicleClient != null && !disposed && !interactionSuspended && !VehicleBusy && !TravelBusy && !MailBusy &&
@@ -35,7 +35,12 @@ namespace FFOne.UI
             var state = session.Snapshot; bool mounted = !state.VehicleMounted;
             var item = state.Equipment[ProtocolVehicle.EquipmentSlot];
             if (mounted && (state.MapNumber != 0 || state.IsTutorial || item.IsEmpty || item.ItemType != 10))
-            { vehicleStatus = T("Equip a vehicle in the overworld first.", "Сначала наденьте транспорт в открытом мире."); RefreshVehicle(); return; }
+            {
+                playSound?.Invoke("action_failure01");
+                vehicleStatus = T("Equip a vehicle in the overworld first.", "Сначала наденьте транспорт в открытом мире.");
+                RefreshVehicle();
+                return;
+            }
             vehiclePending = mounted ? ProtocolVehicle.OnSuccess : ProtocolVehicle.OffSuccess;
             vehicleDeadline = Time.unscaledTime + 3; vehicleStatus = T("Waiting for server…", "Ожидание сервера…"); RefreshVehicle();
             try { await vehicleClient.SetVehicleAsync(mounted, vehicleToken); }
@@ -50,7 +55,11 @@ namespace FFOne.UI
                 // State broadcasts are authoritative too; a missing direct reply must not keep the key locked.
                 if (vehiclePending == (v.Mounted ? ProtocolVehicle.OnSuccess : ProtocolVehicle.OffSuccess)) vehiclePending = 0;
             }
-            else if (vehiclePending != 0 && (v.Type == vehiclePending || v.Type == vehiclePending + 1 || v.Type == ProtocolVehicle.OffSuccess)) vehiclePending = 0;
+            else if (vehiclePending != 0 && (v.Type == vehiclePending || v.Type == vehiclePending + 1 || v.Type == ProtocolVehicle.OffSuccess))
+            {
+                if (v.Failed && vehiclePending == ProtocolVehicle.OnSuccess) playSound?.Invoke("action_failure01");
+                vehiclePending = 0;
+            }
             vehicleStatus = v.Failed ? T("Server rejected vehicle toggle: ", "Сервер отклонил транспорт: ") + v.Error : "";
             RefreshVehicle();
         }

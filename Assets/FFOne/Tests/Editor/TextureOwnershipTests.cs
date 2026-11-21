@@ -17,7 +17,7 @@ namespace FFOne.Tests
         public void AllTextureIdentitiesLoadAfterMovingAndSourceMipsAreNotAddressable()
         {
             var settings=AddressableAssetSettingsDefaultObject.Settings;
-            var keys=JObject.Parse(File.ReadAllText("Assets/FFOne/Settings/Resources/FFOneContentIndex.json"))["keys"].Values<string>().ToHashSet();
+            var keys=settings.groups.Where(group=>group).SelectMany(group=>group.entries).Select(entry=>entry.address).ToHashSet();
             int textures=0,mips=0;
             foreach(var move in Plan["moves"])
             {
@@ -36,7 +36,7 @@ namespace FFOne.Tests
                 else
                 {
                     textures++;Assert.That(entry,Is.Not.Null,path);
-                    Assert.That(entry.address,Is.EqualTo(ContentPaths.Resource(old)));Assert.That(keys.Contains(entry.address),Is.True);
+                    Assert.That(entry.address,Is.EqualTo(ContentPaths.Resource(old)));
                 }
             }
             Assert.That(textures,Is.EqualTo(182));Assert.That(mips,Is.EqualTo(113));

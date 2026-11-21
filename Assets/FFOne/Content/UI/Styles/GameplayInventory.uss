@@ -1,0 +1,267 @@
+/* The five-column cabinet is also mounted by Mail, Trade, vendor and C.R.O.C. */
+.inventory-screen .inventory-copy { color:rgb(204,255,255); }
+.inventory-screen .inventory-item-count { position:absolute; right:3px; bottom:2px; color:white; font-size:12px; }
+.inventory-item-image { position:absolute; left:0; top:0; right:0; bottom:0; }
+.inventory-screen .inventory-item-caption { position:absolute; left:1px; top:0; width:61px; height:10px; font-size:8px; color:rgb(204,255,255); -unity-text-align:upper-right; }
+.inventory-bag-slot, .inventory-nano-collection-slot {
+    position:relative; left:auto; top:auto; width:67px; height:67px; flex-shrink:0;
+    margin:0 2px 2px 0;
+}
+.inventory-bag-slot .inventory-item-caption { display:none; }
+.inventory-equipment-slot { position:absolute; left:0; width:64px; height:64px; }
+.inventory-grid, .nano-inventory-grid { left:6px; top:36px; width:366px; height:500px; }
+.inventory-slots, .nano-inventory-slots { width:345px; min-height:500px; flex-direction:row; flex-wrap:wrap; align-content:flex-start; }
+.inventory-slot-template, .croc-workshop-template { display:none; }
+.inventory-frame { left:0; top:0; width:380px; height:632px; }
+.inventory-frame > .retro-background {
+    background-image:url("../Artwork/en/user-equip/inventory-panel.png");
+    -unity-slice-left:136; -unity-slice-right:10; -unity-slice-top:33; -unity-slice-bottom:77;
+}
+.inventory-screen.inventory-show-nanos .inventory-frame > .retro-background {
+    background-image:url("../Artwork/en/user-equip/nano-back.png");
+    -unity-slice-left:219; -unity-slice-right:10; -unity-slice-top:34; -unity-slice-bottom:77;
+}
+.inventory-screen .inventory-tab { background-image:none; }
+.inventory-screen .inventory-tab.inventory-tab-selected { background-image:none; }
+.inventory-screen .inventory-equipment-tab { left:0; top:0; width:142px; height:29px; }
+.inventory-screen .inventory-nanos-tab { left:96px; top:0; width:129px; height:29px; }
+.inventory-tab > .retro-text { -unity-font-definition:url("../Fonts/jeffe-sdf.asset"); font-size:12px; }
+.equipment-title > .equipment-title-caption { font-size:9px; }
+.inventory-screen .nano-inventory-grid, .inventory-screen .inventory-inactive-equipment,
+.inventory-screen.inventory-show-nanos .inventory-grid, .inventory-screen.inventory-show-nanos .inventory-inactive-nanos,
+.inventory-screen.inventory-read-only .inventory-inactive-equipment, .inventory-screen.inventory-read-only .inventory-inactive-nanos { display:none; }
+.inventory-screen.inventory-show-nanos .nano-inventory-grid,
+.inventory-screen.inventory-show-nanos .inventory-inactive-equipment { display:flex; }
+.inventory-screen.inventory-show-nanos.inventory-read-only .inventory-inactive-equipment { display:none; }
+.inventory-screen .inventory-player-level { color:yellow; }
+.inventory-screen .inventory-nano-power { color:red; }
+
+.inventory-nano-dialog { left:0px; top:0px; width:126px; height:69px; background-image:url("../Artwork/en/user-equip/nano-dialog.png"); }
+
+.inventory-nano-number { left:5px; top:17px; width:110px; height:14px; font-size:8px; }
+
+.inventory-nano-name { left:5px; top:31px; width:110px; height:16px; font-size:9px; }
+
+.inventory-nano-power { left:5px; top:44px; width:100px; height:12px; font-size:8px; color:red; }
+
+.inventory-nano-stamina { left:6px; top:60px; width:88px; height:4px; background-image:url("../Artwork/en/user-equip/fusion-matter-bar.png"); }
+
+.inventory-nano-skill { left:103px; top:47px; width:18px; height:18px; }
+
+.inventory-avatar { left:0px; top:-50px; width:500px; height:564px; }
+
+.inventory-combat-stat-0 { left:100px; top:0px; width:92px; height:92px; background-image:url("../Artwork/en/user-equip/stat-vs-one.png"); }
+
+.inventory-combat-value-0 { left:100px; top:85px; width:92px; height:20px; font-size:12px; -unity-text-align:middle-center; }
+
+.inventory-combat-stat-1 { left:210px; top:0px; width:92px; height:92px; background-image:url("../Artwork/en/user-equip/stat-vs-many.png"); }
+
+.inventory-combat-value-1 { left:210px; top:85px; width:92px; height:20px; font-size:12px; -unity-text-align:middle-center; }
+
+.inventory-combat-stat-2 { left:310px; top:0px; width:92px; height:92px; background-image:url("../Artwork/en/user-equip/stat-defense.png"); }
+
+.inventory-combat-value-2 { left:310px; top:85px; width:92px; height:20px; font-size:12px; -unity-text-align:middle-center; }
+
+.inventory-nano-card-0 { left:24px; top:215px; width:126px; height:69px; }
+
+.inventory-nano-card-1 { left:335px; top:175px; width:126px; height:69px; }
+
+.inventory-nano-card-2 { left:348px; top:350px; width:126px; height:69px; }
+
+.inventory-nano-portrait-0 { left:45px; top:110px; width:128px; height:128px; }
+
+.inventory-nano-portrait-1 { left:355px; top:69px; width:128px; height:128px; }
+
+.inventory-nano-portrait-2 { left:368px; top:244px; width:128px; height:128px; }
+
+.inventory-vehicle-back { left:0px; top:375px; width:167px; height:52px; background-image:url("../Artwork/en/user-equip/vehicle-dialog.png"); }
+
+.inventory-vehicle-heading { left:5px; top:379px; width:151px; height:15px; font-size:8px; }
+
+.inventory-vehicle-name { left:5px; top:399px; width:151px; height:22px; font-size:10px; }
+
+.inventory-player-name { left:13px; top:12px; width:308px; height:40px; font-size:12px; }
+
+.inventory-player-level { left:18px; top:43px; width:180px; height:20px; font-size:12px; color:yellow; }
+
+.inventory-guide-box { left:350px; top:7px; width:139px; height:57px; background-image:url("../Artwork/en/user-equip/guide-box.png"); }
+
+.inventory-guide-heading { left:360px; top:16px; width:100px; height:20px; font-size:8px; }
+
+.inventory-guide-name { left:360px; top:36px; width:118px; height:20px; font-size:8px; }
+
+.inventory-guide-icon { left:440px; top:16px; width:36px; height:36px; }
+
+.inventory-health-back { left:13px; top:68px; width:472px; height:17px; background-image:url("../Artwork/en/user-equip/hp-back.png"); }
+
+.inventory-health-fill { left:14px; top:69px; width:470px; height:15px; background-image:url("../Artwork/en/user-equip/hp-bar.png"); }
+
+.inventory-fusion-back { left:13px; top:90px; width:472px; height:17px; background-image:url("../Artwork/en/user-equip/hp-back.png"); }
+
+.inventory-fusion-fill { left:14px; top:91px; width:470px; height:15px; background-image:url("../Artwork/en/user-equip/fusion-matter-bar.png"); }
+
+.inventory-health-caption { left:17px; top:66px; width:450px; height:20px; font-size:8px; }
+
+.inventory-fusion-caption { left:17px; top:88px; width:450px; height:20px; font-size:8px; }
+
+.inventory-health-value { left:17px; top:66px; width:450px; height:20px; font-size:8px; -unity-text-align:middle-right; }
+
+.inventory-fusion-value { left:17px; top:88px; width:450px; height:20px; font-size:8px; -unity-text-align:middle-right; }
+
+.inventory-status { left:0px; top:517px; width:498px; height:115px; background-image:url("../Artwork/en/user-equip/user-status-panel.png"); -unity-slice-left:7; -unity-slice-bottom:7; -unity-slice-right:7; -unity-slice-top:7; }
+
+.inventory-turn-left { left:120px; top:440px; width:43px; height:78px; background-image:url("../Artwork/en/user-equip/turn-left.png"); }
+
+.inventory-turn-left:hover, .inventory-turn-left:focus, .inventory-turn-left:active { background-image:url("../Artwork/en/user-equip/turn-left-hover.png"); }
+
+.inventory-turn-right { left:340px; top:440px; width:43px; height:78px; background-image:url("../Artwork/en/user-equip/turn-right.png"); }
+
+.inventory-turn-right:hover, .inventory-turn-right:focus, .inventory-turn-right:active { background-image:url("../Artwork/en/user-equip/turn-right-hover.png"); }
+
+.inventory-close { left:400px; top:5px; width:30px; height:30px; }
+
+.inventory-trash { left:390px; top:555px; width:32px; height:32px; }
+
+.inventory-help { left:390px; top:590px; width:32px; height:32px; }
+
+.inventory-hammer { left:390px; top:520px; width:32px; height:32px; }
+
+.inventory-hammer { display:none; }
+
+.equipment-title { left:0px; top:1px; width:64px; height:11px; }
+
+.boost-back { left:0px; top:572px; width:64px; height:30px; background-image:url("../Artwork/en/user-equip/slot-empty.png"); }
+
+.boost-icon { left:32px; top:577px; width:30px; height:28px; background-image:url("../Artwork/en/user-equip/boost-icon.png"); }
+
+.boost-caption { left:0px; top:570px; width:60px; height:19px; font-size:8px; -unity-text-align:upper-right; }
+
+.boost-count { left:4px; top:580px; width:30px; height:20px; font-size:11px; }
+
+.potion-back { left:0px; top:602px; width:64px; height:30px; background-image:url("../Artwork/en/user-equip/slot-empty.png"); }
+
+.potion-icon { left:32px; top:607px; width:30px; height:28px; background-image:url("../Artwork/en/user-equip/potion-icon.png"); }
+
+.potion-caption { left:0px; top:600px; width:60px; height:19px; font-size:8px; -unity-text-align:upper-right; }
+
+.potion-count { left:4px; top:610px; width:30px; height:20px; font-size:11px; }
+
+.inventory-inactive-equipment { left:0px; top:0px; width:142px; height:29px; background-image:url("../Artwork/en/user-equip/item-tab.png"); }
+
+.inventory-inactive-nanos { left:96px; top:0px; width:129px; height:29px; background-image:url("../Artwork/en/user-equip/nano-tab.png"); }
+
+.inventory-grid-shadow { left:3px; top:34px; width:350px; height:503px; background-image:url("../Artwork/en/user-equip/inventory-shadow.png"); }
+
+.inventory-taros-art { left:20px; top:560px; width:149px; height:32px; background-image:url("../Artwork/en/user-equip/taros.png"); }
+
+.inventory-taros { left:0px; top:0px; width:1px; height:1px; font-size:10px; display:none; }
+
+.inventory-taros-digit-0 { left:22px; top:564px; width:12px; height:20px; font-size:10px; -unity-text-align:upper-right; }
+
+.inventory-taros-digit-1 { left:34px; top:564px; width:12px; height:20px; font-size:10px; -unity-text-align:upper-right; }
+
+.inventory-taros-digit-2 { left:46px; top:564px; width:12px; height:20px; font-size:10px; -unity-text-align:upper-right; }
+
+.inventory-taros-digit-3 { left:58px; top:564px; width:12px; height:20px; font-size:10px; -unity-text-align:upper-right; }
+
+.inventory-taros-digit-4 { left:70px; top:564px; width:12px; height:20px; font-size:10px; -unity-text-align:upper-right; }
+
+.inventory-taros-digit-5 { left:82px; top:564px; width:12px; height:20px; font-size:10px; -unity-text-align:upper-right; }
+
+.inventory-taros-digit-6 { left:94px; top:564px; width:12px; height:20px; font-size:10px; -unity-text-align:upper-right; }
+
+.inventory-taros-digit-7 { left:106px; top:564px; width:12px; height:20px; font-size:10px; -unity-text-align:upper-right; }
+
+.inventory-taros-digit-8 { left:118px; top:564px; width:12px; height:20px; font-size:10px; -unity-text-align:upper-right; }
+
+.inventory-dexlabs { left:170px; top:561px; width:203px; height:67px; background-image:url("../Artwork/en/user-equip/dexlabs.png"); }
+
+.inventory-screen .inventory-redeem { left:15px; top:598px; width:148px; height:25px; font-size:12px; -unity-slice-left:4; -unity-slice-bottom:10; -unity-slice-right:10; -unity-slice-top:4; }
+
+.inventory-background { left:585px; top:0px; width:451px; height:653px; background-image:url("../Artwork/Retrobution/c160eeb4a898326e35037903.png"); -unity-background-scale-mode:stretch-to-fill; -unity-slice-left:5; -unity-slice-right:5; }
+
+.inventory-character-background { left:0px; top:0px; width:585px; height:653px; background-image:url("../Artwork/Retrobution/5b1bb6c270c586a0f0833651.png"); -unity-background-scale-mode:stretch-to-fill; }
+
+.inventory-character { left:8px; top:7.5px; width:512px; height:649px; overflow:hidden; }
+
+.inventory-stuff { left:593px; top:7px; width:380px; height:632px; overflow:visible; }
+
+.equipment-panel { left:512px; top:7.5px; width:66px; height:632px; }
+
+.inventory-backdrop { left:0px; top:0px; width:1920px; height:1440px; background-image:url("../Artwork/en/Controls/panelback.png"); }
+
+.inventory-window { left:0px; top:0px; width:1036px; height:653px; overflow:visible; }
+
+.equipment-type-4 { top:14px; }
+
+.equipment-type-5 { top:76px; }
+
+.equipment-type-6 { top:138px; }
+
+.equipment-type-1 { top:200px; }
+
+.equipment-type-2 { top:262px; }
+
+.equipment-type-3 { top:324px; }
+
+.equipment-type-0 { top:386px; }
+
+.equipment-type-7 { top:448px; }
+
+.equipment-type-10 { top:510px; }
+
+.ff-cashmall-list-skin { position:absolute; left:0; top:0; right:0; bottom:0; }
+.ff-cashmall-list-back {
+    left:0; top:20px; width:486px; height:485px;
+    background-image:url("../Artwork/en/vendor/list-back.png");
+    -unity-slice-left:6; -unity-slice-right:6; -unity-slice-top:14; -unity-slice-bottom:55;
+}
+.ff-cashmall-scroll-shadow {
+    left:4px; top:35px; width:450px; height:412px;
+    background-image:url("../Artwork/en/vendor/scroll-shadow.png");
+    -unity-slice-top:32; -unity-slice-bottom:32;
+}
+
+.inventory-item-restricted > .retro-background, .vendor-item-restricted {
+    background-image:url("../Artwork/en/vendor/restricted-item-frame.png");
+    -unity-background-scale-mode:stretch-to-fill;
+}
+.vendor-item-restricted { position:absolute; left:1px; top:1px; width:62px; height:62px; }
+
+.inventory-item-detail { display:none; position:absolute; left:0; right:0; top:0; bottom:0; align-items:center; justify-content:center; }
+.inventory-item-detail--open { display:flex; }
+.inventory-detail-window { width:310px; height:449px; position:relative; }
+.inventory-detail-art { position:absolute; left:0; right:0; top:14px; bottom:0; background-image:url("../Artwork/en/user-equip/unequip-popup.png"); -unity-background-scale-mode:stretch-to-fill; }
+.inventory-item-detail--equipped .inventory-detail-art { background-image:url("../Artwork/en/user-equip/equip-popup.png"); }
+.inventory-detail-title, .inventory-detail-level, .inventory-detail-description, .inventory-detail-column > Label { -unity-font-definition:url("../Fonts/chaletbook-regular-sdf.asset"); font-size:15px; color:white; white-space:normal; }
+.inventory-detail-title { position:absolute; left:88px; right:13px; top:47px; height:51px; -unity-font-definition:url("../Fonts/jeffe-sdf.asset"); -unity-text-align:middle-left; }
+.inventory-detail-icon { position:absolute; left:16px; top:38px; width:62px; height:62px; }
+.inventory-detail-level { position:absolute; left:14px; right:14px; top:127px; height:23px; -unity-text-align:middle-center; }
+.inventory-detail-ratings { position:absolute; left:3px; top:157px; width:304px; height:84px; flex-direction:row; align-items:center; background-image:url("../Artwork/en/user-equip/equip-item-info.png"); }
+.inventory-detail-column { flex-grow:1; flex-basis:0; }
+.inventory-detail-column > Label { height:22px; -unity-text-align:middle-center; }
+.inventory-detail-column > .inventory-rating--better { color:rgb(0,255,0); }
+.inventory-detail-column > .inventory-rating--worse { color:rgb(230,51,0); }
+.inventory-detail-description-box { position:absolute; left:13px; right:13px; top:250px; bottom:55px; }
+.inventory-detail-description { font-size:14px; }
+.inventory-detail-action { position:absolute; left:80px; right:80px; height:27px; bottom:16px; }
+.inventory-detail-close { position:absolute; right:0; top:0; width:32px; height:32px; background-image:url("../Artwork/en/user-equip/close.png"); }
+.inventory-detail-close:hover { background-image:url("../Artwork/en/user-equip/close-hover.png"); }
+
+.ff-bank-panel { position:absolute; left:0; top:0; width:495px; height:638px; background-color:rgba(3,15,26,0.98); }
+.ff-bank-info { position:absolute; left:3px; top:9px; width:481px; height:87px; background-image:url("../Artwork/en/bank-mode/bank-info.png"); }
+.ff-bank-dialog { position:absolute; left:11px; top:105px; width:482px; height:531px; background-image:url("../Artwork/en/bank-mode/bank-panel.png"); -unity-slice-left:136; -unity-slice-right:10; -unity-slice-top:33; -unity-slice-bottom:51; }
+.ff-bank-viewport { position:absolute; left:40px; top:139px; width:450px; height:445px; }
+.ff-bank-grid { width:402px; height:2278px; flex-direction:row; flex-wrap:wrap; align-content:flex-start; flex-shrink:0; }
+.ff-bank-slot {
+    width:66px; height:66px; min-width:66px; min-height:66px; flex-grow:0; flex-shrink:0;
+    margin:0 1px 1px 0; padding:0; border-width:0; background-color:transparent;
+    background-image:url("../Artwork/en/character/selection/controls/blue_button_normal.png");
+    -unity-slice-left:6; -unity-slice-right:6; -unity-slice-top:6; -unity-slice-bottom:4;
+}
+.ff-bank-slot:hover, .ff-bank-slot:focus { background-image:url("../Artwork/en/character/selection/controls/blue_button_over.png"); }
+.ff-bank-search { position:absolute; left:242px; top:105px; width:250px; height:32px; background-image:url("../Artwork/en/bank-mode/search-field.png"); }
+.ff-bank-query { position:absolute; left:64px; top:7px; width:177px; height:18px; margin:0; padding:0; font-size:11px; color:white; }
+.ff-bank-query > .unity-text-input { margin:0; padding:1px 3px; border-width:0; color:white; background-image:url("../Artwork/en/launcher/login/ff-textfield-normal.png"); }
+.ff-bank-grid--filtered { height:auto; }
+.ff-bank-tab { position:absolute; left:-216px; top:0; width:130px; height:29px; padding:3px 0; color:white; font-size:12px; -unity-text-align:middle-center; }

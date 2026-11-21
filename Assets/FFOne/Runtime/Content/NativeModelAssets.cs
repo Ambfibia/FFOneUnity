@@ -7,6 +7,11 @@ namespace FFOne.Content
     public static class NativeModelAssets
     {
         public const string EditableRoot = "NativeEditable";
+        static NativeModelCatalog indexedCatalog;
+        static System.Collections.Generic.Dictionary<string, string> published;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetIndex() { indexedCatalog = null; published = null; }
 
         /// <summary>Resolve serialized model references without adding source paths to runtime data.</summary>
         public static GameObject Resolve(GameObject original)
@@ -34,12 +39,32 @@ namespace FFOne.Content
         static string OverrideResource(string resource)
         {
             var catalog = FFOne.Content.ContentAssets.Load<NativeModelCatalog>(EditableRoot + "/Index");
-            if (catalog) foreach (var binding in catalog.Bindings)
-                if (binding.OriginalResource == resource) return binding.EditableResource;
+            return OverrideResource(resource, catalog);
+        }
+        static string OverrideResource(string resource, NativeModelCatalog catalog)
+        {
+            if (catalog && (!Application.isPlaying || indexedCatalog != catalog || published == null))
+            {
+                published = new System.Collections.Generic.Dictionary<string, string>(StringComparer.Ordinal);
+                foreach (var binding in catalog.Bindings) published.TryAdd(binding.OriginalResource, binding.EditableResource);
+                indexedCatalog = catalog;
+            }
+            if (catalog && published.TryGetValue(resource, out string path)) return path;
+            // The Nano table omits the trailing N used by Belladonna's published model.
+            if (resource == "characters/nanos/nano_belladonna/nano_belladonna")
+                return EditableResourcePath(resource + "N");
             return EditableResourcePath(resource);
         }
 
         public static Request LoadAsync(string resource) => new Request(Normalize(resource));
+
+        public static async System.Threading.Tasks.Task<GameObject> PreloadAsync(string resource, System.Threading.CancellationToken cancellation = default)
+        {
+            resource = Normalize(resource);
+            await ContentAssets.GetAsync<NativeModelCatalog>(EditableRoot + "/Index", cancellation);
+            var prefab = await ContentAssets.GetAsync<GameObject>(OverrideResource(resource), cancellation);
+            return prefab ? prefab : await ContentAssets.GetAsync<GameObject>(resource, cancellation);
+        }
 
         static string Normalize(string resource)
         {
@@ -59,11 +84,11 @@ namespace FFOne.Content
         {
             readonly string original;
             FFOne.Content.ContentAssets.Request pending;
-            bool fallback, disposed;
+            bool catalogPending = true, fallback, disposed;
             internal Request(string resource)
             {
                 original = resource;
-                pending = FFOne.Content.ContentAssets.AcquireAsync<GameObject>(OverrideResource(resource));
+                pending = FFOne.Content.ContentAssets.LoadAsync<NativeModelCatalog>(EditableRoot + "/Index");
             }
             public UnityEngine.Object asset => isDone ? pending.asset : null;
             public bool isDone
@@ -72,6 +97,14 @@ namespace FFOne.Content
                 {
                     if (disposed) return true;
                     if (!pending.isDone) return false;
+                    if (catalogPending)
+                    {
+                        catalogPending = false;
+                        string path = OverrideResource(original, pending.asset as NativeModelCatalog);
+                        pending.Dispose();
+                        pending = FFOne.Content.ContentAssets.AcquireAsync<GameObject>(path);
+                        if (!pending.isDone) return false;
+                    }
                     if (!pending.asset && !fallback)
                     {
                         fallback = true;

@@ -103,7 +103,7 @@ namespace FFOne.Network
             if (Read64(load, 4) != uid) throw new ProtocolException("World entry character UID does not match selection.");
             return new WorldEntry
             {
-                PlayerId = Read32(payload, 0), CharacterUid = uid,
+                PlayerId = Read32(payload, 0), CharacterUid = uid, UserLevel = Read16(load, 0),
                 X = Read32(load, 120), Y = Read32(load, 124), Z = Read32(load, 128), Angle = Read32(load, 132),
                 Level = Read16(load, 84), Hp = Read32(load, 92), FusionMatter = Read32(load, 108),
                 MapNumber = Read32(load, 116), ServerTime = unchecked((ulong)Read64(payload, 2692)), RawLoadData = load
@@ -159,13 +159,19 @@ namespace FFOne.Network
 
         internal static CharacterStyle ReadStyle(byte[] p, int offset, int flags)
         {
+            var style = ReadAppearance(p, offset);
+            style.AppearanceComplete = p[flags] != 0; style.TutorialComplete = p[flags + 1] != 0; style.Payzone = p[flags + 2] != 0;
+            return style;
+        }
+
+        internal static CharacterStyle ReadAppearance(byte[] p, int offset)
+        {
             return new CharacterStyle
             {
                 NameCheck = (sbyte)p[offset + 8], Gender = (sbyte)p[offset + 62], FaceStyle = (sbyte)p[offset + 63],
                 HairStyle = (sbyte)p[offset + 64], HairColor = (sbyte)p[offset + 65], SkinColor = (sbyte)p[offset + 66],
                 EyeColor = (sbyte)p[offset + 67], Height = (sbyte)p[offset + 68], Body = (sbyte)p[offset + 69],
-                Class = Read32(p, offset + 72), AppearanceComplete = p[flags] != 0,
-                TutorialComplete = p[flags + 1] != 0, Payzone = p[flags + 2] != 0
+                Class = Read32(p, offset + 72)
             };
         }
 

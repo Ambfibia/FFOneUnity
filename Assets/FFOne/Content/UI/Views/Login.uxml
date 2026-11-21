@@ -1,16 +1,86 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Template name="AccountRow" src="LoginAccountRow.uxml" />
+    <ui:Template name="ServerRow" src="LoginServerRow.uxml" />
+    <ui:Template name="FrontendDialogs" src="FrontendDialogs.uxml" />
     <Style src="/Assets/FFOne/Content/UI/Styles/FFTheme.uss" />
+    <Style src="/Assets/FFOne/Content/UI/Styles/FrontendLoginBrowser.uss" />
     <Style src="/Assets/FFOne/Content/UI/Styles/Frontend.uss" />
-    <ui:VisualElement name="login-screen" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;">
-        <ui:Image name="login-background" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; width: 1920px; height: 1080px;" />
-        <ui:VisualElement name="login-panel" picking-mode="Ignore" style="position: absolute; width: 370px; height: 299px;">
-            <ui:Label name="username-label" text="USERNAME :" class="ff-label" picking-mode="Ignore" style="position: absolute; left: 50px; top: 15px; width: 200px; height: 20px; padding-top: 3px; padding-bottom: 3px;" />
-            <ui:TextField name="username" class="ff-input" max-length="32" style="position: absolute; left: 45px; top: 40px; width: 280px; height: 25px;" />
-            <ui:Label name="password-label" text="PASSWORD :" class="ff-label" picking-mode="Ignore" style="position: absolute; left: 50px; top: 75px; width: 200px; height: 20px; padding-top: 3px; padding-bottom: 3px;" />
-            <ui:TextField name="password" class="ff-input" is-password-field="true" max-length="32" style="position: absolute; left: 45px; top: 100px; width: 280px; height: 25px;" />
-            <ui:Button name="login-submit" text="LOG IN" class="ff-button ff-button--primary" style="position: absolute; left: 45px; top: 159px; width: 280px; height: 35px;" />
-            <ui:Button name="login-language" text="LANGUAGE: ENGLISH" class="ff-button ff-button--primary" style="position: absolute; left: 45px; top: 202px; width: 280px; height: 35px;" />
-            <ui:Button name="registration-help" text="HOW TO REGISTER?" class="ff-button ff-button--primary" style="position: absolute; left: 45px; top: 245px; width: 280px; height: 35px;" />
+    <ui:VisualElement class="ff-loading" style="display:none;">
+        <ui:Image name="loading-background" class="ff-loading-background" picking-mode="Ignore" scale-mode="ScaleAndCrop" />
+        <ui:VisualElement class="ff-loading-window" picking-mode="Ignore">
+            <ui:Label class="ff-loading-tip ff-copy" picking-mode="Ignore" enable-rich-text="false" />
+            <ui:Label class="ff-loading-resource ff-label" picking-mode="Ignore" enable-rich-text="false" />
+            <ui:Label class="ff-loading-caption ff-label" picking-mode="Ignore" enable-rich-text="false" />
+            <ui:VisualElement class="ff-loading-bar-clip" picking-mode="Ignore" style="top:217px;">
+                <ui:VisualElement class="ff-loading-bar-fill ff-loading-current" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:VisualElement class="ff-loading-bar-clip" picking-mode="Ignore" style="top:257px;">
+                <ui:VisualElement class="ff-loading-bar-fill ff-loading-overall" picking-mode="Ignore" />
+            </ui:VisualElement>
         </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="login-screen" class="ff-login-screen" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;">
+        <ui:VisualElement name="login-background" class="ff-login-art" picking-mode="Ignore" style="position: absolute; left: 0; top: 0; width: 1920px; height: 1080px;" />
+        <ui:VisualElement name="login-panel" class="ff-login-panel" picking-mode="Ignore" style="position: absolute; width: 370px; height: 299px;">
+            <ui:Label name="username-label" text="USERNAME :" class="ff-label ff-login-user-caption" picking-mode="Ignore" style="position: absolute; left: 50px; top: 15px; width: 200px; height: 20px; padding-top: 3px; padding-bottom: 3px;" />
+            <ui:TextField name="username" class="ff-input ff-login-username" max-length="32" style="position: absolute; left: 45px; top: 40px; height: 25px;" />
+            <ui:Label name="password-label" text="PASSWORD :" class="ff-label ff-login-password-caption" picking-mode="Ignore" style="position: absolute; left: 50px; top: 75px; width: 200px; height: 20px; padding-top: 3px; padding-bottom: 3px;" />
+            <ui:TextField name="password" class="ff-input ff-login-password" mask-character="*" password="true" max-length="32" style="position: absolute; left: 45px; top: 100px; width: 280px; height: 25px;" />
+            <ui:Button name="login-submit" text="LOG IN" class="ff-button ff-button--primary ff-login-submit" style="position: absolute; left: 45px; top: 159px; width: 280px; height: 35px;" />
+            <ui:Button name="login-language" text="LANGUAGE: ENGLISH" class="ff-button ff-button--primary ff-login-language" style="position: absolute; left: 45px; top: 202px; width: 280px; height: 35px;" />
+            <ui:Button name="registration-help" text="HOW TO REGISTER?" class="ff-button ff-button--primary ff-login-registration" style="position: absolute; left: 45px; top: 245px; width: 280px; height: 35px;" />
+            <ui:VisualElement name="account-controls" class="ff-account-controls" picking-mode="Ignore">
+                <ui:Label name="account-caption" class="ff-label ff-account-caption" picking-mode="Ignore" />
+                <ui:Button name="new-account" text="+" class="ff-button ff-profile-button ff-account-new" />
+                <ui:VisualElement name="saved-account-frame" class="ff-saved-account-frame" picking-mode="Ignore">
+                    <ui:ScrollView name="saved-accounts" class="ff-account-scroll" mode="Vertical" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" />
+                    <ui:VisualElement name="account-scroll-track" class="ff-account-scroll-track">
+                        <ui:VisualElement name="account-scroll-thumb" class="ff-account-scroll-thumb" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Button name="back-to-accounts" class="ff-button ff-profile-button ff-account-back">
+                    <ui:VisualElement name="icon-back" class="ff-profile-icon ff-profile-icon--back" picking-mode="Ignore">
+                        <ui:VisualElement name="stroke" class="ff-profile-icon-stroke ff-back-line" picking-mode="Ignore" />
+                        <ui:VisualElement name="stroke" class="ff-profile-icon-stroke ff-back-upper" picking-mode="Ignore" />
+                        <ui:VisualElement name="stroke" class="ff-profile-icon-stroke ff-back-lower" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                </ui:Button>
+                <ui:Button name="remember-account" class="ff-button ff-remember-account">
+                    <ui:VisualElement name="remember-check" class="ff-remember-check" picking-mode="Ignore" />
+                    <ui:Label name="remember-caption" class="ff-label ff-remember-caption" picking-mode="Ignore" />
+                </ui:Button>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="server-browser" class="ff-server-browser" picking-mode="Ignore">
+            <ui:Label name="server-browser-title" class="ff-label ff-server-browser-title" picking-mode="Ignore" />
+            <ui:Button name="refresh-servers" class="ff-button ff-profile-button ff-server-refresh">
+                <ui:VisualElement name="icon-refresh" class="ff-profile-icon ff-profile-icon--refresh" picking-mode="Ignore">
+                    <ui:VisualElement name="stroke" class="ff-profile-icon-stroke ff-refresh-line-1" picking-mode="Ignore" />
+                    <ui:VisualElement name="stroke" class="ff-profile-icon-stroke ff-refresh-line-2" picking-mode="Ignore" />
+                    <ui:VisualElement name="stroke" class="ff-profile-icon-stroke ff-refresh-line-3" picking-mode="Ignore" />
+                    <ui:VisualElement name="stroke" class="ff-profile-icon-stroke ff-refresh-line-4" picking-mode="Ignore" />
+                    <ui:VisualElement name="stroke" class="ff-profile-icon-stroke ff-refresh-line-5" picking-mode="Ignore" />
+                    <ui:VisualElement name="stroke" class="ff-profile-icon-stroke ff-refresh-line-6" picking-mode="Ignore" />
+                    <ui:VisualElement name="stroke" class="ff-profile-icon-stroke ff-refresh-line-7" picking-mode="Ignore" />
+                    <ui:VisualElement name="stroke" class="ff-profile-icon-stroke ff-refresh-line-8" picking-mode="Ignore" />
+                    <ui:VisualElement name="stroke" class="ff-profile-icon-stroke ff-refresh-line-9" picking-mode="Ignore" />
+                    <ui:VisualElement name="stroke" class="ff-profile-icon-stroke ff-refresh-tip-top" picking-mode="Ignore" />
+                    <ui:VisualElement name="stroke" class="ff-profile-icon-stroke ff-refresh-tip-side" picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:Button>
+            <ui:Button name="add-server-page" class="ff-button ff-profile-button ff-server-page-toggle" />
+            <ui:VisualElement class="ff-server-list" picking-mode="Ignore">
+                <ui:VisualElement class="ff-server-rows" picking-mode="Ignore" />
+                <ui:Button name="more-servers" class="ff-button ff-profile-button ff-server-more" />
+            </ui:VisualElement>
+            <ui:VisualElement class="ff-server-form" picking-mode="Ignore">
+                <ui:TextField name="server-address" class="ff-input ff-server-address" max-length="240" />
+                <ui:Button name="add-server" class="ff-button ff-button--primary ff-server-add" />
+            </ui:VisualElement>
+            <ui:Label name="profile-error" class="ff-label ff-copy ff-server-error" picking-mode="Ignore" enable-rich-text="false" />
+        </ui:VisualElement>
+        <ui:Instance template="AccountRow" class="ff-account-row-template" style="display:none;" />
+        <ui:Instance template="ServerRow" class="ff-server-row-template" style="display:none;" />
+        <ui:Instance template="FrontendDialogs" class="ff-frontend-dialog-template" style="display:none;" />
     </ui:VisualElement>
 </ui:UXML>

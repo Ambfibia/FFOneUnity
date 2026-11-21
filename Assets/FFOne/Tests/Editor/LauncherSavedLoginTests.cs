@@ -15,6 +15,41 @@ namespace FFOne.Tests
     {
         [TestCase(false)]
         [TestCase(true)]
+        public async Task StalledLauncherRequestDistinguishesDeadlineFromCallerCancellation(bool callerCancels)
+        {
+            var api = new TcpListener(IPAddress.Loopback, 0);
+            api.Start();
+            using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(8));
+            using var stop = deadline.Token.Register(api.Stop);
+            using var caller = CancellationTokenSource.CreateLinkedTokenSource(deadline.Token);
+            using var client = new FusionClient { ReplyTimeout = TimeSpan.FromSeconds(callerCancels ? 5 : 1) };
+            try
+            {
+                var login = client.LoginWithLauncherCredentialAsync($"http://127.0.0.1:{((IPEndPoint)api.LocalEndpoint).Port}",
+                    "tester", "test-only-password", false, caller.Token);
+                using var peer = await api.AcceptTcpClientAsync();
+                using var close = deadline.Token.Register(peer.Dispose);
+                var stream = peer.GetStream();
+                using var reader = new StreamReader(stream, Encoding.ASCII, false, 1024, true);
+                Assert.That(await reader.ReadLineAsync(), Does.StartWith("GET "));
+                if (callerCancels) caller.Cancel();
+                try
+                {
+                    await login;
+                    Assert.Fail("The launcher endpoint never replied.");
+                }
+                catch (OperationCanceledException) when (callerCancels && !deadline.IsCancellationRequested) { }
+                catch (TimeoutException error) when (!callerCancels)
+                {
+                    Assert.That(error.Message, Is.EqualTo("Launcher authentication timed out."));
+                }
+                Assert.That(client.IsLoggedIn, Is.False);
+            }
+            finally { api.Stop(); }
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
         public async Task PasswordAndSavedRefreshBothCompleteTheRealCookieHandshake(bool saved)
         {
             var api = new TcpListener(IPAddress.Loopback, 0);

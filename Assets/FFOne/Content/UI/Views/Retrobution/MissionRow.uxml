@@ -1,9 +1,10 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
   <Style src="../../Styles/Retrobution.uss" />
-  <ui:VisualElement name="mission-row" style="position:relative; width:350px; height:71px; flex-shrink:0;">
-      <ui:Button name="select-mission" class="retro-control retro-style-f21f87afd85253b0" style="left:6px; top:0px; width:330px; height:56px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="select-mission-label" class="retro-text" text="" picking-mode="Ignore" /></ui:Button>
-      <ui:VisualElement name="row-title" class="retro-control retro-style-3a4e1cf36dc040c0" picking-mode="Ignore" style="left:15px; top:5px; width:280px; height:25px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="row-title-label" class="retro-text" text="" picking-mode="Ignore" /></ui:VisualElement>
-      <ui:VisualElement name="row-objective" class="retro-control retro-style-9d14051bf700dc0c" picking-mode="Ignore" style="left:15px; top:25px; width:280px; height:30px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="row-objective-label" class="retro-text" text="" picking-mode="Ignore" /></ui:VisualElement>
-      <ui:Button name="track-mission" class="retro-control retro-style-782179bf1f78618f" style="left:311px; top:20px; width:22px; height:22px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="track-mission-label" class="retro-text" text="" picking-mode="Ignore" /></ui:Button>
+  <Style src="../../Styles/Gameplay.uss" />
+  <ui:VisualElement name="mission-row" class="ff-mission-row" style="position:relative; width:350px; height:71px; flex-shrink:0;">
+      <ui:Button name="select-mission" class="ff-select-mission retro-control retro-style-f21f87afd85253b0" style="left:6px; top:0px; width:330px; height:56px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="select-mission-label" class="retro-text" text="" picking-mode="Ignore" /></ui:Button>
+      <ui:VisualElement name="row-title" class="retro-control retro-style-3a4e1cf36dc040c0" picking-mode="Ignore" style="left:15px; top:5px; width:280px; height:25px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="row-title-label" class="ff-row-title-label retro-text" text="" picking-mode="Ignore" /></ui:VisualElement>
+      <ui:VisualElement name="row-objective" class="retro-control retro-style-9d14051bf700dc0c" picking-mode="Ignore" style="left:15px; top:30px; width:280px; height:22px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="row-objective-label" class="ff-row-objective-label retro-text" text="" picking-mode="Ignore" /></ui:VisualElement>
+      <ui:Button name="track-mission" class="ff-track-mission retro-control retro-style-782179bf1f78618f" style="left:311px; top:20px; width:22px; height:22px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="track-mission-label" class="retro-text" text="" picking-mode="Ignore" /></ui:Button>
   </ui:VisualElement>
 </ui:UXML>

@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using FFOne.Content;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace FFOne.World
 {
@@ -20,7 +20,6 @@ namespace FFOne.World
         internal int ParticleCount { get; private set; }
         internal int BudgetDeferrals { get; private set; }
         internal int RetainedExpiredParticles { get; private set; }
-        struct Particle { internal Vector3 Position, Velocity; internal float Age; internal bool Alive; }
         sealed class RandomStream
         {
             uint state;
@@ -34,8 +33,8 @@ namespace FFOne.World
         struct Key { internal float Time; internal Vector3 Translation; internal bool Emit; }
         sealed class Emitter
         {
-            internal WorldBehaviourEffectAssets.Plan Plan; internal Transform Transform; internal Mesh Mesh; internal MeshRenderer Renderer;
-            internal readonly List<Particle> Particles = new List<Particle>();
+            internal NativeParticleSettings Plan; internal Transform Transform; internal NativeParticleEmitter Native;
+            internal int Expired;
             internal Key[] Keys; internal float Timer = 2, Age, MaximumTimer, Scale; internal bool DisableUpdate;
             internal RandomStream Random;
         }
@@ -46,17 +45,13 @@ namespace FFOne.World
         }
         readonly WorldBehaviour owner;
         readonly List<Emitter> emitters = new List<Emitter>();
-        readonly Dictionary<string, WorldBehaviourEffectAssets.Plan> plans = new Dictionary<string, WorldBehaviourEffectAssets.Plan>();
-        readonly Dictionary<string, JToken> closures;
-        readonly List<Vector3> vertices = new List<Vector3>();
-        readonly List<Vector2> uvs = new List<Vector2>();
-        readonly List<Color> colors = new List<Color>();
-        readonly List<int> indices = new List<int>();
+        readonly Dictionary<string, NativeParticleSettings> plans = new Dictionary<string, NativeParticleSettings>();
+        readonly Dictionary<string, NativeParticleSettings> closures;
         Camera view;
-        internal WorldBehaviourParticles(WorldBehaviour parent, JArray definitions, Camera camera)
+        internal WorldBehaviourParticles(WorldBehaviour parent, NativeWorldParticleDefinition[] definitions, Camera camera)
         {
             owner = parent; view = camera;
-            closures = (definitions ?? new JArray()).ToDictionary(c => (string)c["id"], c => c);
+            closures = (definitions ?? Array.Empty<NativeWorldParticleDefinition>()).ToDictionary(c => c.Settings.Id, c => c.Settings);
             owners.Add(this);
         }
         internal void Complete() => closures.Clear();
@@ -79,37 +74,30 @@ namespace FFOne.World
                     var child = new GameObject("Particle " + plan.Name); child.transform.SetParent(root, false);
                     var keys = scriptKeys.Select(k => new Key { Time = (float)k["time"], Translation = WorldBehaviour.Vector(k["translate"]), Emit = (int)k["genType"] != 0 }).ToArray();
                     child.transform.localPosition = keys[0].Translation;
-                    var mesh = new Mesh { name = "Streamed " + plan.Name }; mesh.MarkDynamic();
-                    child.AddComponent<MeshFilter>().sharedMesh = mesh;
-                    var renderer = child.AddComponent<MeshRenderer>(); renderer.sharedMaterial = plan.Material;
-                    renderer.shadowCastingMode = ShadowCastingMode.Off; renderer.receiveShadows = false; renderer.enabled = plan.RendererEnabled;
-                    emitters.Add(new Emitter { Plan = plan, Transform = child.transform, Mesh = mesh, Renderer = renderer, Keys = keys,
+                    float scale = (bool?)record["conformToScale"] == true ? Mathf.Abs(root.lossyScale.x) : 1;
+                    var native = new NativeParticleEmitter(child, plan.Material, plan.Lifetime, plan.InitialSize,
+                        plan.Width, plan.Height, plan.Rotation, plan.Force, scale, plan.RenderMode,
+                        plan.XTiles, plan.YTiles, plan.Cycles, true, plan.AnimateColor, plan.Colors, MaximumStreamedParticles);
+                    child.GetComponent<ParticleSystemRenderer>().enabled = plan.RendererEnabled;
+                    emitters.Add(new Emitter { Plan = plan, Transform = child.transform, Native = native, Keys = keys,
                         MaximumTimer = (float?)record["maxTimer"] ?? 0, DisableUpdate = (bool?)record["disableUpdate"] ?? false,
-                        Scale = (bool?)record["conformToScale"] == true ? Mathf.Abs(root.lossyScale.x) : 1,
-                        Random = new RandomStream(Seed((string)record["node"] + identity + i)) });
+                        Scale = scale, Random = new RandomStream(Seed((string)record["node"] + identity + i)) });
                     owner.ParticleEmitterBindings++;
                 }
                 catch (Exception error) { owner.Problem(error.Message, true); }
             }
             // Some named effects consist entirely of their separately published NIF meshes.
         }
-        internal void BindElement(JObject document, Transform root, string node)
+        internal void BindElement(NativeEffectDefinition definition, Transform root, string node)
         {
-            var objects = (JArray)document["objects"];
-            var controller = objects.Select(o => o["value"]).First(v => v["particles"] != null && v["maxTimer"] != null);
-            var refs = new JArray();
-            foreach (var particle in controller["particles"])
+            var refs=new JArray();var records=new JArray();
+            foreach(var published in definition.ElementParticles)
             {
-                long actor = (long)particle["particlePrefab"]["pathId"];
-                var gameObject = objects.Single(o => (string)o["objectType"] == "GameObject" && (long)o["pathId"] == actor);
-                string id = "world-ep:" + (string)gameObject["asset"] + "#" + actor;
-                if (!closures.ContainsKey(id)) closures.Add(id, new JObject { ["id"] = id, ["root"] = new JObject { ["pathId"] = actor }, ["objects"] = objects.DeepClone() });
-                refs.Add(id);
+                var plan=published.Settings;closures.TryAdd(plan.Id,plan);refs.Add(plan.Id);
+                records.Add(new JObject { ["scriptKeys"]=new JArray(plan.Keys.Select(k=>new JObject { ["time"]=k.Time,["translate"]=new JArray(k.Translation.x,k.Translation.y,k.Translation.z),["genType"]=k.Emit?1:0 })) });
             }
-            var record = new JObject { ["node"] = node, ["resolvedParticlePrefabs"] = refs, ["particles"] = controller["particles"].DeepClone(),
-                ["maxTimer"] = controller["maxTimer"].DeepClone(), ["disableUpdate"] = (int?)controller["disableUpdate"] != 0,
-                ["conformToScale"] = true };
-            Bind(record, root);
+            Bind(new JObject { ["node"]=node,["resolvedParticlePrefabs"]=refs,["particles"]=records,
+                ["maxTimer"]=definition.MaximumTimer,["disableUpdate"]=definition.DisableUpdate,["conformToScale"]=true },root);
         }
         static uint Seed(string value) { unchecked { uint hash = 2166136261; foreach (char c in value) hash = (hash ^ c) * 16777619; return hash; } }
         internal void Update(float delta, Camera camera)
@@ -136,26 +124,19 @@ namespace FFOne.World
             // Expired native entities release budget at a bounded rate even though they stop drawing immediately.
             int removals = ExpiredRemovalsPerFrame;
             foreach (var item in ordered)
-                for (int i = item.Emitter.Particles.Count-1; i >= 0 && removals > 0; i--)
-                    if (!item.Emitter.Particles[i].Alive)
-                    {
-                        item.Emitter.Particles.RemoveAt(i); item.Owner.RetainedExpiredParticles--; budgetParticles--; removals--;
-                    }
+            {
+                int count = Math.Min(item.Emitter.Expired, removals);
+                item.Emitter.Expired -= count; item.Owner.RetainedExpiredParticles -= count;
+                budgetParticles -= count; removals -= count;
+            }
             ordered.Sort((a,b) => { int order = a.Priority.CompareTo(b.Priority); return order != 0 ? order : a.Order.CompareTo(b.Order); });
             foreach (var item in ordered) item.Owner.Admit(item,delta);
-            foreach (var item in ordered) item.Owner.Render(item.Emitter);
+            foreach (var item in ordered) item.Emitter.Native.Face(item.Owner.view);
         }
         void Simulate(Emitter emitter, float delta)
         {
-            if (delta <= 0) return;
-            for (int i = emitter.Particles.Count-1; i >= 0; i--)
-            {
-                var particle = emitter.Particles[i]; particle.Age += delta;
-                if (!particle.Alive) continue;
-                if (particle.Age > emitter.Plan.Lifetime)
-                { particle.Alive = false; emitter.Particles[i] = particle; ParticleCount--; RetainedExpiredParticles++; continue; }
-                particle.Velocity += emitter.Plan.Force*delta; particle.Position += particle.Velocity*delta; emitter.Particles[i] = particle;
-            }
+            int expired = emitter.Native.Step(delta);
+            emitter.Expired += expired; ParticleCount -= expired; RetainedExpiredParticles += expired;
         }
         void Admit(Emission item,float delta)
         {
@@ -186,7 +167,7 @@ namespace FFOne.World
                             // Source Emit adds an unscaled, unrotated world offset; only velocity is rotated.
                             // Script-local translation is applied after native GlobalTransform propagation; this
                             // frame's births use the world placement captured before advancing the controller.
-                            emitter.Particles.Add(new Particle { Position = item.Position + position, Velocity = item.Rotation * velocity, Alive = true });
+                            emitter.Native.Emit(item.Position + position, item.Rotation * velocity);
                             ParticleCount++; budgetParticles++;
                         }
                     }
@@ -195,49 +176,6 @@ namespace FFOne.World
                 // Out-of-range admission keeps the due timer, just as the native streamed emitter does.
             }
             else if (emit) emitter.Timer += delta * plan.Rate;
-        }
-        void Render(Emitter emitter)
-        {
-            var plan = emitter.Plan;
-            vertices.Clear(); uvs.Clear(); colors.Clear(); indices.Clear();
-            for (int i = emitter.Particles.Count - 1; i >= 0; i--)
-            {
-                var particle = emitter.Particles[i];
-                if (!particle.Alive || !plan.RendererEnabled) continue;
-                float fraction = Mathf.Clamp01(particle.Age / plan.Lifetime);
-                float width = plan.Width.length > 0 ? plan.Width.Evaluate(fraction) : plan.Height.length > 0 ? plan.Height.Evaluate(fraction) : plan.InitialSize;
-                float height = plan.Height.length > 0 ? plan.Height.Evaluate(fraction) : width;
-                Vector3 right = view ? view.transform.right : Vector3.right, up = view ? view.transform.up : Vector3.up;
-                // Native procedural quads are reflected by H along with their world placement.
-                // The camera-facing mode already supplies that basis; fixed/up modes need reflected X explicitly.
-                if (plan.RenderMode == 4) { right = Vector3.left; up = Vector3.back; }
-                else if (plan.RenderMode == 5 && view)
-                {
-                    var toCamera = view.transform.position-particle.Position; toCamera.y = 0;
-                    right = toCamera.sqrMagnitude > .000001f ? -(Quaternion.LookRotation(toCamera)*Vector3.right) : Vector3.left;
-                    up = Vector3.up;
-                }
-                float roll = (plan.Rotation.length > 0 ? plan.Rotation.Evaluate(fraction) : 0)*Mathf.Deg2Rad;
-                float sine = Mathf.Sin(roll), cosine = Mathf.Cos(roll);
-                Vector3 rolledRight = right*cosine+up*sine, rolledUp = up*cosine-right*sine;
-                Color tint = Color.white;
-                if (plan.AnimateColor)
-                {
-                    // Native shared particle materials retain 16 colour samples; atlas/size/rotation stay continuous.
-                    float sample = Mathf.Floor(fraction*15+.5f)/15*4; int key = Math.Min(3,(int)sample);
-                    tint = Color.LerpUnclamped(plan.Colors[key],plan.Colors[key+1],sample-key);
-                }
-                int frame = Mathf.FloorToInt(fraction * plan.Cycles * plan.XTiles * plan.YTiles) % (plan.XTiles*plan.YTiles);
-                var uvScale = new Vector2(1f / plan.XTiles, 1f / plan.YTiles);
-                // Native rows are flipped and particle_quad has bottom V=1. In Unity's raw
-                // texture the equivalent atlas cell uses the reflected row, retaining cell-local UV direction.
-                var uvOffset = new Vector2(frame % plan.XTiles,plan.YTiles-1-frame/plan.XTiles)*uvScale;
-                AddQuad(emitter.Transform,particle.Position,rolledRight,rolledUp,new Vector2(width,height)*emitter.Scale,uvOffset,uvScale,tint);
-            }
-            // Avoid uploading an unchanged empty mesh for thousands of distant emitter plans.
-            if (vertices.Count == 0 && emitter.Mesh.vertexCount == 0) return;
-            emitter.Mesh.Clear(); emitter.Mesh.SetVertices(vertices); emitter.Mesh.SetUVs(0, uvs); emitter.Mesh.SetColors(colors);
-            emitter.Mesh.SetTriangles(indices, 0); emitter.Mesh.RecalculateBounds();
         }
         static bool ScriptState(Key[] keys, float time, out Vector3 translation)
         {
@@ -266,7 +204,7 @@ namespace FFOne.World
                 if (length <= 1) return length > 0 ? candidate/Mathf.Sqrt(length) : Vector2.zero;
             }
         }
-        static void InitialState(WorldBehaviourEffectAssets.Plan plan, RandomStream random, out Vector3 position, out Vector3 velocity)
+        static void InitialState(NativeParticleSettings plan, RandomStream random, out Vector3 position, out Vector3 velocity)
         {
             int generation = plan.Generation;
             if (generation == 2) position = new Vector3((Unit(random)-.5f)*plan.Plane.x, (Unit(random)-.5f)*plan.Plane.y, (Unit(random)-.5f)*plan.Plane.z);
@@ -286,20 +224,11 @@ namespace FFOne.World
                 Mathf.Abs(plan.InitialVelocity.y) < .01f ? rotated.y*plan.InitialVelocity.y : rotated.y, Mathf.Abs(plan.InitialVelocity.z) < .01f ? rotated.z*plan.InitialVelocity.z : rotated.z);
             velocity *= Unit(random)*2*(1-plan.RandomVelocity);
         }
-        void AddQuad(Transform target, Vector3 point, Vector3 rightAxis, Vector3 upAxis, Vector2 size, Vector2 uvOffset, Vector2 uvScale, Color tint)
-        {
-            int first = vertices.Count; var right = rightAxis*size.x*.5f; var up = upAxis*size.y*.5f;
-            vertices.Add(target.InverseTransformPoint(point-right-up)); vertices.Add(target.InverseTransformPoint(point+right-up));
-            vertices.Add(target.InverseTransformPoint(point+right+up)); vertices.Add(target.InverseTransformPoint(point-right+up));
-            uvs.Add(uvOffset); uvs.Add(uvOffset+new Vector2(uvScale.x,0)); uvs.Add(uvOffset+uvScale); uvs.Add(uvOffset+new Vector2(0,uvScale.y));
-            for (int i = 0; i < 4; i++) colors.Add(tint);
-            indices.Add(first); indices.Add(first+1); indices.Add(first+2); indices.Add(first); indices.Add(first+2); indices.Add(first+3);
-        }
         public void Dispose()
         {
             owners.Remove(this); if (owners.Count == 0) updatedFrame = -1;
             budgetParticles = Math.Max(0,budgetParticles-ParticleCount-RetainedExpiredParticles); ParticleCount = 0; RetainedExpiredParticles = 0;
-            foreach (var emitter in emitters) WorldBehaviour.Release(emitter.Mesh);
+            foreach (var emitter in emitters) emitter.Native.Dispose();
             foreach (var plan in plans.Values) WorldBehaviourEffectAssets.Release(plan);
             plans.Clear(); emitters.Clear(); closures.Clear();
         }

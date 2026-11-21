@@ -2900,7 +2900,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1372886058250823528}
-  - component: {fileID: 5775798040559762686}
+  - component: {fileID: 1801366799411749166}
+  - component: {fileID: 4637034206036364759}
   m_Layer: 0
   m_Name: model
   m_TagString: Untagged
@@ -2924,39 +2925,123 @@ Transform:
   - {fileID: 7710230670572121507}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!111 &5775798040559762686
-Animation:
+--- !u!95 &1801366799411749166
+Animator:
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8937086981901054926}
   m_Enabled: 1
-  serializedVersion: 4
-  m_Animation: {fileID: 7400000, guid: 4a7a5b0cb7a18dd4fad547d6d81422f7, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: 85f5a1674a43746488b2f864d490db8a, type: 2}
-  - {fileID: 7400000, guid: a5212eed84785aa44b893843b9387aaa, type: 2}
-  - {fileID: 7400000, guid: d3c5ccd493f472f4cbaf3a06ca1faef1, type: 2}
-  - {fileID: 7400000, guid: 88d7fb94cd73c654ea41b8e468e1cc2a, type: 2}
-  - {fileID: 7400000, guid: 31ed26ba3bf1e1e4bbaaa2cc15ac2c9b, type: 2}
-  - {fileID: 7400000, guid: a882b42b50d2e8340be60121d34d41ac, type: 2}
-  - {fileID: 7400000, guid: 40304d4d2b5c8cf4cb5a623bffeab665, type: 2}
-  - {fileID: 7400000, guid: d839ee6c3b927fb4ea0e4a4de4d5735f, type: 2}
-  - {fileID: 7400000, guid: 9698388d19be4664c9d10e784d9dd6fc, type: 2}
-  - {fileID: 7400000, guid: c1de46de74ee9ee40a2a5685bc0bdd26, type: 2}
-  - {fileID: 7400000, guid: b99519711abf0c947a0c8dc99b3d5a99, type: 2}
-  - {fileID: 7400000, guid: 4a7a5b0cb7a18dd4fad547d6d81422f7, type: 2}
-  - {fileID: 7400000, guid: 2a7c18b436b4eb44b9b8e72cda52abaf, type: 2}
-  - {fileID: 7400000, guid: f7f2b8b1315f91940aa99a0d9c5854bc, type: 2}
-  - {fileID: 7400000, guid: 900d068c210a4184596d03484ea38d72, type: 2}
-  - {fileID: 7400000, guid: 79a25853c76fd374b9e9850feb7c20ed, type: 2}
-  - {fileID: 7400000, guid: 09811f6013880d04792aec5de8dad395, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 99c996bb17ba6e44e9eaf838b1fe73b8, type: 2}
+  m_CullingMode: 0
   m_UpdateMode: 0
-  m_CullingType: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 1
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &4637034206036364759
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8937086981901054926}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b7ac68c382befc4d9fc82662c17e418, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.Content.NativeNpcAnimator
+  animator: {fileID: 1801366799411749166}
+  AnimationSounds:
+  - Cue: FusionButtercup_Corruptak.wav
+    Variants:
+    - {fileID: 8300000, guid: 95d4fe20ccfd97545824722dc85fc057, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: FusionButtercup_Corruptak_Readyspell.wav
+    Variants:
+    - {fileID: 8300000, guid: efec0853f258dd04c9c8d221194ca5e6, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: FusionButtercup_Death.wav
+    Variants:
+    - {fileID: 8300000, guid: 8267e3ab5e6d6cf4ea54a08b4a56a37c, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: FusionButtercup_Megatak_Readyspell.wav
+    Variants:
+    - {fileID: 8300000, guid: 23cd2fb4909320c468bfc3cc238b1517, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: FusionButtercup_Melee1.wav
+    Variants:
+    - {fileID: 8300000, guid: 5635bdcb315d0ed4c9461d59b78d5266, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: FusionButtercup_Melee1Upper.wav
+    Variants:
+    - {fileID: 8300000, guid: f1c0d1177abc88047bd1f362fad0552b, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: FusionButtercup_Melee2.wav
+    Variants:
+    - {fileID: 8300000, guid: e90d1eb22bf85274ab7d6cd607c387ea, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: FusionButtercup_Melee2Upper.wav
+    Variants:
+    - {fileID: 8300000, guid: 4d6d59155d0c5084a8ee8ad58190b94c, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: FusionButtercup_Ready.wav
+    Variants:
+    - {fileID: 8300000, guid: f564c8e831f7c9a4591d71e395af98c2, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: FusionButtercup_Run.wav
+    Variants:
+    - {fileID: 8300000, guid: f76544deee712034e8a1e46fb363bf7d, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: FusionButtercup_Skill0.wav
+    Variants:
+    - {fileID: 8300000, guid: b1bac6b733ec74e41a6ae92d05459204, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: FusionButtercup_Stand1.wav
+    Variants:
+    - {fileID: 8300000, guid: 206bb95f95c1c7a43845f18e26fc28cf, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: FusionButtercup_Stand2.wav
+    Variants:
+    - {fileID: 8300000, guid: d810c8c567edae34490df710c9ad4153, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: FusionButtercup_Stand3.wav
+    Variants:
+    - {fileID: 8300000, guid: c66680a7818c3f34b87560422afd2f81, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: FusionButtercup_Stand4.wav
+    Variants:
+    - {fileID: 8300000, guid: 3a69a6ce9d8c86048855d0c753bdce4a, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: FusionButtercup_Walk.wav
+    Variants:
+    - {fileID: 8300000, guid: 6f4b824ac4fd39f4181d2d166a5adde3, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  Faces: []
 --- !u!1 &8974879256211392665
 GameObject:
   m_ObjectHideFlags: 0

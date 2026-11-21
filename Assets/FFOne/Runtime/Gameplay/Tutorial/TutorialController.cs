@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FFOne.Content;
 using FFOne.Network;
+using FFOne.UI;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -35,64 +36,45 @@ namespace FFOne.Tutorial
         TutorialCinematics cinematics;
         TutorialCinematicEffects effects;
         CharacterController motor;
+        readonly FFOne.World.LegacyGameplayCameraInput cameraInput = new();
+        bool readCameraMotion;
+        float mouseSensitivity = 1;
+        bool invertMouseY, invertPadY;
+        float padSensitivity = 5;
         NativeAvatarPreview avatar;
         GameObject worldRoot, playerRoot, cameraRoot, nano;
         AudioSource voice, sound, ambient, music;
         Action completed, cancelled;
         float yaw = 90, pitch = 12, vertical, stageTime, nextAttack, nextEnemyAttack;
-        float attackAnimationEnd;
+        float attackAnimationEnd, jumpAge;
         bool nanoVoiceDisabled = true;
         float bars, fade, subtitleOpacity = 1, stageOriginYaw;
         Vector3 stageOrigin;
         string subtitle = "";
+        readonly TutorialVoiceSubtitles voiceSubtitles = new();
+        public string VoiceSubtitleText => voiceSubtitles.Text;
+        public float VoiceSubtitleRemaining => voiceSubtitles.Remaining;
+        public bool VoiceSubtitleVisible => !string.IsNullOrEmpty(VoiceSubtitleText) &&
+            (eventScene ? IsCinematic && cinematicScreen && bars > .9f : Russian);
+        public void TickVoiceSubtitles(float delta) => voiceSubtitles.Tick(delta);
         int subtitleCharacters = int.MaxValue;
         int audioCursor, deaths, damageNpc, damageUser;
         int interacting, currentTask;
-        int playerHp = 1000, hiddenHud;
+        int playerHp = 1000, hiddenHud, tutorialEarnedFusionMatter;
         JToken picture;
         string spatialAudioTarget = "Camera";
-        bool eventScene;
+        bool eventScene, cinematicScreen;
         bool jumped, nanoActive, nanoPowerUsed, ending, paused;
         bool mainMenu, journal, missionSelected, accepted, rewardClaimed, warped;
         TutorialActor target;
         Color oldAmbient;
         bool ambientCaptured;
 
-        public void Begin(CharacterInfo character, bool russian, Action onCompleted, Action onCancelled, bool? voiceRussian = null)
+        public async void Begin(CharacterInfo character, bool russian, Action onCompleted, Action onCancelled, bool? voiceRussian = null)
         {
-            if (IsReady || worldRoot) throw new InvalidOperationException("Tutorial is already running.");
-            Russian = russian; completed = onCompleted; cancelled = onCancelled;
-            VoiceRussian = voiceRussian ?? russian;
-            try
-            {
-                content = FFOne.Content.ContentAssets.Load<TutorialContent>("Tutorial/Content");
-                if (!content || !content.World) throw new InvalidOperationException("Import tutorial content with FFOne → Import Tutorial Content.");
-                oldAmbient = RenderSettings.ambientLight;
-                ambientCaptured = true;
-                worldRoot = Instantiate(content.World); worldRoot.name = "Tutorial world";
-                foreach (var camera in FindObjectsByType<Camera>(FindObjectsSortMode.None))
-                    if (camera.enabled) { previousCameras.Add(camera); camera.enabled = false; }
-                cameraRoot = new GameObject("Tutorial camera"); ViewCamera = cameraRoot.AddComponent<Camera>();
-                foreach (var listener in FindObjectsByType<AudioListener>(FindObjectsSortMode.None))
-                    if (listener.enabled) { previousListeners.Add(listener); listener.enabled = false; }
-                cameraRoot.AddComponent<AudioListener>();
-                ViewCamera.nearClipPlane = .08f; ViewCamera.farClipPlane = 1800; ViewCamera.fieldOfView = 55;
-                ViewCamera.backgroundColor = new Color(.34f, .42f, .42f); ViewCamera.clearFlags = CameraClearFlags.SolidColor;
-                playerRoot = new GameObject("Tutorial player"); Player = playerRoot.transform; Player.position = StartPosition;
-                motor = playerRoot.AddComponent<CharacterController>(); motor.height = 1.8f; motor.radius = .45f; motor.center = Vector3.up * .9f; motor.stepOffset = .4f;
-                avatar = playerRoot.AddComponent<NativeAvatarPreview>(); avatar.Apply(character);
-                if (!avatar.IsReady) throw new InvalidOperationException(avatar.LastError);
-                if (content.ButtercupNano) { nano = Instantiate(NativeModelAssets.Resolve(content.ButtercupNano), worldRoot.transform); nano.name = "Buttercup Nano"; nano.SetActive(false); }
-                voice = cameraRoot.AddComponent<AudioSource>(); sound = cameraRoot.AddComponent<AudioSource>(); ambient = cameraRoot.AddComponent<AudioSource>(); music = cameraRoot.AddComponent<AudioSource>();
-                ambient.clip = FFOne.Content.ContentAssets.Load<AudioClip>("audio/ambient/tutorialmain_wambient_loop"); ambient.loop = true; ambient.volume = .35f; ambient.Play();
-                RenderSettings.ambientLight = new Color(.65f, .65f, .7f);
-                PanPlayer = new TutorialPanPlayer();
-                cinematics = new TutorialCinematics(this);
-                effects = worldRoot.AddComponent<TutorialCinematicEffects>();
-                effects.Initialize(id => Actor(id)?.transform, expression => cinematics.ResolvePosition(expression), ViewCamera, VoiceRussian);
-                IsReady = true; SetStage(0, 0); UpdateCamera();
-            }
-            catch (Exception error) { LastError = error.Message; Debug.LogException(error, this); Cleanup(); }
+            try { await BeginAsync(character, russian, onCompleted, onCancelled, voiceRussian); }
+            catch (OperationCanceledException) { }
+            catch (Exception) { /* BeginAsync records the failure for legacy callers. */ }
         }
 
         void Update()
@@ -102,16 +84,22 @@ namespace FFOne.Tutorial
         }
         void UpdateTutorial()
         {
+            TickHud();
+            readCameraMotion = cameraInput.Capture(IsReady && !ending && !ExternalInputBlocked && !paused &&
+                !mainMenu && !journal && interacting == 0 && !eventScene && !IsCinematic);
             if (!IsReady || ending) return;
+            if (worldStream && Player) worldStream.Anchor = Player.position;
             if (ExternalInputBlocked) return;
             var keyboard = Keyboard.current;
+            if (keyboard?.backquoteKey.wasPressedThisFrame == true) { Finish(); return; }
             if (keyboard?.escapeKey.wasPressedThisFrame == true)
             {
                 if (IsCinematic) { SkipScene(); return; }
                 paused = !paused;
             }
             if (paused) return;
-            if (IsCinematic && keyboard?.spaceKey.wasPressedThisFrame == true) { SkipScene(); return; }
+            if (IsCinematic && (keyboard?.spaceKey.wasPressedThisFrame == true ||
+                Gamepad.current?.buttonSouth.wasPressedThisFrame == true)) { SkipScene(); return; }
             float delta = Mathf.Min(Time.deltaTime, .1f);
             stageTime += delta;
             if (IsCinematic)
@@ -121,71 +109,121 @@ namespace FFOne.Tutorial
             }
             else
             {
+                TickVoiceSubtitles(Time.deltaTime);
                 HandleInput(delta); UpdateCamera(); UpdateTarget(); UpdateEnemies();
             }
             GroundActors(delta);
             Evaluate();
             TickAuxiliary(Time.deltaTime);
             if (!IsCinematic && nano && nanoActive) nano.transform.position = Vector3.Lerp(nano.transform.position, Player.position + Player.right * 1.3f + Vector3.up * 1.6f, delta * 5);
+            TickHud();
         }
 
         void HandleInput(float delta)
         {
-            var k = Keyboard.current; var mouse = Mouse.current;
-            if (k == null || mouse == null || mainMenu || journal || interacting != 0 || eventScene) return;
+            var mouse = Mouse.current;
+            bool journalPressed = GameplayInput.Pressed(GameplayAction.Journal);
+            bool close = Gamepad.current?.buttonEast.wasPressedThisFrame == true;
+            if (journal)
+            {
+                if (TutorialWindowCanClose && (journalPressed || close)) journal = false;
+                return;
+            }
+            if (mainMenu)
+            {
+                if (journalPressed && Stage.Allows(11)) journal = true;
+                else if (close || GameplayInput.Pressed(GameplayAction.Menu)) mainMenu = false;
+                return;
+            }
+            if (interacting != 0 || eventScene || HudConsumedInput) return;
+            if (Stage.Chapter == 3 && Stage.Step >= 8 && Stage.Step <= 12 && journalPressed)
+            {
+                journal = true;
+                return;
+            }
+            bool interact = Gamepad.current?.buttonSouth.wasPressedThisFrame == true && Stage.Allows(5);
+            if (interact && actors.TryGetValue(ObjectiveNpc, out var objective) && objective && !objective.Hostile &&
+                objective.Hp > 0 && Vector3.Distance(Player.position, objective.transform.position) < 10)
+                target = objective;
             if (Stage.Allows(17))
             {
-                var motion = mouse.delta.ReadValue();
-                // Hold the right mouse button to orbit without consuming menu clicks.
-                if (mouse.rightButton.isPressed || Stage.Chapter == 0 && Stage.Step >= 3 && Stage.Step <= 6)
-                { yaw += motion.x * .13f; pitch = Mathf.Clamp(pitch - motion.y * .1f, -65, 70); }
+                var motion = mouse?.delta.ReadValue() ?? Vector2.zero;
+                var look = readCameraMotion ? FFOne.World.LegacyGameplayCameraInput.Look(motion, mouseSensitivity, invertMouseY) : Vector2.zero;
+                var pad = GameplayInput.PadLook(delta, padSensitivity, invertPadY);
+                yaw += look.x + pad.x;
+                pitch = Mathf.Clamp(pitch + look.y + pad.y, -30, 70);
             }
-            float forward = (Stage.Allows(0) && k.wKey.isPressed ? 1 : 0) - (Stage.Allows(1) && k.sKey.isPressed ? 1 : 0);
-            float side = Stage.Allows(2) ? (k.dKey.isPressed ? 1 : 0) - (k.aKey.isPressed ? 1 : 0) : 0;
-            if (Stage.Allows(3)) yaw += ((k.rightArrowKey.isPressed ? 1 : 0) - (k.leftArrowKey.isPressed ? 1 : 0)) * 100 * delta;
+            float forward = (Stage.Allows(0) && GameplayInput.Held(GameplayAction.Up) ? 1 : 0) - (Stage.Allows(1) && GameplayInput.Held(GameplayAction.Down) ? 1 : 0);
+            float side = Stage.Allows(2) ? (GameplayInput.Held(GameplayAction.Right) ? 1 : 0) - (GameplayInput.Held(GameplayAction.Left) ? 1 : 0) : 0;
+            if (Stage.Allows(3)) yaw += ((GameplayInput.Held(GameplayAction.RightTurn) ? 1 : 0) - (GameplayInput.Held(GameplayAction.LeftTurn) ? 1 : 0)) * 100 * delta;
             bool moving = forward != 0 || side != 0;
             bool fullBodyAttack = (avatar == null || avatar.PlayerAnimation == null) && Time.time < attackAnimationEnd;
-            Vector3 displacement = Quaternion.Euler(0, yaw, 0) * new Vector3(side, 0, forward).normalized * 8;
-            if (motor.isGrounded && vertical < 0) vertical = -2;
+            bool freeCamera = GameplayInput.Held(GameplayAction.FreeCamera) &&
+                !(Stage.Allows(3) && (GameplayInput.Held(GameplayAction.LeftTurn) || GameplayInput.Held(GameplayAction.RightTurn)));
+            float heading = freeCamera ? Player.eulerAngles.y : yaw;
+            Vector3 displacement = Quaternion.Euler(0, heading, 0) * new Vector3(side, 0, forward).normalized * (forward < 0 ? 3 : 6);
+            bool grounded = IsPlayerGrounded();
+            if (grounded && vertical < 0) vertical = 0;
             bool armed = Player.GetComponent<TutorialPlayerEquipment>() != null;
-            if (Stage.Allows(4) && k.spaceKey.wasPressedThisFrame && motor.isGrounded) { vertical = 12; jumped = true; Animate(Player.gameObject, armed ? "riflejumpstart" : "jumpstart"); }
-            vertical -= 24 * delta;
-            motor.Move((displacement + Vector3.up * vertical) * delta);
-            if (moving)
+            bool launched = Stage.Allows(4) && GameplayInput.Pressed(GameplayAction.Jump) && grounded && !(interact && target && !target.Hostile);
+            if (launched) { vertical = 5.68f * NativePlayerMotor.JumpMultiplier; jumpAge = 0; jumped = true; }
+            var collision = NativePlayerMotor.Step(motor, displacement, ref vertical, ref jumpAge, delta, GameplayInput.Held(GameplayAction.Jump), launched);
+            if ((collision & CollisionFlags.Above) != 0 && vertical > 0 || (collision & CollisionFlags.Below) != 0 && vertical < 0) vertical = 0;
+            grounded = !launched && IsPlayerGrounded();
+            if (moving || launched || !grounded || Stage.Allows(3) && (GameplayInput.Held(GameplayAction.RightTurn) || GameplayInput.Held(GameplayAction.LeftTurn)))
+                Player.rotation = Quaternion.Euler(0, heading, 0);
+            if (avatar && avatar.PlayerAnimation)
             {
-                Player.rotation = Quaternion.Euler(0, yaw, 0);
-                if (!fullBodyAttack && motor.isGrounded) Animate(Player.gameObject, armed ? "riflerun" : "run");
+                bool ready = Time.time < attackAnimationEnd || TutorialCombatHudPresentation.IsActive(tutorialLastCombatResult, Time.realtimeSinceStartup);
+                avatar.PlayerAnimation.UpdateLocomotion(side, forward, grounded, launched, armed ? "rifle" : "", ready, delta, vertical);
             }
-            else if (motor.isGrounded && !fullBodyAttack) Animate(Player.gameObject, armed ? "riflestand1" : "stand1");
-            if (moving || Mathf.Abs(vertical) > 2) Moved?.Invoke(Player.position, yaw);
+            else if (launched) Animate(Player.gameObject, armed ? "riflejumpstart" : "jumpstart");
+            else if (grounded && !fullBodyAttack)
+                Animate(Player.gameObject, (armed ? "rifle" : "") + (moving ? forward < 0 ? "runback" : "run" : "stand1"));
+            if (moving || Mathf.Abs(vertical) > 2) Moved?.Invoke(Player.position, Player.eulerAngles.y);
             if (Player.position.y < -285) WarpPlayer(stageOrigin);
-            if (Stage.Allows(8) && k.enterKey.wasPressedThisFrame) mainMenu = true;
-            if (Stage.Allows(11) && k.jKey.wasPressedThisFrame) { journal = true; if (Stage.Chapter == 3 && Stage.Step == 6) mainMenu = true; }
-            if (Stage.Allows(18) && k.digit1Key.wasPressedThisFrame) SummonNano();
-            if (Stage.Allows(6) && mouse.rightButton.wasPressedThisFrame && nanoActive && target && target.Hostile)
+            if (Stage.Allows(8) && GameplayInput.Pressed(GameplayAction.Menu)) mainMenu = true;
+            if (Stage.Allows(11) && GameplayInput.Pressed(GameplayAction.Journal)) { journal = true; if (Stage.Chapter == 3 && Stage.Step == 6) mainMenu = true; }
+            if (Stage.Allows(18) && GameplayInput.Pressed(GameplayAction.Nano1)) SummonNano();
+            if (Stage.Allows(6) && GameplayInput.Pressed(GameplayAction.Fire2) && nanoActive && target && target.Hostile)
             { nanoPowerUsed = true; target.StunUntil = Time.time + 5; PlayVoice("Computress_Tut61"); }
-            if (Stage.Allows(5) && mouse.leftButton.isPressed && Time.time >= nextAttack && target)
+            if (Stage.Allows(5) && (GameplayInput.Held(GameplayAction.Fire1) || target && !target.Hostile && interact) && Time.time >= nextAttack && target)
             {
                 nextAttack = Time.time + 1;
                 if (target.Hostile) Attack(target);
                 else if (Vector3.Distance(Player.position, target.transform.position) < 10) interacting = target.RuntimeId;
             }
         }
+
+        bool IsPlayerGrounded()
+        {
+            return motor && NativePlayerMotor.IsGrounded(motor, vertical);
+        }
+
+        internal void StepCinematicPlayer(float delta)
+        {
+            if (!motor || !motor.enabled || delta <= 0) return;
+            // Event scenes take over input and the pose, while the capsule
+            // continues to settle under the same gravity as gameplay.
+            NativePlayerMotor.Step(motor, Vector3.zero, ref vertical, ref jumpAge,
+                Mathf.Min(delta, .1f), false, false, false);
+        }
+
         void UpdateCamera()
         {
             if (!ViewCamera || !Player) return;
             Vector3 focus = Player.position + Vector3.up * 1.6f;
             Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
             Vector3 offset = rotation * new Vector3(0, .2f, -6);
-            if (Physics.Raycast(focus, offset.normalized, out var hit, offset.magnitude, ~0, QueryTriggerInteraction.Ignore) && hit.collider.gameObject != playerRoot)
-                offset = offset.normalized * Mathf.Max(.6f, hit.distance - .15f);
+            offset = NativePlayerCamera.ResolveOffset(ViewCamera, Player, focus, offset);
             ViewCamera.transform.SetPositionAndRotation(focus + offset, rotation);
         }
         void UpdateTarget()
         {
             target = null;
             if (interacting != 0 || mainMenu || journal) return;
-            var position = Mouse.current?.position.ReadValue() ?? new Vector2(Screen.width / 2f, Screen.height / 2f);
+            var position = Cursor.lockState == CursorLockMode.Locked ? new Vector2(Screen.width / 2f, Screen.height / 2f)
+                : Mouse.current?.position.ReadValue() ?? new Vector2(Screen.width / 2f, Screen.height / 2f);
             var ray = ViewCamera.ScreenPointToRay(position);
             foreach (var hit in Physics.RaycastAll(ray, 80).OrderBy(h => h.distance))
             {
@@ -196,15 +234,22 @@ namespace FFOne.Tutorial
         void Attack(TutorialActor actor)
         {
             if (Vector3.Distance(Player.position, actor.transform.position) > 16) return;
+            RecordTutorialCombatResult();
             actor.Damaged = true; damageNpc++;
             actor.Hp = Mathf.Max(0, actor.Hp - VirtualDamage(nanoActive ? 1 : -1, actor.Style, actor.Invulnerable));
             FacePlayer(Quaternion.LookRotation(Vector3.ProjectOnPlane(actor.transform.position - Player.position, Vector3.up)));
             var playerAnimation = Player.GetComponentInChildren<NativePlayerAnimator>();
-            if (playerAnimation) playerAnimation.Play("rifleattack1upper");
+            if (playerAnimation) playerAnimation.Play("rifleattack1upper", true);
             else Animate(Player.gameObject, "rifleattack1");
             attackAnimationEnd = Time.time + (playerAnimation ? playerAnimation.Duration("rifleattack1upper") : 1);
-            Animate(actor.gameObject, actor.Hp == 0 ? "death" : "hit");
-            if (actor.Hp == 0) { deaths++; if (actor.RuntimeId == 1100) currentTask = 2249; }
+            PlayCombatAnimation(actor, actor.Hp == 0 ? "death" : "wound",
+                actor.Hp == 0 ? TutorialAnimationEffectReceiver.Completion.Hold : TutorialAnimationEffectReceiver.Completion.Ready);
+            if (actor.Hp == 0)
+            {
+                deaths++;
+                tutorialEarnedFusionMatter = Mathf.Min(220, tutorialEarnedFusionMatter + 30);
+                if (actor.RuntimeId == 1100) AdvanceTutorialTask(2249);
+            }
         }
         void UpdateEnemies()
         {
@@ -219,23 +264,31 @@ namespace FFOne.Tutorial
             };
             if (!actors.TryGetValue(id, out var actor) || !actor || actor.Hp <= 0 || actor.StunUntil > Time.time) return;
             if (actor.AttackRange <= 0 || Vector3.Distance(Player.position, actor.transform.position) > actor.AttackRange) return;
-            damageUser++; playerHp = Mathf.Max(100, playerHp - 50); Animate(actor.gameObject, "melee1");
+            RecordTutorialCombatResult();
+            damageUser++; playerHp = Mathf.Max(100, playerHp - 50);
+            PlayCombatAnimation(actor, "melee1", TutorialAnimationEffectReceiver.Completion.Ready);
         }
         public GameObject SpawnActor(int runtimeId, int npcType, Vector3 unityPosition, float yaw = 0)
         {
             RemoveActor(runtimeId);
             var definition = content.Actors.SingleOrDefault(a => a.NpcType == npcType);
             if (definition == null || !definition.Model) throw new InvalidOperationException("Tutorial actor is not imported: " + npcType);
-            if (definition.Class < 100) unityPosition.y += 1;
+            if (definition.Class < 100 && npcType != 2968) unityPosition.y += 1;
             var go = new GameObject("Tutorial NPC " + runtimeId + " " + definition.Name); go.transform.SetParent(worldRoot.transform, false);
             go.transform.SetPositionAndRotation(unityPosition, Quaternion.Euler(0, yaw, 0));
             var model = Instantiate(NativeModelAssets.Resolve(definition.Model), go.transform); model.transform.localScale = Vector3.one * definition.Scale;
+            FFOne.World.WorldNpcSkins.Apply(model, npcType);
+            foreach (var animation in model.GetComponentsInChildren<NativeNpcAnimator>(true))
+                animation.gameObject.AddComponent<TutorialAnimationEffectReceiver>().Initialize(this, definition, effects);
             var actor = go.AddComponent<TutorialActor>(); actor.RuntimeId = runtimeId; actor.NpcType = npcType;
             actor.Hp = actor.MaxHp = Mathf.Max(1, definition.MaxHp); actor.DisplayName = definition.Name;
-            actor.Style = definition.Style; actor.AttackRange = definition.AttackRange; actor.Height = definition.Height;
+            actor.Style = definition.Style; actor.Class = definition.Class; actor.AttackRange = definition.AttackRange; actor.Height = definition.Height;
             actor.Hostile = npcType == 2674 || npcType == 2675 || npcType == 2676 || npcType == 2677 || npcType == 2678;
-            var capsule = go.AddComponent<CapsuleCollider>(); capsule.height = Mathf.Max(.01f, definition.Height); capsule.radius = Mathf.Max(.01f, definition.Radius);
-            capsule.center = Vector3.up * definition.Height * .5f;
+            if (!actor.IsScenery)
+            {
+                var capsule = go.AddComponent<CapsuleCollider>(); capsule.height = Mathf.Max(.01f, definition.Height); capsule.radius = Mathf.Max(.01f, definition.Radius);
+                capsule.center = Vector3.up * definition.Height * .5f;
+            }
             actors[runtimeId] = actor; Animate(go, "stand1"); return go;
         }
         public GameObject Actor(int runtimeId) => runtimeId == -1 ? nano : actors.TryGetValue(runtimeId, out var actor) && actor ? actor.gameObject : null;
@@ -243,12 +296,12 @@ namespace FFOne.Tutorial
         {
             foreach (var actor in actors.Values)
             {
-                if (!actor || actor.Hp <= 0 || actor.ForceUpdate) continue;
+                if (!actor || actor.Hp <= 0 || actor.ForceUpdate || actor.Class >= 100 || actor.IsScenery) continue;
                 Vector3 position = actor.transform.position;
                 float? floor = null;
                 foreach (var hit in Physics.RaycastAll(position + Vector3.up * actor.Height, Vector3.down, actor.Height + 10, ~0, QueryTriggerInteraction.Ignore))
                 {
-                    if (!(hit.collider is MeshCollider || hit.collider is TerrainCollider) || !hit.collider.transform.IsChildOf(worldRoot.transform)) continue;
+                    if (!(hit.collider is MeshCollider || hit.collider is TerrainCollider) || worldStream == null || !worldStream.Owns(hit.collider)) continue;
                     floor = floor.HasValue ? Mathf.Max(floor.Value, hit.point.y) : hit.point.y;
                 }
                 var result = AdvanceGrounding(position.y, floor, actor.VerticalVelocity, delta);
@@ -272,8 +325,9 @@ namespace FFOne.Tutorial
         public void WarpPlayer(Vector3 unityPosition)
         {
             if (!Player) return;
-            if (motor) motor.enabled = false; Player.position = unityPosition; vertical = 0;
-            if (motor) motor.enabled = true;
+            if (motor) NativePlayerMotor.Teleport(motor, unityPosition);
+            else Player.position = unityPosition;
+            vertical = 0; jumpAge = 0;
             Moved?.Invoke(unityPosition, yaw);
         }
         public void FacePlayer(Quaternion rotation) { Player.rotation = rotation; yaw = rotation.eulerAngles.y; }
@@ -290,15 +344,31 @@ namespace FFOne.Tutorial
             if (!actor) return;
             var player = actor.GetComponentInChildren<NativePlayerAnimator>();
             if (player) { player.Play(clip); return; }
+            var npc = actor.GetComponentInChildren<TutorialAnimationEffectReceiver>(true);
+            if (npc)
+            {
+                npc.PlayNpc(clip, TutorialAnimationEffectReceiver.Completion.Loop, .15f,
+                    clip == "stand1" ? TutorialNpcPose.Rest : TutorialNpcPose.Forced);
+                return;
+            }
             var animation = actor.GetComponentInChildren<Animation>();
-            if (!animation || !animation.GetClip(clip) || animation.IsPlaying(clip)) return;
-            animation.CrossFade(clip, .15f);
+            if (!animation || !animation.GetClip(clip)) return;
+            if (!animation.IsPlaying(clip)) animation.CrossFade(clip, .15f);
+        }
+
+        static void PlayCombatAnimation(TutorialActor actor, string clip, TutorialAnimationEffectReceiver.Completion completion)
+        {
+            foreach (var receiver in actor.GetComponentsInChildren<TutorialAnimationEffectReceiver>(true))
+                if (receiver.PlayNpc(clip, completion, .15f)) return;
         }
         public void PlayVoice(string cue)
         {
             var row = content?.Audio.FirstOrDefault(a => string.Equals(a.Cue, cue, StringComparison.OrdinalIgnoreCase));
-            if (row == null) { Debug.LogWarning("Missing tutorial voice " + cue); return; }
-            voice.clip = VoiceRussian && row.Russian ? row.Russian : row.English; voice.Play();
+            var clip = row == null ? null : VoiceRussian && row.Russian ? row.Russian : row.English;
+            voiceSubtitles.Play(cue, Russian, Localized, VoiceRussian && clip ? clip.length : 0);
+            if (voice) voice.Stop();
+            if (!clip || !voice) { Debug.LogWarning("Missing tutorial voice " + cue); return; }
+            voice.clip = clip; voice.Play();
         }
         public void PlaySound(string cue, bool loop = false)
         {
@@ -314,14 +384,19 @@ namespace FFOne.Tutorial
         {
             var clip = content?.Audio.FirstOrDefault(a => string.Equals(a.Cue, cue, StringComparison.OrdinalIgnoreCase))?.English;
             if (!clip) return;
+            PlayAnimationSound(clip, position);
+        }
+        public int AnimationSoundsPlayed { get; private set; }
+        public void PlayAnimationSound(AudioClip clip, Vector3 position)
+        {
             bool playerFocus = spatialAudioTarget == "Player";
             Vector3 focus = playerFocus ? Player.position : ViewCamera.transform.position;
             int active = worldRoot.GetComponentsInChildren<AudioSource>().Count(s => s.isPlaying);
             float range = playerFocus ? active < 6 ? 18 : 16 : active < 6 ? 40 : 30;
             if (Vector3.Distance(position, focus) > range) return;
-            var go = new GameObject(cue); go.transform.SetParent(worldRoot.transform); go.transform.position = position;
+            var go = new GameObject(clip.name); go.transform.SetParent(worldRoot.transform); go.transform.position = position;
             var source = go.AddComponent<AudioSource>(); source.clip = clip; source.spatialBlend = 1; source.maxDistance = range;
-            source.Play(); Destroy(go, clip.length);
+            source.Play(); AnimationSoundsPlayed++; Destroy(go, clip.length);
         }
         void PlayTimeline()
         {
@@ -332,7 +407,12 @@ namespace FFOne.Tutorial
                 if (cue.Kind == 0) PlayVoice(cue.Cue); else if (cue.Kind == 3) StopLoops(); else PlaySound(cue.Cue, cue.Kind == 2);
             }
         }
-        public void Subtitle(string key) { subtitle = Localized(key); locationCaption = key == "content.tutorial.scene.1.1"; subtitleOpacity = 1; subtitleCharacters = int.MaxValue; }
+        public void Subtitle(string key)
+        {
+            subtitle = Localized(key);
+            locationCaption = key is "tutorial.cinematic.tech_square_future" or "content.tutorial.scene.1.1";
+            subtitleOpacity = 1; subtitleCharacters = int.MaxValue;
+        }
         public void SetSubtitleCharacters(int visible, int canonicalTotal) => subtitleCharacters = canonicalTotal <= 0 ? subtitle.Length : Mathf.Clamp(Mathf.RoundToInt((float)visible / canonicalTotal * subtitle.Length), 0, subtitle.Length);
         public void SetFade(float value) => fade = Mathf.Clamp01(value);
         public void SetBars(float value) => bars = Mathf.Clamp01(value);
@@ -370,7 +450,7 @@ namespace FFOne.Tutorial
                     effects.ProjectilePair(Player.position, () => destination, true);
                 }
             }
-            else if (kind == "VoiceOff") voice.Stop();
+            else if (kind == "VoiceOff") { if (voice) voice.Stop(); voiceSubtitles.Clear(); }
             else if (kind == "StopBgm") music.Stop();
             else if (kind == "Ambient")
             {
@@ -379,6 +459,11 @@ namespace FFOne.Tutorial
             else if (kind == "Picture") picture = (string)value?["type"] == "HideAll" ? null : value;
             else if (kind == "Hud") hiddenHud = Mathf.Max(0, hiddenHud + ((string)value?["type"] == "PushHide" ? 1 : -1));
             else if (kind == "SpatialAudio") spatialAudioTarget = (string)value?["type"];
+            else if (kind == "Cinematic")
+            {
+                cinematicScreen = (bool)value;
+                if (!cinematicScreen) SetBars(0);
+            }
             else if (kind == "EventScene") eventScene = (bool)value;
             else if (kind == "Player" && (string)value?["type"] == "SetTemporaryNanoAbsent") nanoActive = false;
             else if (kind == "Nano")
@@ -406,6 +491,9 @@ namespace FFOne.Tutorial
         public void Stop() { ending = true; Cleanup(); }
         void Cleanup()
         {
+            cameraInput.Release();
+            DetachHud();
+            StopWorld();
             IsReady = false; StopAuxiliary(); StopLoops(); cinematics?.Dispose(); cinematics = null; PanPlayer?.Dispose(); PanPlayer = null;
             if (worldRoot) Destroy(worldRoot); if (playerRoot) Destroy(playerRoot); if (cameraRoot) Destroy(cameraRoot);
             foreach (var camera in previousCameras) if (camera) camera.enabled = true;

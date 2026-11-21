@@ -19,6 +19,15 @@ namespace FFOne.Tests
         RenderTexture target;
         GameplayUiController ui;
 
+        [TestCase("en", "ui/en/gameplay/mission/npc/current_mission")]
+        [TestCase("ru", "ui/ru/gameplay/mission/npc/current_mission")]
+        public void NpcAndTravelServiceMenusUseThePublishedMissionIconForTheTextLocale(string locale, string address)
+        {
+            var expected = ContentAssets.Load<Texture2D>(address);
+            Assert.That(expected, Is.Not.Null);
+            Assert.That(GameplayUiController.LoadServiceIcon(GameplayUiController.MissionServiceIcon, locale), Is.SameAs(expected));
+        }
+
         [UnityTest]
         public IEnumerator SourceGameplayViewsRenderBindAndKeepHitTargetsAcrossResolutions()
         {
@@ -28,7 +37,74 @@ namespace FFOne.Tests
             yield return Exercise();
         }
 
-        IEnumerator Exercise()
+        [UnityTest]
+        public IEnumerator QuickChatColumnsFitLocalizedCaptionsWithoutShrinking()
+        {
+            UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,
+                UnityEditor.SceneManagement.NewSceneMode.Single);
+            yield return new EnterPlayMode();
+            yield return ExerciseQuickChat();
+        }
+
+        IEnumerator ExerciseQuickChat()
+        {
+            var document = CreateOffscreenDocument();
+            yield return null;
+            var root = document.rootVisualElement;
+            root.style.width = 1264;
+            root.style.height = 681;
+            foreach (string locale in new[] { "en", "ru" })
+            {
+                ui = new GameplayUiController(root, GameplayUiValidationData.Session(), locale, () => { }, () => { });
+                ui.Windows.Open(GameplayWindow.NanoCom);
+                yield return null;
+                const string place = "KND Training Ground Infected Zone";
+                root.Q<Label>("hud-minimap-name").text = place;
+
+                foreach (var (control, category) in new[] { ("chat-menu", 12), ("chat-emotes", 18) })
+                {
+                    Submit(root.Q<Button>(control));
+                    yield return null;
+                    AssertCaptionWidths(root.Q("quick-root"));
+                    Submit(root.Q<Button>($"quick-item-0-{category}"));
+                    yield return null; yield return null;
+                    var submenu = root.Q("quick-submenu");
+                    AssertCaptionWidths(root.Q("quick-root"));
+                    AssertCaptionWidths(submenu);
+                    if (category == 12)
+                        Assert.That(submenu.Query<Label>().ToList().Any(label => label.text.Contains(place)), Is.True);
+                    var rootButton = root.Q<Button>($"quick-item-0-{category}");
+                    Assert.That(submenu.worldBound.xMin, Is.GreaterThan(rootButton.worldBound.xMax));
+                    var item = submenu.Q<Button>();
+                    Assert.That(root.panel.Pick(item.worldBound.center), Is.SameAs(item));
+                    SavePreview(control + "-" + locale);
+                    Submit(root.Q<Button>(control));
+                }
+                ui.Dispose(); ui = null;
+            }
+        }
+
+        static void AssertCaptionWidths(VisualElement column)
+        {
+            Assert.That(column, Is.Not.Null);
+            var rows = column.Children().OfType<Button>().ToArray();
+            Assert.That(rows, Is.Not.Empty);
+            float width = rows[0].resolvedStyle.width;
+            float longestWithPadding = 0;
+            foreach (var row in rows)
+            {
+                var label = row.Q<Label>(className: "ff-quick-choice-copy");
+                Assert.That(label.resolvedStyle.fontSize, Is.EqualTo(12), label.text);
+                float textWidth = label.MeasureTextSize(label.text, 0, VisualElement.MeasureMode.Undefined,
+                    0, VisualElement.MeasureMode.Undefined).x;
+                longestWithPadding = Mathf.Max(longestWithPadding, textWidth + row.resolvedStyle.paddingLeft + row.resolvedStyle.paddingRight);
+                Assert.That(textWidth, Is.LessThanOrEqualTo(label.contentRect.width + 1), label.text);
+                Assert.That(row.resolvedStyle.width, Is.EqualTo(width).Within(1), label.text);
+            }
+            Assert.That(width, Is.EqualTo(longestWithPadding).Within(1), "Rows fit the widest actual caption and its padding.");
+        }
+
+        UIDocument CreateOffscreenDocument()
         {
             target = new RenderTexture(1920, 1080, 0); target.Create();
             settings = Object.Instantiate(AssetDatabase.LoadAssetAtPath<PanelSettings>(ContentPaths.Resolve("Assets/UI/MainPanel.asset")));
@@ -36,11 +112,34 @@ namespace FFOne.Tests
             settings.clearColor = true; settings.colorClearValue = Color.clear;
             owner = new GameObject("Gameplay UI acceptance"); owner.SetActive(false);
             var document = owner.AddComponent<UIDocument>(); document.panelSettings = settings; owner.SetActive(true);
+            return document;
+        }
+
+        IEnumerator Exercise()
+        {
+            var document = CreateOffscreenDocument();
             yield return null;
             var root = document.rootVisualElement;
             var session = GameplayUiValidationData.Session();
             int settingsRequests = 0, quitRequests = 0, gateChanges = 0;
             ui = new GameplayUiController(root, session, "ru", () => settingsRequests++, () => quitRequests++);
+            var layers = UiLayers.For(root);
+            var dialog = new VisualElement();
+            var lateWindow = new VisualElement();
+            var loading = new VisualElement();
+            dialog.StretchToParentSize();
+            lateWindow.StretchToParentSize();
+            loading.StretchToParentSize();
+            layers.Add(dialog, UiLayer.Dialog);
+            layers.Add(loading, UiLayer.Loading);
+            layers.Add(lateWindow, UiLayer.Window);
+            yield return null;
+            yield return null;
+            Assert.That(root.panel.Pick(new Vector2(30, 30)), Is.SameAs(loading));
+            loading.RemoveFromHierarchy();
+            Assert.That(root.panel.Pick(new Vector2(30, 30)), Is.SameAs(dialog));
+            dialog.RemoveFromHierarchy();
+            lateWindow.RemoveFromHierarchy();
             Assert.That(root.Q("hud-exp-frame").style.display.value, Is.EqualTo(DisplayStyle.None), "The ordinary HUD has no optional EXP strip.");
             ui.InputGateChanged += () => gateChanges++;
             foreach (var size in new[] { new Vector2(1264,681), new Vector2(1280,720), new Vector2(1920,1080) })
@@ -52,6 +151,11 @@ namespace FFOne.Tests
                 while (Enumerable.Range(0,3).Any(i => !(root.Q<Image>($"nano-{i}-portrait").image is RenderTexture)) && Time.realtimeSinceStartup < readyBy)
                     yield return null;
                 yield return null; yield return null;
+                var chat = FFView.RequireClass<VisualElement>(root, "ff-chat-window");
+                Assert.That(chat.resolvedStyle.width, Is.EqualTo(440));
+                Assert.That(chat.resolvedStyle.height, Is.EqualTo(150));
+                Assert.That(root.Q("chat-friend").resolvedStyle.left, Is.EqualTo(95));
+                Assert.That(root.Q("chat-group").resolvedStyle.left, Is.EqualTo(230));
                 float scale = RetrobutionLayout.Scale(size.y);
                 Assert.That(root.Q<Label>("hud-name").text, Is.EqualTo("UI Validation"));
                 Assert.That(root.Q("hud-hp").worldBound.width, Is.EqualTo(186 * .7f * scale).Within(.8), "Allow UI Toolkit's logical pixel rounding before the source transform.");
@@ -126,6 +230,20 @@ namespace FFOne.Tests
                 Assert.That(root.Q("journal-details").style.display.value, Is.EqualTo(DisplayStyle.Flex));
                 Assert.That(root.Q<Label>("mission-title-label").text, Is.Not.Empty.And.Not.EqualTo("2248"));
                 if (size.x == 1280) { yield return null; SavePreview("journal"); }
+                var completed = FFView.RequireClass<Button>(root, "ff-tab-completed");
+                Assert.That(root.panel.Pick(completed.worldBound.center), Is.SameAs(completed));
+                Submit(completed);
+                yield return null; yield return null;
+                var activeCaption = FFView.RequireClass<Label>(root, "ff-tab-active-label");
+                var completedCaption = FFView.RequireClass<Label>(root, "ff-tab-completed-label");
+                var activeText = activeCaption.MeasureTextSize(activeCaption.text, 0, VisualElement.MeasureMode.Undefined,
+                    0, VisualElement.MeasureMode.Undefined);
+                Assert.That(activeText.x, Is.LessThanOrEqualTo(activeCaption.contentRect.width),
+                    "The inactive Russian tab must show both ends of its caption.");
+                Assert.That(activeCaption.worldBound.xMax, Is.LessThan(completedCaption.worldBound.xMin),
+                    "Each tab must have its own text rectangle.");
+                if (size.x == 1280) SavePreview("journal-ru-completed-tab");
+                Submit(FFView.RequireClass<Button>(root, "ff-tab-active"));
                 ui.CloseWindow();
             }
             session.SetTutorialHealth(300, 1000);
@@ -137,7 +255,7 @@ namespace FFOne.Tests
             Assert.That(settingsRequests, Is.EqualTo(1)); Assert.That(ui.InputBlocked, Is.False);
             ui.Windows.Open(GameplayWindow.NanoCom);
             Submit(FFView.Require<Button>(root, "quit"));
-            Assert.That(quitRequests, Is.EqualTo(1)); Assert.That(ui.InputBlocked, Is.False);
+            Assert.That(quitRequests, Is.EqualTo(1)); Assert.That(ui.Windows.Current, Is.EqualTo(GameplayWindow.NanoCom), "Exit is an overlay above NanoCom.");
             Assert.That(gateChanges, Is.GreaterThan(6));
             ui.Dispose(); ui = null;
             Assert.That(root.Q("hud-root"), Is.Null);

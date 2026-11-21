@@ -1,0 +1,40 @@
+{
+  "kind": "bug",
+  "status": "done",
+  "priority": "normal",
+  "verification": "passed",
+  "area": "UI — интерфейс",
+  "notes": "На форме очищается сообщение о потере связи именно с выбранным сервером при успешном опросе. Живая приёмка выполнена по прямому TCP на изолированном RustyFusion. В кадрах использован одноразовый тестовый аккаунт.",
+  "evidence": "На кадре проверки studio-b9a120a02be6 при зелёном индикаторе виден отказ предыдущей попытки входа. Logs/Studio/server-indicator-20261119/Windows/Logs/FrontendRecovery/05-server-online-again.png.\n19.11.2026. Windows Development, Unity 6000.4.0f1, FFOneUnity f5b40dbc990f4dd42066d0bf9e32400bccff8ce9 с рабочими правками и готовым кэшем Addressables. Остановили и запустили изолированный RustyFusion с прежним адресом и базой. Пока сервер был выключен, индикатор оставался красным и сообщение об ошибке было видно. Успешный опрос установил зелёный индикатор и скрыл сообщение в том же обновлении формы до следующего Log In. Повторный вход открыл того же персонажа в том же клиенте. Кадры 04-login-while-offline.png и 05-server-online-again.png в Logs/Studio/login-error-recovery-20261119/Windows/Logs/FrontendRecovery/. Проверены фактические пиксели индикатора и области сообщения, Logs/Studio/login-error-recovery-20261119/screenshot-verification.json. Живой прогон Logs/Studio/login-error-recovery-20261119/acceptance.json, Unity EditMode 31/31, Logs/Studio/login-error-recovery-20261119/editmode.xml. Сохранность Logs/Studio/login-error-recovery-20261119/preservation.json.",
+  "source": "",
+  "historical": "",
+  "chat": "",
+  "triageChat": "",
+  "history": [
+    {
+      "time": "2026-11-19T07:52:19+00:00",
+      "changes": {
+        "area": "UI — интерфейс",
+        "evidence": "На кадре проверки studio-b9a120a02be6 при зелёном индикаторе виден отказ предыдущей попытки входа. Logs/Studio/server-indicator-20261119/Windows/Logs/FrontendRecovery/05-server-online-again.png.",
+        "kind": "bug",
+        "notes": "Ошибка обрыва должна исчезнуть на форме в том же обновлении, в котором сервер снова онлайн.",
+        "status": "active",
+        "title": "Ошибка соединения остаётся на форме входа после восстановления сервера",
+        "verification": "confirmed"
+      }
+    },
+    {
+      "time": "2026-11-19T08:10:05+00:00",
+      "changes": {
+        "evidence": "На кадре проверки studio-b9a120a02be6 при зелёном индикаторе виден отказ предыдущей попытки входа. Logs/Studio/server-indicator-20261119/Windows/Logs/FrontendRecovery/05-server-online-again.png.\n19.11.2026. Windows Development, Unity 6000.4.0f1, FFOneUnity f5b40dbc990f4dd42066d0bf9e32400bccff8ce9 с рабочими правками и готовым кэшем Addressables. Остановили и запустили изолированный RustyFusion с прежним адресом и базой. Пока сервер был выключен, индикатор оставался красным и сообщение об ошибке было видно. Успешный опрос установил зелёный индикатор и скрыл сообщение в том же обновлении формы до следующего Log In. Повторный вход открыл того же персонажа в том же клиенте. Кадры 04-login-while-offline.png и 05-server-online-again.png в Logs/Studio/login-error-recovery-20261119/Windows/Logs/FrontendRecovery/. Проверены фактические пиксели индикатора и области сообщения, Logs/Studio/login-error-recovery-20261119/screenshot-verification.json. Живой прогон Logs/Studio/login-error-recovery-20261119/acceptance.json, Unity EditMode 31/31, Logs/Studio/login-error-recovery-20261119/editmode.xml. Сохранность Logs/Studio/login-error-recovery-20261119/preservation.json.",
+        "notes": "На форме очищается сообщение о потере связи именно с выбранным сервером при успешном опросе. Живая приёмка выполнена по прямому TCP на изолированном RustyFusion. В кадрах использован одноразовый тестовый аккаунт.",
+        "status": "done",
+        "verification": "passed"
+      }
+    }
+  ],
+  "updated": "2026-11-19T08:10:05+00:00",
+  "id": "studio-84ce5414a862",
+  "original": "Ошибка соединения остаётся на форме входа после восстановления сервера",
+  "title": "Ошибка соединения остаётся на форме входа после восстановления сервера"
+}

@@ -6,6 +6,8 @@ namespace FFOne.Network
 {
     public sealed partial class FusionClient
     {
+        internal Task BlockNearbyAsync(int id,long uid,CancellationToken token) =>
+            SendGameplayAsync(0x13000070,ProtocolSocial.Identity(id,uid),token);
         public Task CheckMailAsync(CancellationToken token = default) => SendGameplayAsync(ProtocolMail.Check, new byte[1], token);
         public Task ListMailAsync(int page, CancellationToken token = default) => SendGameplayAsync(ProtocolMail.List, ProtocolMail.Page(page), token);
         public Task ReadMailAsync(long index, CancellationToken token = default) => SendGameplayAsync(ProtocolMail.Read, ProtocolMail.Index(index), token);
@@ -17,6 +19,7 @@ namespace FFOne.Network
             => SendGameplayAsync(ProtocolMail.Send, ProtocolMail.Compose(recipient, subject, body, taros, items), token);
         public Task RefreshFriendsAsync(CancellationToken token = default) => SendGameplayAsync(0x1300003c, new byte[1], token);
         public Task RequestFriendAsync(int id, long uid, CancellationToken token = default) => SendGameplayAsync(0x13000035, ProtocolSocial.Identity(id, uid), token);
+        public Task WarpToBuddyAsync(int slot, long uid, CancellationToken token = default) => SendGameplayAsync(0x13000051, ProtocolSocial.Slot(slot, uid), token);
         public Task AcceptFriendAsync(int id, bool accept, CancellationToken token = default) => SendGameplayAsync(0x13000036, ProtocolSocial.Accept(id, accept), token);
         public Task RequestFriendByNameAsync(string first, string last, CancellationToken token = default) => SendGameplayAsync(0x1300008e, ProtocolSocial.Name(first, last), token);
         public Task AcceptNamedFriendAsync(long uid, string first, string last, bool accept, CancellationToken token = default)
@@ -29,5 +32,13 @@ namespace FFOne.Network
         public Task SendGroupChatAsync(string text, CancellationToken token = default) => SendGameplayAsync(0x13000063, ProtocolChat.FreeChatPayload(text), token);
         public Task SendFriendChatAsync(int slot, long uid, string text, CancellationToken token = default)
             => SendGameplayAsync(0x13000037, ProtocolSocial.Whisper(slot, uid, text), token);
+        public Task SendMenuChatAsync(string text, int emote, CancellationToken token = default)
+        {
+            var payload = ProtocolChat.FreeChatPayload(text); Protocol0104.Write32(payload, 256, emote);
+            return SendGameplayAsync(ProtocolChat.MenuRequest, payload, token);
+        }
+        public Task SendGroupMenuChatAsync(string text, CancellationToken token) => SendGameplayAsync(0x13000066, ProtocolChat.FreeChatPayload(text), token);
+        public Task SendFriendMenuChatAsync(int slot, long uid, string text, CancellationToken token) => SendGameplayAsync(0x13000038, ProtocolSocial.Whisper(slot, uid, text), token);
+        public Task SendAvatarEmoteAsync(int player, int emote, CancellationToken token) => SendGameplayAsync(ProtocolChat.EmoteRequest, ProtocolTravel.Words(player, emote), token);
     }
 }

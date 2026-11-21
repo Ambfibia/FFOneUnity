@@ -21,6 +21,17 @@ namespace FFOne.World
         public event Action<ProjectileImpact> ProjectileImpacted;
         public int ProjectileCount => projectiles.Count;
         int projectilePlayerId;
+        internal void PlayMeleeImpact(WorldWeaponDefinition weapon, int battery, NetworkEntityView target)
+        {
+            if (weapon?.Mode != 1 || !target) return;
+            int row = battery > 0 && weapon.BoostedEffect > 0 ? weapon.BoostedEffect : weapon.Effect;
+            var bullet = WorldWeaponCatalog.Load().Bullet(row);
+            if (bullet == null || bullet.Impact <= 0) return;
+            var link = target.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == bullet.ImpactLink);
+            Vector3 point = link ? link.position : target.transform.position + Vector3.up * (target.Definition?.Height * .5f ?? .8f);
+            try { NativeCombatEffect.Spawn(ownedRoot.transform, bullet.Impact, bullet.ImpactScale, false, View, -1, point); }
+            catch (Exception error) { Replicas?.ContentFailure("Melee impact ES" + bullet.Impact + ": " + error.Message); }
+        }
         internal void ClearProjectiles()
         {
             foreach (var projectile in projectiles.Values) if (projectile) Destroy(projectile.gameObject);
@@ -41,6 +52,7 @@ namespace FFOne.World
             if (!actor) return;
             var weapon = WorldWeaponCatalog.Load().Find(update.WeaponId);
             if (weapon == null || !weapon.Projectile) { ReportCombatContentFailure("Unknown accepted projectile weapon " + update.WeaponId); return; }
+            if (owner != projectilePlayerId) actor.GetComponent<NetworkEntityView>()?.Animate("attack1");
             var bullet = WorldWeaponCatalog.Load().Bullet(update.Charged ? weapon.BoostedEffect : weapon.Effect);
             if (bullet == null) { ReportCombatContentFailure("Missing accepted bullet route for weapon " + weapon.Id); return; }
             var source = update.HasStart ? WorldCoordinates.FromServer(update.X, update.Y, update.Z) : actor.position + Vector3.up * .8f;
@@ -65,36 +77,117 @@ namespace FFOne.World
 
     public sealed class NetworkProjectileMotor : MonoBehaviour
     {
+        const float GrenadeGravity = 9.8f;
+        internal const float GrenadeCollisionRadius = .2f;
+        readonly RaycastHit[] traceHits = new RaycastHit[16];
         WorldWeaponDefinition weapon; WorldBulletDefinition bullet; Camera viewCamera;
         Vector3 target, velocity; float age; bool done; int mode; Action<Vector3> impact; Action<string> failure;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        internal event Action<RaycastHit, Vector3> Bounced;
+#endif
         public void Initialize(Vector3 source, Vector3 destination, int targetMode, WorldWeaponDefinition definition, WorldBulletDefinition projectile, Camera view, Action<Vector3> landed, Action<string> failed)
         {
             weapon = definition; bullet = projectile; viewCamera = view; mode = targetMode; target = destination; impact = landed; failure = failed;
-            transform.position = source; velocity = (destination - source).normalized * weapon.Range;
-            if (mode == 6) velocity.y = weapon.GrenadeVerticalSpeed;
+            transform.position = source; velocity = InitialVelocity(source, destination, mode, weapon);
             if (velocity.sqrMagnitude > 0) transform.rotation = Quaternion.LookRotation(velocity);
             NativeCombatEffect.Spawn(transform, bullet.Particle, bullet.Scale, true, viewCamera, -1);
         }
         void Update()
         {
             if (done) return;
-            float delta = Time.deltaTime; age += delta;
-            if (age >= weapon.Duration) { Detonate(); return; }
-            Vector3 next = mode == 5 ? Vector3.MoveTowards(transform.position, target, weapon.Range * delta) : transform.position + velocity * delta;
-            var step = next - transform.position;
-            foreach (var hit in Physics.RaycastAll(transform.position, step.normalized, step.magnitude, ~(1 << 31), QueryTriggerInteraction.Collide).OrderBy(h => h.distance))
+            float delta = Mathf.Min(Time.deltaTime, weapon.Duration - age);
+            age += delta;
+            if (mode == 6)
+                while (delta > 0 && !done)
+                {
+                    float step = Mathf.Min(delta, 1f / 60);
+                    AdvanceGrenade(step);
+                    delta -= step;
+                }
+            else AdvanceRocket(delta);
+            if (age >= weapon.Duration) Detonate();
+        }
+
+        void AdvanceRocket(float delta)
+        {
+            var next = Vector3.MoveTowards(transform.position, target, weapon.Range * delta);
+            if (Trace(transform.position, next, traceHits, out var hit))
             {
-                var entity = hit.collider.GetComponentInParent<NetworkEntityView>();
-                if (entity && entity.Entity.Kind == WorldEntityKind.Player) continue;
-                if (hit.collider.GetComponentInParent<CharacterController>()) continue;
-                if (entity && (!entity.Hostile || entity.Entity.Hidden)) continue;
                 transform.position = hit.point;
-                if (mode == 6 && !entity) { velocity = Vector3.Reflect(velocity, hit.normal) * .8f; transform.position += hit.normal * .02f; return; }
-                Detonate(); return;
+                Detonate();
+                return;
             }
             transform.position = next;
-            if (mode == 6) velocity += Vector3.down * (9.8f * delta);
-            else if ((next - target).sqrMagnitude < .0001f) Detonate();
+            if ((next - target).sqrMagnitude < .0001f) Detonate();
+        }
+
+        void AdvanceGrenade(float delta)
+        {
+            var start = transform.position;
+            var next = GrenadePosition(start, velocity, delta);
+            if (!Trace(start, next, traceHits, out var hit, GrenadeCollisionRadius))
+            {
+                transform.position = next;
+                velocity += Vector3.down * (GrenadeGravity * delta);
+                return;
+            }
+            transform.position = Vector3.MoveTowards(start, next, hit.distance);
+            if (hit.collider.GetComponentInParent<NetworkEntityView>())
+            {
+                Detonate();
+                return;
+            }
+            float timeToHit = delta * hit.distance / Vector3.Distance(start, next);
+            velocity += Vector3.down * (GrenadeGravity * timeToHit);
+            var horizontal = Vector3.ProjectOnPlane(velocity, Vector3.up);
+            var deflected = (horizontal.normalized + Vector3.ProjectOnPlane(hit.normal, Vector3.up)).normalized;
+            velocity = deflected * horizontal.magnitude + Vector3.up * (hit.normal.y * Mathf.Abs(velocity.y) * .8f);
+            transform.position += hit.normal * .001f;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Bounced?.Invoke(hit, velocity);
+#endif
+        }
+
+        internal static Vector3 GrenadePosition(Vector3 start, Vector3 velocity, float elapsed) =>
+            start + elapsed * velocity + Vector3.down * (.5f * GrenadeGravity * elapsed * elapsed);
+
+        internal static Vector3 InitialVelocity(Vector3 start, Vector3 target, int mode, WorldWeaponDefinition weapon)
+        {
+            var initial = (target - start).normalized * weapon.Range;
+            if (mode == 6) initial.y += weapon.GrenadeVerticalSpeed;
+            return initial;
+        }
+
+        internal static bool Trace(Vector3 start, Vector3 end, RaycastHit[] buffer, out RaycastHit nearest, float radius = 0)
+        {
+            nearest = default;
+            var step = end - start;
+            float distance = step.magnitude;
+            if (distance < .00001f) return false;
+            var ray = new Ray(start, step / distance);
+            const int layers = ~(1 << 31);
+            int count = radius > 0
+                ? Physics.SphereCastNonAlloc(ray, radius, buffer, distance, layers, QueryTriggerInteraction.Collide)
+                : Physics.RaycastNonAlloc(ray, buffer, distance, layers, QueryTriggerInteraction.Collide);
+            if (count == buffer.Length)
+            {
+                buffer = radius > 0
+                    ? Physics.SphereCastAll(ray, radius, distance, layers, QueryTriggerInteraction.Collide)
+                    : Physics.RaycastAll(ray, distance, layers, QueryTriggerInteraction.Collide);
+                count = buffer.Length;
+            }
+            float closest = float.PositiveInfinity;
+            for (int i = 0; i < count; i++)
+            {
+                var hit = buffer[i];
+                if (hit.distance >= closest || hit.collider.GetComponentInParent<CharacterController>()) continue;
+                var entity = hit.collider.GetComponentInParent<NetworkEntityView>();
+                if (entity && (entity.Entity.Kind == WorldEntityKind.Player || !entity.Hostile || entity.Entity.Hidden || entity.Entity.Hp <= 0)) continue;
+                if (!entity && hit.collider.isTrigger) continue;
+                nearest = hit;
+                closest = hit.distance;
+            }
+            return nearest.collider;
         }
         void Detonate()
         {
@@ -123,17 +216,16 @@ namespace FFOne.World
         }
         internal static GameObject Spawn(Transform parent, int id, float scale, bool projectile, Camera view, float lifetime, Vector3? position = null)
         {
-            var catalog = ContentAssets.Load<NativeModelCatalog>("NativeEditable/Index");
-            string prefix = (projectile ? "map/shared/projectiles/effects/models/es" : "map/shared/effects/models/es") + id + "/";
-            string model = catalog.Bindings.Where(b => b.OriginalResource.StartsWith(prefix, StringComparison.Ordinal)).Select(b => b.OriginalResource).SingleOrDefault();
-            if (model == null && !projectile)
-            {
-                // These accepted status meshes have semantic identities from the
-                // original Nano publication, rather than an ES-number directory.
-                var statuses = FFOne.Content.NativeData.Object("effects/skills/catalog");
-                model = (string)statuses["effects"]?.SingleOrDefault(e => (int)e["id"] == id)?["mesh"];
-            }
-            var assets = TutorialEffectAssets.Load(id, model, projectile, true);
+            var assets = TutorialEffectAssets.Load(id, null, projectile, true, defaultModel:true);
+            return Spawn(parent, assets, id, scale, view, lifetime, position);
+        }
+        internal static GameObject Spawn(Transform parent, NativeEffectDefinition definition, Camera view, Vector3? position, float scale = 1)
+        {
+            var assets = TutorialEffectAssets.FromDefinition(definition, worldShader: true, defaultModel: true);
+            return Spawn(parent, assets, definition.Id, scale, view, -1, position);
+        }
+        static GameObject Spawn(Transform parent, TutorialEffectAssets assets, int id, float scale, Camera view, float lifetime, Vector3? position)
+        {
             var root = new GameObject("Native combat ES" + id); root.transform.SetParent(parent, false);
             if (position.HasValue) root.transform.position = position.Value;
             root.AddComponent<NativeCombatEffect>().assets = assets;

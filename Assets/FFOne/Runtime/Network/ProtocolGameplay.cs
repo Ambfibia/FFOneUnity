@@ -9,7 +9,9 @@ namespace FFOne.Network
         public int Id { get; }
         public int Damage { get; }
         public int Hp { get; }
-        public CombatHit(WorldEntityKind kind, int id, int damage, int hp) { Kind = kind; Id = id; Damage = damage; Hp = hp; }
+        public bool Critical { get; }
+        public CombatHit(WorldEntityKind kind, int id, int damage, int hp, bool critical = false)
+        { Kind = kind; Id = id; Damage = damage; Hp = hp; Critical = critical; }
     }
     public sealed class CombatUpdate
     {
@@ -98,7 +100,7 @@ namespace FFOne.Network
                 int o = prefix + i * 24, kind = I(p, o), id = I(p, o + 4), damage = I(p, o + 12), hp = I(p, o + 16);
                 // eCharType: PC=1, NPC=2, Mob=4. IDs can overlap across player/NPC namespaces.
                 if ((kind != 1 && kind != 2 && kind != 4) || id <= 0 || damage < 0 || hp < 0) throw new ProtocolException("Invalid combat target post-state.");
-                hits[i] = new CombatHit(kind == 1 ? WorldEntityKind.Player : WorldEntityKind.Npc, id, damage, hp);
+                hits[i] = new CombatHit(kind == 1 ? WorldEntityKind.Player : WorldEntityKind.Npc, id, damage, hp, (p[o + 20] & 2) != 0);
             }
             return Array.AsReadOnly(hits);
         }

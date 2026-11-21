@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace FFOne.Network
 {
     public enum WorldEntityKind { Player, Npc, Transportation }
-    public enum WorldUpdateKind { Enter, Leave, Move, Equipment, Health, Nano, Settings, State, Condition }
+    public enum WorldUpdateKind { Enter, Leave, Move, Equipment, Health, Nano, Settings, State, Condition, Appearance }
 
     public sealed class WorldEntity
     {
@@ -17,6 +17,7 @@ namespace FFOne.Network
         public int Z { get; internal set; }
         public int Angle { get; internal set; }
         public int Speed { get; internal set; }
+        public bool NpcRunning { get; internal set; }
         public int ConditionFlags { get; internal set; }
         public int StateFlags { get; internal set; }
         public int RideState { get; internal set; }
@@ -26,6 +27,7 @@ namespace FFOne.Network
         public int LocalY { get; internal set; }
         public int LocalZ { get; internal set; }
         public bool Jumping { get; internal set; }
+        internal bool Ziplining { get; set; }
         public ulong ServerTime { get; internal set; }
         public CharacterInfo Character { get; internal set; }
         public int NanoId { get; internal set; }
@@ -81,11 +83,20 @@ namespace FFOne.Network
                             Speed = stop ? 0 : I(p, 40), Jumping = frame.PacketType == PlayerJump,
                             ServerTime = unchecked((ulong)Protocol0104.Read64(p, stop ? 24 : 48)) } });
                     break;
+                case ProtocolZipline.Broadcast: result.Add(ProtocolZipline.ReadBroadcast(p)); break;
                 case NpcMove:
                     Size(p, 24);
                     result.Add(new WorldUpdate { Kind = WorldUpdateKind.Move,
                         Entity = new WorldEntity { Kind = WorldEntityKind.Npc, Id = Id(I(p, 0)),
-                            X = I(p, 4), Y = I(p, 8), Z = I(p, 12), Speed = Math.Max(0, I(p, 16)) } });
+                            X = I(p, 4), Y = I(p, 8), Z = I(p, 12), Speed = Math.Max(0, I(p, 16)),
+                            NpcRunning = Protocol0104.Read16(p, 20) != 0 } });
+                    break;
+                case ProtocolBarber.Broadcast:
+                    Size(p, 80);
+                    result.Add(new WorldUpdate { Kind = WorldUpdateKind.Appearance, Entity = new WorldEntity {
+                        Kind = WorldEntityKind.Player, Id = Id(I(p, 0)),
+                        Character = new CharacterInfo { Uid = Protocol0104.Read64(p, 4), Style = Protocol0104.ReadAppearance(p, 4) }
+                    } });
                     break;
                 case ProtocolInventory.EquipmentChanged:
                     if (!ProtocolInventory.TryDecode(frame, out var equipment)) return false;

@@ -1,18 +1,248 @@
 .creation-rect, .creation-panel { position: absolute; }
 .creation-panel { transform-origin: 50% 50%; }
 .creation-label { color: rgb(204, 255, 255); -unity-text-align: middle-center; }
+.creation-label, .creation-rect.ff-button {
+    -unity-font-definition: url("../Fonts/jeffe-sdf.asset");
+}
 .creation-cyan { color: cyan; font-size: 12px; }
 .creation-name-wheel { overflow: hidden; }
 .creation-name-wheel .creation-label { padding: 4px 6px 6px 10px; }
-.creation-panel .creation-gender .creation-label { overflow: hidden; }
-.creation-panel #choose-body, .creation-panel #choose-features, .creation-panel #choose-clothes { -unity-text-align: middle-left; }
-.creation-panel #creation-title { padding-top: 3px; padding-bottom: 3px; }
-.creation-panel #generated-name, .creation-panel #custom-name { padding-bottom: 5px; font-size: 12px; }
-.creation-panel #name-or, .creation-panel #selected-name-tab { padding-top: 4px; padding-bottom: 7px; font-size: 12px; }
-.creation-panel #name-help, .creation-panel #creation-error { white-space: normal; }
-.creation-panel #name-question { font-size: 12px; color: white; }
-.creation-panel #name-display { color: yellow; font-size: 12px; }
-.creation-panel #creation-exit, .creation-panel #appearance-exit { padding: 4px 6px 6px 6px; }
+.creation-wheel-up { background-image: url("../Artwork/en/character/creation/name/CCScrollUpNormal.png"); }
+.creation-wheel-down { background-image: url("../Artwork/en/character/creation/name/CCScrollDownUp.png"); }
+.creation-wheel-up:hover, .creation-wheel-up:focus {
+    background-image: url("../Artwork/en/character/creation/name/CCScrollUpOver.png");
+}
+.creation-wheel-down:hover, .creation-wheel-down:focus {
+    background-image: url("../Artwork/en/character/creation/name/CCScrollDownOver.png");
+}
+.creation-wheel-up:active { background-image: url("../Artwork/en/character/creation/name/CCScrollUpNormal.png"); }
+.creation-wheel-down:active { background-image: url("../Artwork/en/character/creation/name/CCScrollDownUp.png"); }
+.creation-swatch-selected { display: none; }
+.creation-swatch-active .creation-swatch-selected { display: flex; }
+.creation-swatch-unavailable { display: none; }
+.creation-rect.creation-picture, .creation-backdrop, .creation-rect.ff-button {
+    -unity-background-scale-mode: stretch-to-fill;
+}
+.creation-section-heading { -unity-text-align: middle-left; }
+.creator-bind-creation-title { padding-top: 3px; padding-bottom: 3px; }
+.creation-name-tab-button { padding-bottom: 5px; font-size: 12px; }
+.creation-tab-caption { padding-top: 4px; padding-bottom: 7px; font-size: 12px; }
+.creator-bind-name-question { font-size: 12px; color: white; }
+.creation-help, .creation-feedback {
+    -unity-font-definition: url("../Fonts/chaletbook-regular-sdf.asset");
+    white-space: normal;
+}
+/* Match the source Chalet line step for the name screen's authored hard breaks.
+   The retained Manrope face has a 122.94px line step at 90px instead. */
+.creation-help { -unity-paragraph-spacing: -5px; }
+.creation-feedback { font-size: 12px; -unity-paragraph-spacing: -4px; }
+.creation-appearance .creation-feedback {
+    -unity-font-definition: url("../Fonts/jeffe-sdf.asset");
+    font-size: 11px;
+    -unity-paragraph-spacing: 0px;
+}
+.creation-small-action { font-size: 12px; }
+.creation-value { padding: 4px 6px 6px 10px; font-size: 12px; }
+.creator-bind-name-display { color: yellow; }
+.creation-exit { padding: 4px 6px 6px 6px; }
+
+.creation-slice-standard {
+    -unity-slice-left: 5; -unity-slice-right: 5; -unity-slice-top: 5; -unity-slice-bottom: 5;
+}
+.creation-slice-name-background { -unity-slice-left: 5; -unity-slice-right: 5; }
+.creation-slice-name-button { -unity-slice-left: 35; -unity-slice-right: 35; -unity-slice-top: 20; }
+.creation-slice-name-tab {
+    -unity-slice-left: 5; -unity-slice-right: 5; -unity-slice-top: 21; -unity-slice-bottom: 10;
+}
+/* The custom tab texture is 31px high. Keep one texel for the stretch region. */
+.creation-slice-name-tab--custom { -unity-slice-top:20; }
+.creation-slice-appearance-background { -unity-slice-left: 10; -unity-slice-right: 10; }
+.creation-slice-embedded-panel {
+    -unity-slice-left: 5; -unity-slice-right: 40; -unity-slice-top: 5; -unity-slice-bottom: 40;
+}
+.creation-panel .creation-slice-name-field {
+    -unity-font-definition: url("../Fonts/jeffe-sdf.asset");
+}
+.creation-panel .creation-slice-name-field .unity-text-field__input {
+    color: yellow;
+    padding: 3px;
+}
 .character-creation .creation-gender, .character-creation .creation-exit { color: rgb(204, 255, 255); }
 .character-creation .ff-button:hover, .character-creation .ff-button:focus, .character-creation .ff-button:active { color: rgb(0, 71, 122); }
 .character-creation .creation-exit:hover, .character-creation .creation-exit:focus, .character-creation .creation-exit:active { color: rgb(165, 192, 192); }
+
+
+.creation-page-unavailable { display: none; }
+.creation-clothes-near { -unity-background-image-tint-color: rgba(255, 255, 255, 0.75); }
+.creation-clothes-far { -unity-background-image-tint-color: rgba(255, 255, 255, 0.50); }
+.creation-fullscreen {
+    left: 100%;
+    top: 100%;
+    width: 35px;
+    height: 31px;
+    transform-origin: 0 0;
+    background-image: url("../Artwork/en/character/selection/controls/CSFullScreenButton.png");
+}
+.creation-fullscreen:hover, .creation-fullscreen:focus { background-image: url("../Artwork/en/character/selection/controls/FullscreenModeButton_Over.png"); }
+.creation-fullscreen.creation-windowed { background-image: url("../Artwork/en/character/selection/controls/CSFullToWindow.png"); }
+.creation-fullscreen.creation-windowed:hover, .creation-fullscreen.creation-windowed:focus { background-image: url("../Artwork/en/character/selection/controls/WindowModeButton_Over.png"); }
+.creation-rect.creation-gender {
+    background-size: 22px 22px;
+    background-position-x: left;
+    background-position-y: center;
+    background-repeat: no-repeat;
+    background-image: url("../Artwork/en/character/creation/body/checkbox/CCCheckboxNormal.png");
+}
+.creation-gender:hover, .creation-gender:focus { background-image: url("../Artwork/en/character/creation/body/checkbox/CCCheckboxOver.png"); }
+.creation-gender.creation-gender-selected { background-image: url("../Artwork/en/character/creation/body/checkbox/CCCheckboxChecked.png"); }
+.creation-gender.creation-gender-selected:hover, .creation-gender.creation-gender-selected:focus { background-image: url("../Artwork/en/character/creation/body/checkbox/CCCheckboxCkeckedOver.png"); }
+
+.creation-name-tab-button {
+    background-image: url("../Artwork/en/character/creation/name/CCNameTabButtonNormal.png");
+}
+.creation-name-tab-button:hover, .creation-name-tab-button:focus {
+    background-image: url("../Artwork/en/character/creation/name/CCNameTabButtonOver.png");
+}
+.creation-name-tab-button:active {
+    background-image: url("../Artwork/en/character/creation/name/CCNameTabButtonNormal.png");
+}
+
+.creation-blue-action {
+    background-image: url("../Artwork/en/character/selection/controls/blue_button_normal.png");
+}
+.creation-blue-action:hover, .creation-blue-action:focus {
+    background-image: url("../Artwork/en/character/selection/controls/blue_button_over.png");
+}
+.creation-blue-action:active {
+    background-image: url("../Artwork/en/character/selection/controls/blue_button_normal.png");
+}
+
+.creation-red-action {
+    background-image: url("../Artwork/en/character/selection/controls/red_button_normal.png");
+}
+.creation-red-action:hover, .creation-red-action:focus {
+    background-image: url("../Artwork/en/character/selection/controls/red_button_over.png");
+}
+.creation-red-action:active {
+    background-image: url("../Artwork/en/character/selection/controls/red_button_normal.png");
+}
+
+.creation-body-previous {
+    background-image: url("../Artwork/en/character/creation/body/CCBodyshapeRightNormal.png");
+}
+.creation-body-previous:hover, .creation-body-previous:focus {
+    background-image: url("../Artwork/en/character/creation/body/CCBodyshapeRightOver.png");
+}
+.creation-body-previous:active {
+    background-image: url("../Artwork/en/character/creation/body/CCBodyshapeRightNormal.png");
+}
+
+.creation-body-next {
+    background-image: url("../Artwork/en/character/creation/body/CCBodyshapeLeftNormal.png");
+}
+.creation-body-next:hover, .creation-body-next:focus {
+    background-image: url("../Artwork/en/character/creation/body/CCBodyshapeLeftOver.png");
+}
+.creation-body-next:active {
+    background-image: url("../Artwork/en/character/creation/body/CCBodyshapeLeftNormal.png");
+}
+
+.creation-clothes-left {
+    background-image: url("../Artwork/en/character/creation/clothes/CCClothesLeftButtonNormal.png");
+}
+.creation-clothes-left:hover, .creation-clothes-left:focus {
+    background-image: url("../Artwork/en/character/creation/clothes/CCClothesLeftButtonOver.png");
+}
+.creation-clothes-left:active {
+    background-image: url("../Artwork/en/character/creation/clothes/CCClothesLeftButtonNormal.png");
+}
+
+.creation-clothes-right {
+    background-image: url("../Artwork/en/character/creation/clothes/CCClothesRightButtonNormal.png");
+}
+.creation-clothes-right:hover, .creation-clothes-right:focus {
+    background-image: url("../Artwork/en/character/creation/clothes/CCClothesRightButtonOver.png");
+}
+.creation-clothes-right:active {
+    background-image: url("../Artwork/en/character/creation/clothes/CCClothesRightButtonNormal.png");
+}
+
+.creation-clothes-top-left {
+    background-image: url("../Artwork/en/character/creation/clothes/CCClothesLeftTopButtonNormal.png");
+}
+.creation-clothes-top-left:hover, .creation-clothes-top-left:focus {
+    background-image: url("../Artwork/en/character/creation/clothes/CCClothesLeftTopOver.png");
+}
+.creation-clothes-top-left:active {
+    background-image: url("../Artwork/en/character/creation/clothes/CCClothesLeftTopButtonNormal.png");
+}
+
+.creation-clothes-top-right {
+    background-image: url("../Artwork/en/character/creation/clothes/CCClothesRightTopButtonNormal.png");
+}
+.creation-clothes-top-right:hover, .creation-clothes-top-right:focus {
+    background-image: url("../Artwork/en/character/creation/clothes/CCClothesRightTopOver.png");
+}
+.creation-clothes-top-right:active {
+    background-image: url("../Artwork/en/character/creation/clothes/CCClothesRightTopButtonNormal.png");
+}
+
+.creation-clothes-bottom-left {
+    background-image: url("../Artwork/en/character/creation/clothes/CCClothesLeftBottomButtonNormal.png");
+}
+.creation-clothes-bottom-left:hover, .creation-clothes-bottom-left:focus {
+    background-image: url("../Artwork/en/character/creation/clothes/CCClothesLeftBottomButtonOver.png");
+}
+.creation-clothes-bottom-left:active {
+    background-image: url("../Artwork/en/character/creation/clothes/CCClothesLeftBottomButtonNormal.png");
+}
+
+.creation-clothes-bottom-right {
+    background-image: url("../Artwork/en/character/creation/clothes/CCClothesRightBottomButtonNormal.png");
+}
+.creation-clothes-bottom-right:hover, .creation-clothes-bottom-right:focus {
+    background-image: url("../Artwork/en/character/creation/clothes/CCClothesRightBottomOver.png");
+}
+.creation-clothes-bottom-right:active {
+    background-image: url("../Artwork/en/character/creation/clothes/CCClothesRightBottomButtonNormal.png");
+}
+
+.creation-rotate-left {
+    background-image: url("../Artwork/en/character/creation/camera/CCRotateLeftNormal.png");
+}
+.creation-rotate-left:hover, .creation-rotate-left:focus {
+    background-image: url("../Artwork/en/character/creation/camera/CCRotateLeftOver.png");
+}
+.creation-rotate-left:active {
+    background-image: url("../Artwork/en/character/creation/camera/CCRotateLeftNormal.png");
+}
+
+.creation-rotate-right {
+    background-image: url("../Artwork/en/character/creation/camera/CCRotateRightNormal.png");
+}
+.creation-rotate-right:hover, .creation-rotate-right:focus {
+    background-image: url("../Artwork/en/character/creation/camera/CCRoatateRightOver.png");
+}
+.creation-rotate-right:active {
+    background-image: url("../Artwork/en/character/creation/camera/CCRotateRightNormal.png");
+}
+
+.creation-zoom-in {
+    background-image: url("../Artwork/en/character/creation/camera/CCZoomInNormal.png");
+}
+.creation-zoom-in:hover, .creation-zoom-in:focus {
+    background-image: url("../Artwork/en/character/creation/camera/CCZoomInOver.png");
+}
+.creation-zoom-in:active {
+    background-image: url("../Artwork/en/character/creation/camera/CCZoomInNormal.png");
+}
+
+.creation-zoom-out {
+    background-image: url("../Artwork/en/character/creation/camera/CCZoomOutNormal.png");
+}
+.creation-zoom-out:hover, .creation-zoom-out:focus {
+    background-image: url("../Artwork/en/character/creation/camera/CCZoomOutOver.png");
+}
+.creation-zoom-out:active {
+    background-image: url("../Artwork/en/character/creation/camera/CCZoomOutNormal.png");
+}

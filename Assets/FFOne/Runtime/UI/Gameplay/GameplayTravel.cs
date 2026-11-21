@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,27 +23,37 @@ namespace FFOne.UI
         int warpFlags, looksSlot = -1, statsSlot = -1, selectedRecallPoint;
         long skyway0, skyway1;
         string travelStatus = "";
-        Button crocButton;
-        public bool TravelBusy => travelPending != 0 || travelFaulted || travelRiding;
+        public bool TravelBusy => travelPending != 0 || travelFaulted || travelRiding || crocWaiting || transportDeparting;
+        internal Func<int, NetworkEntityView> ResolveServiceNpc;
+        internal Action<WorldEntity,string> ServiceVoice;
+        internal Func<WorldEntity, CancellationToken, Task<bool>> SyncWarpPosition;
         public void ConfigureTravel(FusionClient client, CancellationToken token, WorldEntry entry)
         {
             travelClient = client; travelToken = token; travelCatalog = WorldTravelCatalog.Load();
+            RequestMentor = mentor => client.ChangeMentorAsync(mentor, token);
+            LoadMapPreferences();
             if (entry.RawLoadData?.Length >= 2524)
             { warpFlags = Protocol0104.Read32(entry.RawLoadData, 2504); skyway0 = Protocol0104.Read64(entry.RawLoadData, 2508); skyway1 = Protocol0104.Read64(entry.RawLoadData, 2516); }
-            crocButton = ServiceButton(parent, "croc-open", "CROC POT", 18, 170, 200, OpenCroc);
         }
         bool TravelAvailable => travelClient != null && !disposed && !interactionSuspended && !TravelBusy && !MailBusy && !ServiceActive && !serviceFaulted && !inventoryPending && !TradeWindowActive &&
             trade?.Snapshot.Phase != GameplayTradePhase.OutgoingOffer && trade?.Snapshot.Phase != GameplayTradePhase.IncomingOffer && session.Snapshot.Hp > 0;
         public bool OpenNpcTravel(WorldEntity npc, WorldNpcDefinition definition)
         {
             if (npc == null || definition == null || !TravelAvailable) return false;
-            if (!travelCatalog.Locations.Any(l => l.Npc == npc.NpcType) && !travelCatalog.Warps.Any(w => w.Npc == npc.NpcType) && !definition.IsGroupNpc && definition.Category != 17) return false;
+            if (definition.Category is 13 or 14) { OpenRaceNpc(npc,definition.Category); return true; }
+            transportHub = travelCatalog.Locations.FirstOrDefault(l => l.Npc == npc.NpcType);
+            selectedTrip = null; turboTravel = false;
+            if (definition.Category is >=7 and <=9 or 26 or 28 || transportHub!=null || npc.NpcType is >=643 and <=650)
+            {
+                serviceMenuNpc=npc; Windows.Open(GameplayWindow.NpcServices);return true;
+            }
+            if (!travelCatalog.Locations.Any(l => l.Npc == npc.NpcType) && !travelCatalog.Warps.Any(w => w.Npc == npc.NpcType) && !definition.IsGroupNpc && definition.Category != 17 && !IsMentorCategory(definition.Category)) return false;
             travelNpc = npc; crocView = false; travelStatus = ""; Windows.Open(GameplayWindow.Travel); return true;
         }
-        public void OpenCroc()
+        public void OpenCroc(WorldEntity npc = null)
         {
             if (!TravelAvailable) return;
-            crocView = true; travelNpc = null; looksSlot = statsSlot = -1; travelStatus = ""; Windows.Open(GameplayWindow.Travel);
+            crocView = true; travelNpc = npc; looksSlot = statsSlot = crocCarried = crocResult = -1; travelStatus = ""; Windows.Open(GameplayWindow.Travel);
         }
         async Task BeginTravel(uint expected, Func<Task> action)
         {
@@ -55,11 +66,15 @@ namespace FFOne.UI
         { travelPending = 0; travelFaulted = true; travelStatus = text + T(" Re-enter the world to synchronize.", " Войдите в мир заново для синхронизации."); RefreshTravel(); Error?.Invoke(travelStatus); }
         void TickTravel()
         {
+            if(stationReply!=0 && Time.unscaledTime>=stationDeadline)StationFailure(T("No Nano station acknowledgement.","Сервер не подтвердил действие Nano-станции."));
+            if (mentorPending != 0 && !travelFaulted && Time.unscaledTime >= mentorReplyDeadline)
+                FaultTravel(T("No guide change acknowledgement.", "Сервер не подтвердил смену гида."));
             if (travelPending != 0 && Time.unscaledTime >= travelDeadline) FaultTravel(T("No acknowledgement.", "Нет подтверждения операции."));
-            if (crocButton != null) crocButton.style.display = session.Snapshot.IsActive && !session.Snapshot.IsTutorial && session.Snapshot.Hp > 0 && !Windows.IsOpen && !interactionSuspended && prompt == null ? DisplayStyle.Flex : DisplayStyle.None;
         }
         public void ReceiveTravel(ProtocolFrame f)
         {
+            if (ReceiveMentor(f)) return;
+            if (ReceiveMapPresence(f)) return;
             if (ProtocolRecall.TryDecode(f, out var recall))
             {
                 if (!recall.Failed && travelPending == ProtocolRecall.Success && recall.NpcId != travelNpc?.Id)
@@ -79,7 +94,11 @@ namespace FFOne.UI
                 if (u.Type == ProtocolTravel.RegisterOk) { warpFlags = u.WarpFlags; skyway0 = u.SkywayFlags0; skyway1 = u.SkywayFlags1; }
                 uint failure = travelPending == ProtocolTravel.WarpOk ? ProtocolTravel.WarpFail : travelPending - 1;
                 if (travelPending == 0 || (u.Type != travelPending && u.Type != failure)) return;
+                if(travelPending==ProtocolTravel.TripOk)playSound?.Invoke(u.Failed?"action_failure01":"action_sucess");
                 travelPending = 0; travelStatus = u.Failed ? T("Server rejected the trip: ", "Сервер отклонил переход: ") + u.Error : T("Confirmed.", "Подтверждено.");
+                if (u.Type == ProtocolTravel.RegisterOk)
+                    travelStatus = FFOne.Content.LocalizationCatalog.Lookup(
+                        u.Transport == 1 ? "ui.transportation.registered.warp" : "ui.transportation.registered.hub", language);
                 if (!u.Failed && u.Type != ProtocolTravel.RegisterOk) Windows.Close(); else RefreshTravel();
             }
             if (ProtocolCroc.TryDecode(f, out var c) && travelPending == ProtocolCroc.Ok)
@@ -87,7 +106,8 @@ namespace FFOne.UI
                 if (c.LooksSlot != looksSlot || c.StatsSlot != statsSlot) throw new ProtocolException("Croc Pot reply does not match the selected slots.");
                 travelPending = 0;
                 travelStatus = c.Failed ? T("Server rejected the combination.", "Сервер отклонил совмещение.") : c.Combined ? T("Combination succeeded.", "Совмещение удалось.") : T("Attempt failed. Both items returned; Taros spent.", "Попытка не удалась. Предметы возвращены; Taros списаны.");
-                if (c.Combined) looksSlot = statsSlot = -1;
+                if (c.Combined) { crocResult = looksSlot; looksSlot = statsSlot = -1; }
+                else if (!c.Failed) crocResult = -2;
                 RefreshTravel();
             }
         }
@@ -95,61 +115,74 @@ namespace FFOne.UI
             ((unchecked((ulong)(id <= 64 ? skyway0 : skyway1)) >> ((id - 1) % 64)) & 1) != 0);
         VisualElement BuildTravelView()
         {
-            var root = SocialRoot("travel", 880, 630, crocView ? "CROC POT" : WorldNpcCatalog.Load().Find(travelNpc.NpcType)?.Name ?? "TRAVEL");
-            var panel = root.Q("travel-window");
-            FFWidgets.Label(panel, "travel-status", travelStatus, 18, 48, 840, 48, true, 14, false);
-            var list = new ScrollView { name = "travel-list" }; FFWidgets.Rect(list, 18, 100, 840, 510); panel.Add(list);
-            FillTravel(root); return root;
-        }
-        void RefreshTravel() { if (Windows.Current == GameplayWindow.Travel) FillTravel(Windows.View); }
-        void FillTravel(VisualElement root)
-        {
-            if (root == null) return; root.Q<Label>("travel-status").text = travelStatus;
-            var list = root.Q<ScrollView>("travel-list"); list.Clear();
-            if (crocView) { FillCroc(list); return; }
-            bool ready = !TravelBusy;
-            if (WorldNpcCatalog.Load().Find(travelNpc.NpcType)?.Category == 17)
+            if (crocView) return BuildCrocView();
+            if (transportHub != null) return BuildTransportView();
+            var npc = travelNpc;
+            var definition = WorldNpcCatalog.Load().Find(npc.NpcType);
+            var rows = new List<(string id,string label,string icon,Action run)>();
+            const string quest = "ui/en/gameplay/mission/npc/";
+            int category = definition.Category;
+            if (IsMentorCategory(category))
             {
-                var row = TravelRow(list, T("Register this point to return with your Recall Nano.", "Зарегистрируйте точку, чтобы вернуться с помощью Nano возврата."));
-                ServiceButton(row, "recall-register", selectedRecallPoint == travelNpc.Id ? T("REGISTERED", "ЗАРЕГИСТРИРОВАНО") : T("REGISTER", "ЗАРЕГИСТРИРОВАТЬ"), 565, 4, 240,
-                    () => _ = BeginTravel(ProtocolRecall.Success, () => travelClient.RegisterRecallPointAsync(travelNpc.Id, travelToken))).SetEnabled(ready && selectedRecallPoint != travelNpc.Id);
-                return;
+                string text = category == 23 ? MentorText("warp.action") : MentorText("action." + (session.Snapshot.Guide == 5 ? "choose" : "change"));
+                rows.Add(("npc-mentor", text, category == 23 ? quest+"npcicon_warp" : "ui/en/gameplay/journal/npcicon_guide",
+                    () => OpenMentor(category, travelClient.PaymentFlag)));
             }
-            foreach (var loc in travelCatalog.Locations.Where(l => l.Npc == travelNpc.NpcType))
+            if (category == 17)
+                rows.Add(("recall-register", T("REGISTER", "ЗАРЕГИСТРИРОВАТЬ"), quest+"npcicon_warp",
+                    () => _ = BeginTravel(ProtocolRecall.Success, () => travelClient.RegisterRecallPointAsync(npc.Id, travelToken))));
+            var warps = travelCatalog.Warps.Where(w => w.Npc == npc.NpcType && !(category == 23 && w.Id == 76)).ToArray();
+            var destinations = FFOne.Content.ContentAssets.Load<WorldCatalog>("World/Catalog");
+            var availability = new Dictionary<NpcWarp,bool>();
+            foreach (var warp in warps)
             {
-                var row = TravelRow(list, (loc.Type == 1 ? "S.C.A.M.P.E.R. — " : "Monkey Skyway — ") + loc.Name);
-                ServiceButton(row, "transport-register-" + loc.Type + "-" + loc.Id, Unlocked(loc.Type, loc.Id) ? T("REGISTERED", "ОТКРЫТО") : T("REGISTER", "ОТКРЫТЬ"), 565, 4, 240,
-                    () => _ = BeginTravel(ProtocolTravel.RegisterOk, () => travelClient.RegisterTransportAsync(travelNpc.Id, loc.Type, loc.Id, travelToken))).SetEnabled(ready && !Unlocked(loc.Type, loc.Id));
-                foreach (var trip in travelCatalog.Trips.Where(t => t.Type == loc.Type && t.From == loc.Id && t.Npc == travelNpc.NpcType))
+                availability.Add(warp,NetworkWorldController.HasCoverage(destinations,warp.Map,WorldCoordinates.FromServer(warp.X,warp.Y,warp.Z)));
+                rows.Add(("npc-warp-"+warp.Id, warp.Name, quest+"npcicon_warp", () => ConfirmTravel(warp.Name +
+                    (warp.Group ? T(" — nearby group members travel together.", " — участники группы рядом перейдут вместе.") : ""), () => SendNpcWarp(warp))));
+            }
+            if (definition.IsGroupNpc)
+                rows.Add(("npc-group-action", T("INVITE","ПРИГЛАСИТЬ"), "ui/en/gameplay/system/messicon_group", () =>
+                    _ = SocialSend(() => social.Npcs.Any(n => n.Id == npc.Id) ? travelClient.KickNpcAsync(npc.Id, travelToken) : travelClient.InviteNpcAsync(npc.Id, travelToken))));
+            if (category != 17)
+                rows.Add(("travel-missions", T("MISSIONS","ЗАДАНИЯ"), MissionServiceIcon, () => OpenNpcConversation(npc)));
+            rows.Add(("npc-dismiss", T("CLOSE","ЗАКРЫТЬ"), quest+"npcicon_exit", () => Windows.Close()));
+            var controls = new Dictionary<string, Button>();
+            var root = BuildServiceRows(definition, rows, controls);
+            var status = FFView.RequireClass<Label>(root, "npc-service-status");
+            FFWidgets.AutoFit(status);
+            void UpdateActions()
+            {
+                status.text = string.IsNullOrEmpty(travelStatus) && warps.Length > 0 && warps.All(w => session.Snapshot.Level < w.Level)
+                    ? FFOne.Content.LocalizationCatalog.Lookup("content.tabledata.message.message.111.sz_string", language)
+                    : travelStatus;
+                foreach (var row in rows) controls[row.id].SetEnabled(!TravelBusy);
+                if (IsMentorCategory(category)) controls["npc-mentor"].SetEnabled(!TravelBusy && session.Snapshot.Guide is >= 1 and <= 5);
+                if (category == 17)
                 {
-                    var dest = travelCatalog.Locations.FirstOrDefault(l => l.Type == trip.Type && l.Id == trip.To); if (dest == null) continue;
-                    bool covered = NetworkWorldController.HasCoverage(FFOne.Content.ContentAssets.Load<WorldCatalog>("World/Catalog"), 0, WorldCoordinates.FromServer(dest.X, dest.Y, dest.Z));
-                    var r = TravelRow(list, dest.Name + $"   {trip.Cost} Taros" + (!Unlocked(trip.Type, trip.To) ? T(" [locked]", " [закрыто]") : !covered ? T(" [scene unavailable]", " [нет сцены]") : ""));
-                    ServiceButton(r, "transport-trip-" + trip.Id, T("TRAVEL", "ОТПРАВИТЬСЯ"), 565, 4, 240,
-                        () => ConfirmTravel(dest.Name + $" — {trip.Cost} Taros", () => BeginTravel(ProtocolTravel.TripOk, () => travelClient.TravelAsync(travelNpc.Id, trip.Id, travelToken))))
-                        .SetEnabled(ready && covered && Unlocked(trip.Type, trip.From) && Unlocked(trip.Type, trip.To) && session.Snapshot.Taros >= trip.Cost);
+                    var register = controls["recall-register"];
+                    bool selected = selectedRecallPoint == npc.Id;
+                    register.text = selected ? T("REGISTERED","ЗАРЕГИСТРИРОВАНО") : T("REGISTER","ЗАРЕГИСТРИРОВАТЬ");
+                    register.SetEnabled(!TravelBusy && !selected);
+                }
+                foreach (var warp in warps) controls["npc-warp-" + warp.Id].SetEnabled(!TravelBusy && availability[warp] &&
+                    session.Snapshot.Level >= warp.Level && session.Snapshot.Taros >= warp.Cost);
+                if (definition.IsGroupNpc)
+                {
+                    var button=controls["npc-group-action"];
+                    button.text=social.Npcs.Any(n=>n.Id==npc.Id) ? T("REMOVE","УБРАТЬ") : T("INVITE","ПРИГЛАСИТЬ");
+                    button.SetEnabled(!TravelBusy && !socialSending);
                 }
             }
-            foreach (var warp in travelCatalog.Warps.Where(w => w.Npc == travelNpc.NpcType))
-            {
-                bool covered = NetworkWorldController.HasCoverage(FFOne.Content.ContentAssets.Load<WorldCatalog>("World/Catalog"), warp.Map, WorldCoordinates.FromServer(warp.X, warp.Y, warp.Z));
-                var row = TravelRow(list, warp.Name + (warp.Group ? T(" [group]", " [группа]") : "") + $"   Lv {warp.Level}   {warp.Cost} Taros" + (!covered ? T(" [scene unavailable]", " [нет сцены]") : ""));
-                ServiceButton(row, "npc-warp-" + warp.Id, T("ENTER", "ВОЙТИ"), 565, 4, 240, () => ConfirmTravel(warp.Name + (warp.Group ? T(" — nearby group members travel together.", " — участники группы рядом перейдут вместе.") : ""), () => SendNpcWarp(warp)))
-                    .SetEnabled(ready && covered && session.Snapshot.Level >= warp.Level && session.Snapshot.Taros >= warp.Cost);
-            }
-            if (WorldNpcCatalog.Load().Find(travelNpc.NpcType)?.IsGroupNpc == true)
-            {
-                var row = TravelRow(list, T("NPC companion", "NPC в группе")); bool member = social.Npcs.Any(n => n.Id == travelNpc.Id);
-                ServiceButton(row, "npc-group-action", member ? T("REMOVE", "УБРАТЬ") : T("INVITE", "ПРИГЛАСИТЬ"), 565, 4, 240,
-                    () => _ = SocialSend(() => member ? travelClient.KickNpcAsync(travelNpc.Id, travelToken) : travelClient.InviteNpcAsync(travelNpc.Id, travelToken))).SetEnabled(ready && !socialSending);
-            }
-            var missions = TravelRow(list, T("NPC missions", "Задания NPC"));
-            ServiceButton(missions, "travel-missions", T("MISSIONS", "ЗАДАНИЯ"), 565, 4, 240, () => OpenNpcMissions(travelNpc)).SetEnabled(ready);
+            root.userData = (Action)UpdateActions;
+            UpdateActions();
+            return root;
         }
-        VisualElement TravelRow(VisualElement list, string text)
+        void RefreshTravel()
         {
-            var row = new VisualElement(); row.style.height = 57; row.style.flexShrink = 0; list.Add(row);
-            var label = FFWidgets.Label(row, "name", text, 0, 0, 550, 52, true, 14, false); label.style.whiteSpace = WhiteSpace.Normal; return row;
+            if (Windows.Current != GameplayWindow.Travel || Windows.View == null) return;
+            if (crocView) RefreshCroc(Windows.View);
+            else if (transportHub != null) FillTransport(Windows.View);
+            else (Windows.View.userData as Action)?.Invoke();
         }
         void ConfirmTravel(string text, Func<Task> action) => ShowPrompt(T("CONFIRM", "ПОДТВЕРЖДЕНИЕ"), text, null, _ => action(), () => Task.CompletedTask);
         Task SendNpcWarp(NpcWarp w)
@@ -157,31 +190,19 @@ namespace FFOne.UI
             var required = (w.RequiredType == 8 ? session.Snapshot.QuestInventory : session.Snapshot.Inventory).FirstOrDefault(i => i.ItemType == w.RequiredType && i.ItemId == w.RequiredItem);
             var consumed = session.Snapshot.Inventory.FirstOrDefault(i => i.ItemType == w.ConsumedType && i.ItemId == w.ConsumedItem);
             if (w.RequiredItem > 0 && required.IsEmpty || w.ConsumedItem > 0 && consumed.IsEmpty) { travelStatus = T("Required item is missing.", "Нет нужного предмета."); RefreshTravel(); return Task.CompletedTask; }
-            return BeginTravel(ProtocolTravel.WarpOk, () => travelClient.WarpNpcAsync(travelNpc.Id, w.Id, w.RequiredItem > 0 ? (w.RequiredType == 8 ? 2 : 1) : 4,
-                w.RequiredItem > 0 ? required.Slot : 0, w.ConsumedItem > 0 ? consumed.Slot : -1, travelToken));
-        }
-        void FillCroc(VisualElement list)
-        {
-            var items = session.Snapshot.Inventory.Where(i => !i.IsEmpty && i.ItemType <= 3 && i.MetadataComplete).ToArray();
-            foreach (var item in items)
+            var npc = travelNpc;
+            return BeginTravel(ProtocolTravel.WarpOk, async () =>
             {
-                var row = TravelRow(list, $"[{item.Slot + 1}] " + GameplayUiCatalog.Load().Item(item.ItemType, item.ItemId, language)?.Name);
-                ServiceButton(row, "croc-looks-" + item.Slot, looksSlot == item.Slot ? T("LOOKS ✓", "ВИД ✓") : T("LOOKS", "ВИД"), 565, 4, 115,
-                    () => { looksSlot = item.Slot; RefreshTravel(); }).SetEnabled(!TravelBusy);
-                ServiceButton(row, "croc-stats-" + item.Slot, statsSlot == item.Slot ? T("STATS ✓", "СТАТЫ ✓") : T("STATS", "СТАТЫ"), 690, 4, 115,
-                    () => { statsSlot = item.Slot; RefreshTravel(); }).SetEnabled(!TravelBusy);
-            }
-            if (looksSlot < 0 || statsSlot < 0 || looksSlot == statsSlot) { TravelRow(list, T("Select two matching equipment items: appearance and stats.", "Выберите два предмета одного типа: внешний вид и характеристики.")); return; }
-            var look = session.Snapshot.Inventory[looksSlot]; var stat = session.Snapshot.Inventory[statsSlot];
-            var a = GameplayUiCatalog.Load().Item(look.ItemType, look.ItemId); var b = GameplayUiCatalog.Load().Item(stat.ItemType, stat.ItemId);
-            if (a == null || b == null || look.ItemType != stat.ItemType || !travelCatalog.Croc.TryGetValue(Math.Abs(a.RequiredLevel - b.RequiredLevel), out var odds) || Math.Abs(a.Rarity - b.Rarity) > 3) return;
-            long cost = (long)a.BuyPrice * odds.LooksCost + (long)b.BuyPrice * odds.StatsCost;
-            string detail = $"{cost} Taros   {odds.Base * odds.Rarity[Math.Abs(a.Rarity - b.Rarity)] * 100:0.##}%";
-            var confirm = TravelRow(list, detail);
-            ServiceButton(confirm, "croc-combine", T("COMBINE", "СОВМЕСТИТЬ"), 565, 4, 240,
-                () => ConfirmTravel(detail + T(". Failure still costs Taros. Success consumes the stats item.", ". При неудаче Taros списываются. При успехе предмет характеристик расходуется."),
-                    () => BeginTravel(ProtocolCroc.Ok, () => travelClient.CombineItemsAsync(looksSlot, statsSlot, travelToken))))
-                .SetEnabled(!TravelBusy && session.Snapshot.Taros >= cost && !look.IsEmpty && !stat.IsEmpty);
+                if (SyncWarpPosition != null && !await SyncWarpPosition(npc, travelToken))
+                {
+                    travelPending = 0;
+                    travelStatus = T("Move closer to the portal.", "Подойдите ближе к порталу.");
+                    RefreshTravel();
+                    return;
+                }
+                await travelClient.WarpNpcAsync(npc.Id, w.Id, w.RequiredItem > 0 ? (w.RequiredType == 8 ? 2 : 1) : 4,
+                    w.RequiredItem > 0 ? required.Slot : 0, w.ConsumedItem > 0 ? consumed.Slot : -1, travelToken);
+            });
         }
     }
 }

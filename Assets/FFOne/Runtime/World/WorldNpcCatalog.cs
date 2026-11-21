@@ -7,13 +7,20 @@ namespace FFOne.World
 {
     public sealed class WorldNpcDefinition
     {
-        public int Type, MaxHp, Team, Category, AiType, Effect, SightRange;
+        public int Type, MaxHp, Team, Category, AiType, Effect, SightRange, Style;
+        public int MapIcon, Sound, EruptionSkill;
+        internal (int Id, int Motion)[] SkillMotions = Array.Empty<(int, int)>();
         public bool IsGroupNpc => Team == 1 && (Category == 6 || AiType > 0 && AiType < 11);
         public bool IsBank => Category == 50 || Category == 111;
         public bool HiddenMarker => Category >= 100 && HnpcAppearance < 0;
         public bool IsVendor;
         public float Scale, Height, Radius;
-        public string Name, Model;
+        public float WalkAnimationSpeed = 1, RunAnimationSpeed = 1;
+        public string Name, Model, VoiceOwner;
+        public string[] IdleClips;
+        public int GreetingId, BarkerType;
+        public string Greeting;
+        public int[] BarkSets;
         public int HnpcAppearance;
     }
 
@@ -25,7 +32,10 @@ namespace FFOne.World
         // Source identity and replay: docs/recall-point-rxcom.md.
         public const string RecallPointModel = "ffone/6949aa01f8c678a3f4f3390964a8aaf8";
         readonly Dictionary<int, WorldNpcDefinition> definitions = new();
+        readonly Dictionary<int, string[]> barkLines = new();
+        public string BarkLine(int set, int slot) => slot >= 0 && slot < 4 && barkLines.TryGetValue(set, out var lines) ? lines[slot] : "";
         static WorldNpcCatalog cached;
+        public IEnumerable<WorldNpcDefinition> Definitions => definitions.Values;
         public static WorldNpcCatalog Load() => cached ??= ContentAssets.Read<NativeDataDocument, WorldNpcCatalog>(NativeData.Resource("data/tables/xdt"), Read);
         public WorldNpcDefinition Find(int type) => definitions.TryGetValue(type, out var value) ? value : null;
         public static WorldNpcCatalog Read(NativeDataDocument d)
@@ -58,19 +68,49 @@ namespace FFOne.World
             if (!routes.ContainsKey("RXcom")) routes.Add("RXcom", RecallPointModel);
             int npc = Child(d, 0, "m_pNpcTable");
             var meshes = new List<int>(Children(d, Child(d, npc, "m_pNpcMeshData")));
+            var barks = new List<int>(Children(d, Child(d, npc, "m_pNpcBarkerData")));
             var strings = new List<int>(Children(d, Child(d, npc, "m_pNpcStringData")));
             foreach (int row in Children(d, Child(d, npc, "m_pNpcData")))
             {
                 int type = Number(d, row, "m_iNpcNumber"); if (type <= 0) continue;
                 int mesh = Number(d, row, "m_iMesh"), name = Number(d, row, "m_iNpcName");
+                int comment = Number(d, row, "m_iComment");
                 string logical = mesh >= 0 && mesh < meshes.Count ? Text(d, meshes[mesh], "m_pstrMMeshModelString") : "";
                 routes.TryGetValue(logical, out var model);
+                var sets = new List<int>();
+                void AddSet(int set)
+                {
+                    if (set <= 0 || set >= barks.Count || sets.Contains(set)) return;
+                    sets.Add(set);
+                    if (result.barkLines.ContainsKey(set)) return;
+                    int source = barks[set];
+                    result.barkLines[set] = new[] { Text(d,source,"m_strName"), Text(d,source,"m_strComment"),
+                        Text(d,source,"m_strComment1"), Text(d,source,"m_strComment2") };
+                }
+                AddSet(Number(d, row, "m_iBarkerNumber"));
+                foreach (int child in Children(d, Child(d, row, "_ffoneBarkerSets")))
+                    if (int.TryParse(d.Nodes[child].Value, out int set)) AddSet(set);
                 result.definitions[type] = new WorldNpcDefinition { Type = type, MaxHp = Number(d, row, "m_iHP"), Team = Number(d, row, "m_iTeam"),
-                    AiType = Number(d, row, "m_iAiType"), Category = Number(d, row, "m_iNpcType"), SightRange = Number(d, row, "m_iSightRange"), Effect = Number(d, row, "m_iEffect"), IsVendor = vendors.Contains(type) || Number(d, row, "m_iNpcType") == 2 || Number(d, row, "m_iNpcType") == 25,
+                    SkillMotions = new[] {
+                        (Number(d, row, "m_iMegaType"), Number(d, row, "m_iMegaAni")),
+                        (Number(d, row, "m_iActiveSkill1"), Number(d, row, "m_iActiveSkill1Ani")),
+                        (Number(d, row, "m_iActiveSkill2"), Number(d, row, "m_iActiveSkill2Ani")),
+                        (Number(d, row, "m_iSupportSkill"), Number(d, row, "m_iSupportSkillAni")) },
+                    MapIcon = Number(d, row, "m_iMapIcon"), Sound = Number(d, row, "m_iSound"),
+                    Style = Child(d, row, "m_iNpcStyle") >= 0 ? Number(d, row, "m_iNpcStyle") : -1,
+                    AiType = Number(d, row, "m_iAiType"), Category = Number(d, row, "m_iNpcType"), SightRange = Number(d, row, "m_iSightRange"), Effect = Number(d, row, "m_iEffect"), EruptionSkill = Number(d, row, "m_iMegaType"), IsVendor = vendors.Contains(type) || Number(d, row, "m_iNpcType") == 2 || Number(d, row, "m_iNpcType") == 25,
+                    BarkerType = Number(d,row,"m_iBarkerType"), GreetingId = name, Greeting = name >= 0 && name < strings.Count ? Text(d, strings[name], "m_strComment") : "",
+                    BarkSets = sets.Count > 0 ? sets.ToArray() : Array.Empty<int>(),
                     Name = name >= 0 && name < strings.Count ? Text(d, strings[name], "m_strName") : type.ToString(),
+                    VoiceOwner = comment >= 0 && comment < strings.Count ? Text(d,strings[comment],"m_strComment2").Trim() : "",
+                    IdleClips = Number(d, row, "m_iHNpc") != 0 && mesh > 0 && mesh < meshes.Count ? new[] {
+                        logical.Trim().ToLowerInvariant(), Text(d, meshes[mesh], "m_pstrMTextureString").Trim().ToLowerInvariant(),
+                        Text(d, meshes[mesh], "m_pstrMTextureString2").Trim().ToLowerInvariant() } : null,
                     Model = model, HnpcAppearance = Number(d, row, "m_iHNpc") != 0 ? Number(d, row, "m_iHNpcNum") : -1,
                     Scale = Real(d, row, "m_fScale", 1), Height = Number(d, row, "m_iHeight") / 100f,
-                    Radius = Number(d, row, "m_iRadius") / 100f };
+                    Radius = Number(d, row, "m_iRadius") / 100f,
+                    WalkAnimationSpeed = AnimationSpeed(d, row, "m_fWalkAnimationSpeed"),
+                    RunAnimationSpeed = AnimationSpeed(d, row, "m_fRunAnimationSpeed") };
             }
             return result;
         }
@@ -81,5 +121,10 @@ namespace FFOne.World
         { int i = Child(d, row, key); return i < 0 ? "" : d.Nodes[i].Value ?? ""; }
         static int Number(NativeDataDocument d, int row, string key) => int.TryParse(Text(d, row, key), NumberStyles.Integer, CultureInfo.InvariantCulture, out int n) ? n : 0;
         static float Real(NativeDataDocument d, int row, string key, float fallback) => float.TryParse(Text(d, row, key), NumberStyles.Float, CultureInfo.InvariantCulture, out float n) && float.IsFinite(n) ? n : fallback;
+        static float AnimationSpeed(NativeDataDocument d, int row, string key)
+        {
+            float value = Real(d, row, key, 1);
+            return value > 0 ? value : 1;
+        }
     }
 }

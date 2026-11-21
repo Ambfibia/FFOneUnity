@@ -384,7 +384,10 @@ static partial class Program
         await Until(() => a.Social.Npcs.Count==1 && b.Social.Npcs.Count==1, "NPC member records reach both player rosters");
         Check(a.Social.Npcs[0].Type==2567 && a.Social.Npcs[0].Hp>0, "NPC roster preserves source type and live health");
         await a.Client.KickNpcAsync(companion.Id); await Until(() => a.Social.Npcs.Count==0 && b.Social.Npcs.Count==0, "NPC removal updates both rosters");
-        var gate=Npc(680); await MoveTo(a,gate); await MoveTo(b,gate); a.Frames.Clear(); b.Frames.Clear(); await a.Client.WarpNpcAsync(gate.Id,4);
+        var gate=Npc(680); await MoveTo(a,gate); await MoveTo(b,gate);
+        await Until(() => a.World.TryGet(WorldEntityKind.Player,b.Entry.PlayerId,out var passenger) &&
+            passenger.X==gate.X && passenger.Y==gate.Y,"leader sees passenger arrive at the group portal");
+        a.Frames.Clear(); b.Frames.Clear(); await a.Client.WarpNpcAsync(gate.Id,4);
         await TravelReply(a, ProtocolTravel.WarpOk, "group leader receives instance warp"); await TravelReply(b,ProtocolTravel.WarpOk,"group passenger receives unsolicited instance warp");
         await Task.WhenAll(WarpLoad(a,true),WarpLoad(b,true));
         Check(a.Entry.MapNumber==75 && b.Entry.MapNumber==75, "both loading handshakes receive authoritative instance map 75");

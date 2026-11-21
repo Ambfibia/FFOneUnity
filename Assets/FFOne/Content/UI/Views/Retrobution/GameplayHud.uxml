@@ -1,5 +1,74 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
   <Style src="../../Styles/Retrobution.uss" />
+  <Style src="../../Styles/FFTheme.uss" />
+  <Style src="../../Styles/WorldAnnotations.uss" />
+  <Style src="../../Styles/TutorialPresentation.uss" />
+  <Style src="../../Styles/GameplayBuffEffects.uss" />
+  <ui:Template name="TutorialPresentation" src="TutorialPresentation.uxml" />
+  <ui:Template name="GameplayBuffEffects" src="GameplayBuffEffects.uxml" />
+  <ui:Instance template="TutorialPresentation" class="ui-suppressed" picking-mode="Ignore" />
+  <ui:Instance template="GameplayBuffEffects" class="ui-suppressed" picking-mode="Ignore" />
+  <ui:VisualElement name="race-hud" class="ff-race-hud" picking-mode="Ignore">
+    <ui:Image name="race-pod" class="ff-race-hud-pod" picking-mode="Ignore" scale-mode="StretchToFill" />
+    <ui:Label name="race-pods" class="ff-label ff-race-hud-copy ff-race-hud-count" picking-mode="Ignore" enable-rich-text="false" />
+    <ui:Label name="race-clock" class="ff-label ff-race-hud-copy ff-race-hud-clock" picking-mode="Ignore" enable-rich-text="false" />
+    <ui:Label name="race-limit" class="ff-label ff-race-hud-copy ff-race-hud-limit" picking-mode="Ignore" enable-rich-text="false" />
+  </ui:VisualElement>
+  <ui:VisualElement class="world-annotations" picking-mode="Ignore" />
+  <ui:VisualElement class="world-warp-bars" picking-mode="Ignore">
+    <ui:VisualElement class="world-warp-bar world-warp-top" picking-mode="Ignore" />
+    <ui:VisualElement class="world-warp-bar world-warp-bottom" picking-mode="Ignore" />
+  </ui:VisualElement>
+  <ui:Image class="world-use-trigger" picking-mode="Ignore" scale-mode="StretchToFill" />
+  <ui:Label class="world-location-caption" picking-mode="Ignore" enable-rich-text="false" />
+  <ui:VisualElement class="world-launcher" picking-mode="Ignore">
+    <ui:VisualElement class="world-launcher-cross" picking-mode="Ignore" />
+    <ui:VisualElement class="world-launcher-gauge" picking-mode="Ignore">
+      <ui:VisualElement class="world-launcher-power" picking-mode="Ignore" />
+    </ui:VisualElement>
+  </ui:VisualElement>
+  <ui:VisualElement class="world-nameplate world-annotation" picking-mode="Ignore">
+    <ui:Label class="world-nameplate-copy" picking-mode="Ignore" enable-rich-text="false" />
+    <ui:VisualElement class="world-nameplate-vitals" picking-mode="Ignore">
+      <ui:Label class="world-nameplate-level" picking-mode="Ignore" />
+      <ui:VisualElement class="world-nameplate-hp" picking-mode="Ignore">
+        <ui:VisualElement class="world-nameplate-hp-fill" picking-mode="Ignore" />
+      </ui:VisualElement>
+    </ui:VisualElement>
+  </ui:VisualElement>
+  <ui:VisualElement class="world-damage world-annotation" picking-mode="Ignore">
+    <ui:Label class="world-damage-copy" picking-mode="Ignore" enable-rich-text="false" />
+  </ui:VisualElement>
+  <ui:VisualElement class="world-speech world-annotation" picking-mode="Ignore">
+    <ui:Label class="world-speech-copy" picking-mode="Ignore" enable-rich-text="false" />
+    <ui:VisualElement class="world-speech-tail" picking-mode="Ignore" />
+  </ui:VisualElement>
+  <ui:VisualElement class="ff-combat-hud" picking-mode="Ignore">
+    <ui:Image class="ff-combat-frame" picking-mode="Ignore" scale-mode="StretchToFill" style="position:absolute; left:0; top:0; width:100%; height:100%; display:none;" />
+    <ui:Image class="ff-combat-danger" picking-mode="Ignore" scale-mode="StretchToFill" style="position:absolute; display:none;" />
+    <ui:VisualElement class="ff-active-nano-info" picking-mode="Ignore" style="position:absolute; width:154px; height:29px; transform-origin:0 0; display:none; background-image:url('../../Artwork/en/gameplay/nano/active/nano_info.png'); -unity-background-scale-mode:stretch-to-fill;">
+      <ui:Label class="ff-active-nano-name ff-label" picking-mode="Ignore" enable-rich-text="false" style="position:absolute; left:20px; top:0; width:100px; height:20px; font-size:12px; -unity-font-definition:url('../../Fonts/chaletbook-regular-sdf.asset'); -unity-text-align:middle-left;" />
+      <ui:VisualElement class="ff-active-nano-stamina" picking-mode="Ignore" style="position:absolute; left:18px; top:19px; width:104px; height:4px; background-image:url('../../Artwork/en/gameplay/nano/stamina/nano_st_bar.png'); -unity-background-scale-mode:stretch-to-fill;" />
+      <ui:Image class="ff-active-nano-skill" picking-mode="Ignore" scale-mode="StretchToFill" style="position:absolute; left:125px; top:2px; width:26px; height:26px;" />
+    </ui:VisualElement>
+  </ui:VisualElement>
+  <ui:VisualElement class="ff-target-hud" picking-mode="Ignore">
+    <ui:VisualElement class="ff-target-info" picking-mode="Ignore" style="position:absolute; left:0; top:5px; width:290px; height:76px; display:none; overflow:hidden; transform-origin:0 0;">
+      <ui:Image class="ff-target-frame" scale-mode="StretchToFill" picking-mode="Ignore" style="position:absolute; left:0px; top:5px; width:290px; height:66px;" />
+      <ui:VisualElement class="ff-target-hostile-disk" picking-mode="Ignore" style="position:absolute; left:1px; top:49px; width:69px; height:23px; background-image:url('../../Artwork/en/gameplay/player/DiskFront.png'); -unity-background-scale-mode:stretch-to-fill;" />
+      <ui:Image class="ff-target-affinity-back" scale-mode="StretchToFill" picking-mode="Ignore" style="position:absolute; left:6px; top:-13px; width:58px; height:72px;" />
+      <ui:Image class="ff-target-portrait" scale-mode="StretchToFill" picking-mode="Ignore" style="position:absolute; left:5px; top:-3px; width:64px; height:64px;" />
+      <ui:Image class="ff-target-affinity-front" scale-mode="StretchToFill" picking-mode="Ignore" style="position:absolute; left:6px; top:-13px; width:58px; height:72px;" />
+      <ui:Image class="ff-target-affinity-icon" scale-mode="StretchToFill" picking-mode="Ignore" style="position:absolute; left:25px; top:55px; width:21px; height:21px;" />
+      <ui:VisualElement class="ff-target-hp-damage" picking-mode="Ignore" style="position:absolute; left:58px; top:22px; width:199px; height:4px; background-image:url('../../Artwork/en/gameplay/group/hp_bar.png'); -unity-background-scale-mode:stretch-to-fill; -unity-background-image-tint-color:red;" />
+      <ui:VisualElement class="ff-target-hp" picking-mode="Ignore" style="position:absolute; left:58px; top:22px; width:199px; height:4px; background-image:url('../../Artwork/en/gameplay/group/hp_bar.png'); -unity-background-scale-mode:stretch-to-fill;" />
+      <ui:Label class="ff-target-name ff-label" picking-mode="Ignore" enable-rich-text="false" style="position:absolute; left:70px; top:0px; width:190px; height:20px; font-size:12px; -unity-font-definition:url('../../Fonts/chaletbook-regular-sdf.asset'); -unity-text-align:middle-left;" />
+      <ui:Label class="ff-target-level ff-label" picking-mode="Ignore" enable-rich-text="false" style="position:absolute; left:90px; top:23px; width:60px; height:20px; font-size:12px; -unity-font-definition:url('../../Fonts/chaletbook-regular-sdf.asset'); -unity-text-align:middle-left;" />
+      <ui:VisualElement class="ff-target-friendly-disk" picking-mode="Ignore" style="position:absolute; left:1px; top:49px; width:69px; height:23px; background-image:url('../../Artwork/en/gameplay/player/DiskFront.png'); -unity-background-scale-mode:stretch-to-fill;" />
+      <ui:Image class="ff-target-matchup" scale-mode="StretchToFill" picking-mode="Ignore" style="position:absolute; left:0px; top:0px; width:20px; height:16px;" />
+    </ui:VisualElement>
+    <ui:Image class="ff-target-reticle" picking-mode="Ignore" scale-mode="StretchToFill" style="position:absolute; display:none;" />
+  </ui:VisualElement>
   <ui:VisualElement name="hud-root" class="retro-screen" picking-mode="Ignore">
     <ui:VisualElement name="hud-top-left" class="retro-control" picking-mode="Ignore" style="left:0; top:0; width:100%; height:100%; transform-origin:0 0; overflow:visible;">
       <ui:VisualElement name="hud-exp-frame" class="retro-control retro-style-3c493cbb81552741" picking-mode="Ignore" style="left:0; top:0; height:7px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /></ui:VisualElement>
@@ -17,10 +86,46 @@
       <ui:VisualElement name="hud-free-chat" class="retro-control" picking-mode="Ignore" style="left:3px; top:10px; width:19px; height:14px;background-image:url('../../Artwork/Retrobution/ab1775ff63a9347d746ec0ca.png'); -unity-background-scale-mode:stretch-to-fill; display:none;" />
       <ui:VisualElement name="hud-combat-disabled" class="retro-control" picking-mode="Ignore" style="left:260px; top:6px; width:29px; height:29px;background-image:url('../../Artwork/Retrobution/87b6627755699aff47c33e50.png'); -unity-background-scale-mode:stretch-to-fill; display:none;" />
     </ui:VisualElement>
-    <ui:VisualElement name="hud-crosshair-center" class="retro-control" picking-mode="Ignore" style="width:0; height:0; overflow:visible; transform-origin:0 0; display:none;">
+    <ui:VisualElement class="hud-projectile-trajectory world-annotations ui-suppressed" picking-mode="Ignore" />
+    <ui:VisualElement name="hud-crosshair-center" class="retro-control hud-projectile-crosshair ui-suppressed" picking-mode="Ignore" style="width:0; height:0; overflow:visible; transform-origin:0 0;">
       <ui:VisualElement name="hud-crosshair" class="retro-control" picking-mode="Ignore" style="left:-10.5px; top:-11.25px; width:21px; height:22.5px;background-image:url('../../Artwork/Retrobution/1ddf5e6c7dd10b3df402f82d.png'); -unity-background-scale-mode:stretch-to-fill; " />
       <ui:VisualElement name="hud-bracket-left" class="retro-control" picking-mode="Ignore" style="left:-31.5px; top:-24px; width:31.5px; height:48px;background-image:url('../../Artwork/Retrobution/1dd9cc4c230c9468285ff5ed.png'); -unity-background-scale-mode:stretch-to-fill; display:none;" />
       <ui:VisualElement name="hud-bracket-right" class="retro-control" picking-mode="Ignore" style="left:0px; top:-24px; width:31.5px; height:48px;background-image:url('../../Artwork/Retrobution/1dd9cc4c230c9468285ff5ed.png'); -unity-background-scale-mode:stretch-to-fill; scale:-1 1; transform-origin:50% 50%; display:none;" />
+    </ui:VisualElement>
+    <ui:VisualElement class="reward-counters" picking-mode="Ignore">
+      <ui:Label class="reward-quest-notice" picking-mode="Ignore" />
+      <ui:VisualElement class="reward-drop reward-drop--crate" picking-mode="Ignore"><ui:Label class="reward-drop-text" picking-mode="Ignore" /></ui:VisualElement>
+      <ui:VisualElement class="reward-drop reward-inventory-full" picking-mode="Ignore" />
+      <ui:VisualElement class="reward-drop reward-drop--potion" picking-mode="Ignore"><ui:Label class="reward-drop-text" picking-mode="Ignore" /></ui:VisualElement>
+      <ui:VisualElement class="reward-drop reward-drop--boost" picking-mode="Ignore"><ui:Label class="reward-drop-text" picking-mode="Ignore" /></ui:VisualElement>
+      <ui:VisualElement class="reward-counter reward-counter--fusion" picking-mode="Ignore">
+        <ui:Image class="reward-counter-art" picking-mode="Ignore" scale-mode="StretchToFill" />
+        <ui:VisualElement class="reward-counter-digits" picking-mode="Ignore">
+          <ui:Label class="reward-counter-digit" picking-mode="Ignore" />
+          <ui:Label class="reward-counter-digit" picking-mode="Ignore" />
+          <ui:Label class="reward-counter-digit" picking-mode="Ignore" />
+          <ui:Label class="reward-counter-digit" picking-mode="Ignore" />
+          <ui:Label class="reward-counter-digit" picking-mode="Ignore" />
+          <ui:Label class="reward-counter-digit" picking-mode="Ignore" />
+          <ui:Label class="reward-counter-digit" picking-mode="Ignore" />
+          <ui:Label class="reward-counter-digit" picking-mode="Ignore" />
+          <ui:Label class="reward-counter-digit" picking-mode="Ignore" />
+        </ui:VisualElement>
+      </ui:VisualElement>
+      <ui:VisualElement class="reward-counter reward-counter--taros" picking-mode="Ignore">
+        <ui:Image class="reward-counter-art" picking-mode="Ignore" scale-mode="StretchToFill" />
+        <ui:VisualElement class="reward-counter-digits" picking-mode="Ignore">
+          <ui:Label class="reward-counter-digit" picking-mode="Ignore" />
+          <ui:Label class="reward-counter-digit" picking-mode="Ignore" />
+          <ui:Label class="reward-counter-digit" picking-mode="Ignore" />
+          <ui:Label class="reward-counter-digit" picking-mode="Ignore" />
+          <ui:Label class="reward-counter-digit" picking-mode="Ignore" />
+          <ui:Label class="reward-counter-digit" picking-mode="Ignore" />
+          <ui:Label class="reward-counter-digit" picking-mode="Ignore" />
+          <ui:Label class="reward-counter-digit" picking-mode="Ignore" />
+          <ui:Label class="reward-counter-digit" picking-mode="Ignore" />
+        </ui:VisualElement>
+      </ui:VisualElement>
     </ui:VisualElement>
   </ui:VisualElement>
 </ui:UXML>

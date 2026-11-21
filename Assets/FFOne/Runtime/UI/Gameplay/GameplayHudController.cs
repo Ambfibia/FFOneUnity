@@ -11,6 +11,12 @@ namespace FFOne.UI
         public VisualElement View { get; }
         public Image Portrait { get; }
         readonly VisualElement parent, topLeft, center, health, damage, expFrame, expFill;
+        readonly VisualElement projectileTrajectory;
+        readonly Vector2[] trajectoryPoints = new Vector2[33];
+        readonly bool[] trajectoryInFront = new bool[33];
+        int trajectoryCount;
+        readonly VisualElement playerBackground;
+        readonly StyleBackground englishPlayerBackground;
         readonly Label name, level;
         readonly EventCallback<GeometryChangedEvent> geometry;
         GameplayUiState state;
@@ -18,12 +24,17 @@ namespace FFOne.UI
         float? experienceFraction;
         bool healthInitialized;
 
-        public GameplayHudController(VisualElement parent)
+        public GameplayHudController(VisualElement parent, string language = "en")
         {
             this.parent = parent;
             View = FFView.Instantiate("ui/views/Retrobution/GameplayHud", "hud-root");
+            playerBackground = FFView.Require<VisualElement>(View, "hud-player-background");
+            englishPlayerBackground = playerBackground.style.backgroundImage;
+            SetLanguage(language);
             topLeft = FFView.Require<VisualElement>(View, "hud-top-left");
-            center = FFView.Require<VisualElement>(View, "hud-crosshair-center");
+            center = FFView.RequireClass<VisualElement>(View, "hud-projectile-crosshair");
+            projectileTrajectory = FFView.RequireClass<VisualElement>(View, "hud-projectile-trajectory");
+            projectileTrajectory.generateVisualContent += DrawProjectileTrajectory;
             health = FFView.Require<VisualElement>(View, "hud-hp");
             damage = FFView.Require<VisualElement>(View, "hud-hp-damage");
             expFrame = FFView.Require<VisualElement>(View, "hud-exp-frame");
@@ -32,12 +43,13 @@ namespace FFOne.UI
             name = FFView.Require<Label>(View, "hud-name");
             level = FFView.Require<Label>(View, "hud-level");
             name.enableRichText = level.enableRichText = false;
-            FFWidgets.Font(name, false, 12); FFWidgets.Font(level, false, 12);
+            // CnGuiCharacter_info uses pMenuSkin.label (Chalet), including the
+            // level digits. Keep its accepted Cyrillic-capable replacement.
+            FFWidgets.Font(name, true, 12); FFWidgets.Font(level, true, 12);
             geometry = _ => Layout();
             View.RegisterCallback(geometry);
             parent.Add(View);
             SetExperienceVisible(false); // Primary localized.expBartype default is zero.
-            center.style.display = DisplayStyle.None; // Requires the weapon/aim controller's drawCrosshair state.
             var combat = View.Q("hud-combat-disabled");
             if (combat != null) combat.style.display = DisplayStyle.None;
         }
@@ -52,6 +64,9 @@ namespace FFOne.UI
             SetHealth(snapshot.HealthFraction);
             SetExperience(snapshot.FusionMatterFraction);
         }
+
+        public void SetLanguage(string language) => playerBackground.style.backgroundImage = language == "ru"
+            ? new StyleBackground(FFWidgets.Texture("ui/ru/gameplay/player/character_info")) : englishPlayerBackground;
 
         public void SetHealth(float? fraction)
         {
@@ -108,6 +123,53 @@ namespace FFOne.UI
 
         public void SetVisible(bool visible) => View.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
 
+        internal void SetProjectileAim(bool rocket, Camera view = null, Vector3[] points = null, int count = 0)
+        {
+            center.EnableInClassList("ui-suppressed", !rocket);
+            trajectoryCount = projectileTrajectory.panel == null ? 0 : Mathf.Min(count, trajectoryPoints.Length);
+            projectileTrajectory.EnableInClassList("ui-suppressed", trajectoryCount < 2);
+            if (trajectoryCount < 2) return;
+
+            for (int i = 0; i < trajectoryCount; i++)
+            {
+                trajectoryInFront[i] = view.WorldToViewportPoint(points[i]).z > view.nearClipPlane;
+                if (trajectoryInFront[i])
+                    trajectoryPoints[i] = projectileTrajectory.WorldToLocal(
+                        RuntimePanelUtils.CameraTransformWorldToPanel(projectileTrajectory.panel, points[i], view));
+            }
+            projectileTrajectory.MarkDirtyRepaint();
+        }
+
+        void DrawProjectileTrajectory(MeshGenerationContext context)
+        {
+            if (trajectoryCount < 2) return;
+            var painter = context.painter2D;
+            painter.lineJoin = LineJoin.Round;
+            painter.lineCap = LineCap.Round;
+            painter.BeginPath();
+            for (int i = 1; i < trajectoryCount; i += 2)
+            {
+                if (!trajectoryInFront[i - 1] || !trajectoryInFront[i]) continue;
+                painter.MoveTo(trajectoryPoints[i - 1]);
+                painter.LineTo(trajectoryPoints[i]);
+            }
+            if (trajectoryInFront[trajectoryCount - 1])
+            {
+                var landing = trajectoryPoints[trajectoryCount - 1];
+                painter.MoveTo(landing + new Vector2(0, -7));
+                painter.LineTo(landing + new Vector2(9, 0));
+                painter.LineTo(landing + new Vector2(0, 7));
+                painter.LineTo(landing + new Vector2(-9, 0));
+                painter.ClosePath();
+            }
+            painter.lineWidth = 5;
+            painter.strokeColor = new Color(.12f, .08f, .04f, .8f);
+            painter.Stroke();
+            painter.lineWidth = 2;
+            painter.strokeColor = new Color(1, .78f, .24f);
+            painter.Stroke();
+        }
+
         public void Layout()
         {
             float width = parent.resolvedStyle.width, height = parent.resolvedStyle.height;
@@ -130,6 +192,7 @@ namespace FFOne.UI
 
         public void Dispose()
         {
+            projectileTrajectory.generateVisualContent -= DrawProjectileTrajectory;
             View.UnregisterCallback(geometry);
             Portrait.image = null;
             View.RemoveFromHierarchy();

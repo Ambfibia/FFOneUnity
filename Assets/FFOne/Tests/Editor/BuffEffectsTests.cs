@@ -2,6 +2,7 @@ using System;
 using FFOne.Network;
 using FFOne.World;
 using NUnit.Framework;
+using UnityEngine;
 namespace FFOne.Tests
 {
     public sealed class BuffEffectsTests
@@ -28,6 +29,40 @@ namespace FFOne.Tests
             Assert.Throws<ProtocolException>(() => { ProtocolBuff.TryUpdate(new ProtocolFrame(ProtocolBuff.Update, p), out var update); state.Apply(update, 0); });
             Assert.That(state.Condition, Is.EqualTo(1));
             Assert.Throws<ProtocolException>(() => ProtocolBuff.TryUpdate(new ProtocolFrame(ProtocolBuff.Update, new byte[45]), out _));
+        }
+        [Test]
+        public void ActiveNanoConditionAppliesOnlyToTheNamedPlayer()
+        {
+            var payload = new byte[20];
+            I(payload, 0, 9);
+            I(payload, 12, 1 << 7);
+            I(payload, 16, 1);
+            var frame = new ProtocolFrame(ProtocolGameplay.NanoActiveBroadcast, payload);
+            Assert.That(ProtocolBuff.TryNanoCondition(frame, 8, out _), Is.False);
+            Assert.That(ProtocolBuff.TryNanoCondition(frame, 9, out int condition), Is.True);
+            Assert.That(condition, Is.EqualTo(1 << 7));
+        }
+        [Test]
+        public void SnareConditionSlowsImmediatelyThenUsesExplicitValueAndClears()
+        {
+            var player = new GameObject("Snare test");
+            try
+            {
+                var world = player.AddComponent<NetworkWorldController>();
+                var buffs = new BuffState();
+                world.SetBuffState(buffs);
+                Assert.That(world.BuffGroundSpeed(6), Is.EqualTo(6));
+                buffs.SetCondition(1 << 7);
+                Assert.That(world.BuffGroundSpeed(6), Is.EqualTo(3));
+                buffs.Apply(new BuffUpdate { Id = 8, Operation = 1, Condition = 1 << 7, Value = 250 }, 0);
+                Assert.That(world.BuffGroundSpeed(6), Is.EqualTo(3.5f));
+                buffs.SetCondition(0);
+                Assert.That(world.BuffGroundSpeed(6), Is.EqualTo(6));
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(player);
+            }
         }
         [Test]
         public void InfectionTickCarriesProtectedNegativeDamageAndAuthoritativeHpStaminaCondition()

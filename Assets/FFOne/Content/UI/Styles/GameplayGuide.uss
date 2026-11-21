@@ -1,0 +1,171 @@
+.game-guide,
+.guide-canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+.guide-template { display: none; }
+.game-guide { overflow: hidden; }
+.guide-canvas { align-items: center; justify-content: center; }
+.guide-backdrop {
+    left: 50%;
+    top: 50%;
+    width: 1920px;
+    height: 1440px;
+    translate: -50% -50%;
+    background-image: url("../Artwork/en/Controls/panelback.png");
+}
+.guide-window {
+    width: 1036px;
+    height: 654px;
+    flex-shrink: 0;
+    background-image: url("../Artwork/en/character/creation/help/background.png");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+.guide-title,
+.guide-choose-topic,
+.guide-heading,
+.guide-topics,
+.guide-sections,
+.guide-content,
+.guide-navigation,
+.guide-close { position: absolute; }
+.guide-title,
+.guide-choose-topic,
+.guide-heading {
+    color: rgb(204, 255, 255);
+    -unity-font-style: normal;
+    -unity-text-align: middle-left;
+}
+.guide-title { left: 18px; top: 15px; width: 150px; height: 20px; font-size: 16px; }
+.guide-choose-topic { left: 8px; top: 52px; width: 145px; height: 10px; font-size: 8px; }
+.guide-heading {
+    left: 195px;
+    top: 48px;
+    width: 806px;
+    height: 20px;
+    font-size: 14px;
+    -unity-font-definition: url("../Fonts/chaletbook-regular-sdf.asset");
+}
+.guide-topics { left: 13px; top: 70px; width: 158px; height: 321px; padding-top: 10px; overflow: hidden; }
+.guide-sections {
+    left: 200px;
+    top: 78px;
+    width: 806px;
+    height: 105px;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: flex-start;
+}
+.guide-topic-button {
+    height: 16px;
+    flex-shrink: 0;
+    margin-bottom: 5px;
+    padding-left: 6px;
+    padding-top: 1px;
+    font-size: 10px;
+    -unity-font-definition: url("../Fonts/chaletbook-regular-sdf.asset");
+    -unity-font-style: normal;
+    -unity-text-align: middle-left;
+    color: rgb(204, 255, 255);
+    background-image: url("../Artwork/en/gameplay/game-guide/controls/help-button-normal.png");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+.guide-topics .guide-topic-button { left: -3px; width: 135px; font-size: 9.2px; padding-top: 2px; }
+.game-guide--russian .guide-topics .guide-topic-button { font-size: 10px; padding-top: 1px; }
+.guide-sections .guide-topic-button { width: 256px; margin-right: 10px; }
+.guide-topic-button:hover,
+.guide-topic-button:focus,
+.guide-topic-button:active {
+    color: rgb(0, 51, 102);
+    background-image: url("../Artwork/en/gameplay/game-guide/controls/help-button-hover.png");
+}
+.guide-content { left: 199px; top: 200px; width: 810px; height: 380px; }
+.guide-row { width: 790px; flex-shrink: 0; margin-left: 1px; margin-top: 25px; }
+.guide-row--first { margin-top: 3px; }
+.guide-illustration { height: 262px; }
+.guide-screenshot { position: absolute; left: 220px; top: 0; width: 350px; height: 262px; }
+.guide-line {
+    font-size: 14px;
+    -unity-font-definition: url("../Fonts/chaletbook-regular-sdf.asset");
+    -unity-font-style: normal;
+    -unity-text-align: middle-left;
+}
+.guide-line--copy { font-size: 12px; color: rgb(15, 44, 77); }
+.guide-line--centered { -unity-text-align: middle-center; }
+.guide-line--title {
+    min-height: 22px;
+    padding-left: 8px;
+    color: rgb(204, 255, 255);
+    background-image: url("../Artwork/en/gameplay/game-guide/controls/title.png");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+.guide-line--caption { min-height: 20px; color: black; }
+.guide-navigation,
+.guide-close { -unity-background-scale-mode: stretch-to-fill; }
+.guide-navigation {
+    top: 607px;
+    width: 187px;
+    height: 27px;
+    padding-bottom: 3px;
+    font-size: 12px;
+    -unity-font-style: normal;
+    color: rgb(204, 255, 255);
+    background-image: url("../Artwork/en/character/selection/controls/blue_button_normal.png");
+    -unity-slice-left: 5;
+    -unity-slice-top: 5;
+    -unity-slice-right: 5;
+    -unity-slice-bottom: 5;
+}
+.guide-previous { left: 192px; }
+.guide-next { left: 815px; }
+.guide-navigation:hover,
+.guide-navigation:focus,
+.guide-navigation:active { background-image: url("../Artwork/en/character/selection/controls/blue_button_over.png"); }
+.guide-close {
+    left: 980px;
+    top: 12px;
+    width: 30px;
+    height: 30px;
+    background-image: url("../Artwork/en/Controls/close_normal.png");
+}
+.guide-close:hover,
+.guide-close:focus,
+.guide-close:active { background-image: url("../Artwork/en/Controls/close_over.png"); }
+.ff-guide-scroller .unity-scroller--vertical { width: 17px; }
+.ff-guide-scroller .unity-scroller__low-button,
+.ff-guide-scroller .unity-scroller__high-button {
+    display: flex;
+    height: 12px;
+    min-height: 12px;
+    margin: 0;
+    padding: 0;
+    border-width: 0;
+    border-radius: 0;
+    background-color: transparent;
+    -unity-background-scale-mode: stretch-to-fill;
+}
+.ff-guide-scroller .unity-scroller__low-button {
+    background-image: url("../Artwork/en/gameplay/game-guide/controls/scroll-up.png");
+}
+.ff-guide-scroller .unity-scroller__high-button {
+    background-image: url("../Artwork/en/user-equip/scroll-down.png");
+}
+.ff-guide-scroller .unity-scroller--vertical .unity-base-slider__tracker,
+.ff-guide-scroller .unity-scroller--vertical .unity-base-slider__dragger {
+    border-width: 0;
+    border-radius: 0;
+    background-color: transparent;
+    -unity-slice-left: 2;
+    -unity-slice-right: 2;
+    -unity-slice-top: 4;
+    -unity-slice-bottom: 4;
+}
+.ff-guide-scroller .unity-scroller--vertical .unity-base-slider__tracker {
+    background-image: url("../Artwork/en/user-equip/scroll-track.png");
+}
+.ff-guide-scroller .unity-scroller--vertical .unity-base-slider__dragger {
+    background-image: url("../Artwork/en/user-equip/scroll-thumb.png");
+}

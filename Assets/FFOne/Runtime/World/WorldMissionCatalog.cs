@@ -14,11 +14,11 @@ namespace FFOne.World
     public sealed class WorldMissionDefinition
     {
         public int TaskId, MissionId, Type, MissionType, GiverNpc, EndNpc, NextTask, FailureTask, EscortNpc, MinimumLevel, MapNumber, RequiredGuide;
-        public int RewardId, GrantTimer, CompletionTimer, WaypointNpc, JournalRow, MissionNameString;
+        public int RewardId, GrantTimer, CompletionTimer, WaypointNpc, JournalNpc, JournalRow, MissionNameString;
         public int MaximumLevel, StartLevel, StartTrigger, RepeatFlag;
         public WorldMissionDialogue StartDialogue, SuccessDialogue, FailureDialogue;
         public bool IsFinal, IsFirst;
-        public int[] KillTypes, KillCounts, ItemIds, ItemCounts, RequiredMissions, RequiredNanos, MentorEmailIds, StartItemIds, StartItemCounts;
+        public int[] BarkerTextIds, KillTypes, KillCounts, ItemIds, ItemCounts, RequiredMissions, RequiredNanos, MentorEmailIds, StartItemIds, StartItemCounts;
     }
     public sealed class WorldMissionCatalog
     {
@@ -36,7 +36,7 @@ namespace FFOne.World
             foreach (int row in d.Children(table))
             {
                 int id = Number(d, row, "m_iHTaskID"); if (id <= 0) continue;
-                var value = new WorldMissionDefinition { TaskId = id, MissionId = Number(d, row, "m_iHMissionID"),
+                var value = new WorldMissionDefinition { TaskId = id, JournalNpc = Number(d, row, "m_iHJournalNPCID"), MissionId = Number(d, row, "m_iHMissionID"),
                     Type = Number(d, row, "m_iHTaskType"), MissionType = Number(d, row, "m_iHMissionType"), GiverNpc = Number(d, row, "m_iHNPCID"), EndNpc = Number(d, row, "m_iHTerminatorNPCID"),
                     NextTask = Number(d, row, "m_iSUOutgoingTask"), FailureTask = Number(d, row, "m_iFOutgoingTask"),
                     EscortNpc = Number(d, row, "m_iCSUDEFNPCID"), MinimumLevel = Number(d, row, "m_iCTRReqLvMin"),
@@ -49,7 +49,7 @@ namespace FFOne.World
                     StartItemIds = Array(d, row, "m_iCSTItemID", 3), StartItemCounts = Array(d, row, "m_iCSTItemNumNeeded", 3),
                     SuccessDialogue = Dialogue(d, row, "SU", "m_iSUMessagetextID"), FailureDialogue = Dialogue(d, row, "F", "m_iFMessageTextID"),
                     MapNumber = Number(d, row, "m_iRequireInstanceID"), RequiredGuide = Number(d, row, "m_iCSTReqGuide"),
-                    KillTypes = Array(d, row, "m_iCSUEnemyID", 3), KillCounts = Array(d, row, "m_iCSUNumToKill", 3),
+                    BarkerTextIds = Array(d, row, "m_iHBarkerTextID", 4), KillTypes = Array(d, row, "m_iCSUEnemyID", 3), KillCounts = Array(d, row, "m_iCSUNumToKill", 3),
                     ItemIds = Array(d, row, "m_iCSUItemID", 3), ItemCounts = Array(d, row, "m_iCSUItemNumNeeded", 3),
                     RequiredMissions = Array(d, row, "m_iCSTReqMission", 2), RequiredNanos = Array(d, row, "m_iCSTRReqNano", 5) };
                 value.IsFirst = first.Add(value.MissionId);

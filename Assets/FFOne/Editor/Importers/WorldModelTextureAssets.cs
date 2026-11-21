@@ -196,8 +196,14 @@ namespace FFOne.Editor
         static string SafePath(string assetPath, string uri)
         {
             if (string.IsNullOrEmpty(uri) || uri.StartsWith("data:",StringComparison.Ordinal) || Path.IsPathRooted(uri)) throw new InvalidDataException("World texture URI is not a relative PNG: " + uri);
-            string full = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(ContentPaths.Legacy(assetPath)),uri));
-            string root = Path.GetFullPath(NativeContentImport.Destination) + Path.DirectorySeparatorChar;
+            string source = ContentPaths.Legacy(assetPath);
+            string owner = Path.GetDirectoryName(source);
+            string full = Path.GetFullPath(Path.Combine(owner, uri));
+            bool localTextures = source.StartsWith("Assets/FFOne/Content/VFX/NanoModels/", StringComparison.Ordinal) ||
+                source.StartsWith("Assets/FFOne/Content/Characters/", StringComparison.Ordinal) &&
+                source.Contains("/Source/", StringComparison.Ordinal);
+            string importRoot = localTextures ? owner : NativeContentImport.Destination;
+            string root = Path.GetFullPath(importRoot) + Path.DirectorySeparatorChar;
             if (!full.StartsWith(root,StringComparison.OrdinalIgnoreCase)) throw new InvalidDataException("World texture escaped imported root: " + uri);
             return Path.GetRelativePath(Directory.GetCurrentDirectory(),full).Replace('\\','/');
         }

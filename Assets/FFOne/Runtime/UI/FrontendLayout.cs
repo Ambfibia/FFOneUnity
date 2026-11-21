@@ -18,11 +18,11 @@ namespace FFOne.UI
         public static Rect Avatar(float width, float height) => new Rect(width / 2 - 510, height / 2 - 315, 600, 600);
         public static Rect Chrome(float width, float height) => new Rect((width - 1920) / 2, (height - 1440) / 2, 1920, 1440);
         public static Rect Login(float width, float height) => new Rect((width - 370) / 2, (height - 299) / 2, 370, 299);
-        public static float UiScale(float height) => Mathf.Max(1, height / 768 * 1.05f);
+        public static float UiScale(float height) => RetrobutionLayout.AutomaticScale ? Mathf.Max(1, height / 768 * 1.05f) : 1;
         // Retrobution FFGUIUtility.GetUiScale, with the default UI Scale Factor of 1.
-        public static float CharacterScale(float height) => height / 681;
+        public static float CharacterScale(float height) => RetrobutionLayout.Scale(height);
         // Keep the source composition at 16:9 and 16:10; fit narrower windows too.
-        public static float CharacterScale(float width, float height) => Mathf.Min(height / 681, width / 1089.6f);
+        public static float CharacterScale(float width, float height) => Mathf.Min(RetrobutionLayout.Scale(height), width / 1089.6f);
 
         public static Rect Centered(float width, float height, Vector2 size, float scale) =>
             new Rect((width - size.x * scale) / 2, (height - size.y * scale) / 2, size.x, size.y);

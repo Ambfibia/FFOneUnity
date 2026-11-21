@@ -1,0 +1,628 @@
+{
+  "schema": "ffone.studio.provenance.v1",
+  "date": "2026-11-14",
+  "coverage": "Initial bounded register, not exhaustive asset/quest inventory.",
+  "entries": [
+    {
+      "id": "P-001",
+      "name": "Accepted NPC identity variants",
+      "sources": [
+        "primary",
+        "previous"
+      ],
+      "object_identity": "NPC 3464–3468 separate Omniverse identities; primary3430–3450 remap to3469–3489",
+      "hashes": [],
+      "unity": "The Windows player resolves all five separate variants. The atlas is bound at admission. Full-resolution RGBA readback matches the accepted body and face textures for the active slots of 3464–3468.",
+      "ffoneclient": "Accepted native identity/source of product intent",
+      "rustyfusion_dependency": "NPC tables and IDs; do not infer world placement",
+      "differences": "Keep separate variants and selected older appearances",
+      "preferred_version": "Keep separate variants and selected older appearances",
+      "reason": "Keep the five separate identities and the retained mapping for the 21 displaced world actors.",
+      "status": "preserved",
+      "confidence": "observed",
+      "evidence": [
+        "../FusionForge/recipes/native/identities/accepted-native-identities.json",
+        "Docs/Studio/actor-presentation-audit-2026-11-20.md",
+        "Docs/Studio/actor-repair-2026-11-20.md"
+      ],
+      "coverage": "All 26 world actors 3464–3489 loaded and rendered on two backgrounds in the final Windows client. The first visible frame retained the settled body bindings. The humanoid texture audit includes the recovered hair atlas for 3488 and the authored translucent lens for 3476."
+    },
+    {
+      "id": "P-002",
+      "name": "Previous appearance retention",
+      "sources": [
+        "previous",
+        "primary"
+      ],
+      "object_identity": "Kevin2226/3380; DeeDee701; TutorialPan06/07; Ben guide/UI variants",
+      "hashes": [],
+      "unity": "Retention recipes; runtime coverage pending per object",
+      "ffoneclient": "Accepted older appearances",
+      "rustyfusion_dependency": "Semantic NPC/portrait/voice routing",
+      "differences": "Previous for selected retained appearances; fusion_deedee primary",
+      "preferred_version": "Previous for selected retained appearances; fusion_deedee primary",
+      "reason": "Preserve accepted product intent; see evidence and unresolved coverage.",
+      "status": "preserved",
+      "confidence": "observed",
+      "evidence": [
+        "../FusionForge/recipes/native/retention/previous-build-retention.json"
+      ],
+      "coverage": "Initial system/selected-object audit; current runtime not exhaustively verified."
+    },
+    {
+      "id": "P-003",
+      "name": "Nano52 and Unstable identity conflict",
+      "sources": [
+        "primary",
+        "alternate",
+        "retro-010920"
+      ],
+      "object_identity": "Nano41/52/66; tuning/skill mappings conflict",
+      "hashes": [],
+      "unity": "Do not change current assets/saves",
+      "ffoneclient": "nano-roster retains52/66; Forge recipe retires52",
+      "rustyfusion_dependency": "Ownership/tuning/progression/save identity",
+      "differences": "Unresolved: current behavior retained pending decision",
+      "preferred_version": "Unresolved: current behavior retained pending decision",
+      "reason": "Contradictory accepted recipe and client roster documentation; current tables and decision history must be reconciled before changing saves or assets.",
+      "status": "conflict",
+      "confidence": "observed",
+      "evidence": [
+        "../FFOneClient/docs/nano-roster.md",
+        "../FusionForge/recipes/native/identities/accepted-native-identities.json"
+      ],
+      "coverage": "Initial system/selected-object audit; current runtime not exhaustively verified."
+    },
+    {
+      "id": "P-004",
+      "name": "Academy Nano donors",
+      "sources": [
+        "alternate"
+      ],
+      "object_identity": "Nano48–51,53–66; incubator71/72",
+      "hashes": [],
+      "unity": "68 Nano directories observed; individual behavior unassessed",
+      "ffoneclient": "Accepted additional donors; do not copy progression wholesale",
+      "rustyfusion_dependency": "Nano ownership/tunes/skills and acquisition path",
+      "differences": "Preserve accepted additions, unresolved exact animation parity",
+      "preferred_version": "Preserve accepted additions, unresolved exact animation parity",
+      "reason": "Preserve accepted product intent; see evidence and unresolved coverage.",
+      "status": "partial",
+      "confidence": "observed",
+      "evidence": [
+        "../FusionForge/recipes/native/characters/academy-incubator-nanos.json"
+      ],
+      "coverage": "Initial system/selected-object audit; current runtime not exhaustively verified."
+    },
+    {
+      "id": "P-005",
+      "name": "Native world scenes and collision",
+      "sources": [
+        "primary"
+      ],
+      "object_identity": "170 authored scenes; scene-owned MeshColliders",
+      "hashes": [],
+      "unity": "Wired WorldStreamer; prior actual-client acceptance",
+      "ffoneclient": "Engineering/appearance reference, not active physics owner",
+      "rustyfusion_dependency": "World admission, map/cell/transport IDs",
+      "differences": "Current authored geometry and bindings; no legacy physics restoration",
+      "preferred_version": "Current authored geometry and bindings; no legacy physics restoration",
+      "reason": "Preserve accepted product intent; see evidence and unresolved coverage.",
+      "status": "implemented",
+      "confidence": "observed",
+      "evidence": [
+        "Docs/native-collision-contract.md"
+      ],
+      "coverage": "Initial system/selected-object audit; current runtime not exhaustively verified."
+    },
+    {
+      "id": "P-006",
+      "name": "Native tutorial Timeline",
+      "sources": [
+        "primary"
+      ],
+      "object_identity": "10 editable .playable scenes; native PlayableDirector tracks",
+      "hashes": [],
+      "unity": "Wired; historical 10-scene receipt and66-test run",
+      "ffoneclient": "Existing tutorial behavior is adaptation reference",
+      "rustyfusion_dependency": "Tutorial player/NPC transitions",
+      "differences": "Preserve native editable Timeline and skip/cleanup",
+      "preferred_version": "Preserve native editable Timeline and skip/cleanup",
+      "reason": "Preserve accepted product intent; see evidence and unresolved coverage.",
+      "status": "implemented",
+      "confidence": "observed",
+      "evidence": [
+        "Docs/native-tutorial-timeline.md"
+      ],
+      "coverage": "Initial system/selected-object audit; current runtime not exhaustively verified."
+    },
+    {
+      "id": "P-007",
+      "name": "Async first character presentation",
+      "sources": [
+        "primary",
+        "previous"
+      ],
+      "object_identity": "First visible avatar, creation-world, cold occupied roster",
+      "hashes": [],
+      "unity": "Nov8 scoped receipt verified; current fresh run pending",
+      "ffoneclient": "Accepted selected appearance variants",
+      "rustyfusion_dependency": "Login/roster/name/create/shard/world admission",
+      "differences": "Current accepted identity plus no blocking appearance load",
+      "preferred_version": "Current accepted identity plus no blocking appearance load",
+      "reason": "Preserve accepted product intent; see evidence and unresolved coverage.",
+      "status": "implemented",
+      "confidence": "observed",
+      "evidence": [
+        "Docs/Studio/unity-discovery.md"
+      ],
+      "coverage": "Initial system/selected-object audit; current runtime not exhaustively verified."
+    },
+    {
+      "id": "P-008",
+      "name": "Stable Addressables authoring",
+      "sources": [],
+      "object_identity": "Stable addresses/GUIDs; content/editor owner separation",
+      "hashes": [],
+      "unity": "Existing pipeline; no fresh mass catalog audit",
+      "ffoneclient": "Native editable assets/editor schemas reference",
+      "rustyfusion_dependency": "Client scene readiness before world admission",
+      "differences": "Keep native assets and single-writer publication",
+      "preferred_version": "Keep native assets and single-writer publication",
+      "reason": "Preserve accepted product intent; see evidence and unresolved coverage.",
+      "status": "implemented",
+      "confidence": "observed",
+      "evidence": [
+        "README.md"
+      ],
+      "coverage": "Initial system/selected-object audit; current runtime not exhaustively verified."
+    },
+    {
+      "id": "P-009",
+      "name": "Accepted travel and mission route repairs",
+      "sources": [
+        "primary"
+      ],
+      "object_identity": "maps142–144; warp317→149; authored40000–40020; warps321–323; mission842",
+      "hashes": [],
+      "unity": "Historical route checks; current per-route run pending",
+      "ffoneclient": "Accepted authored product improvements",
+      "rustyfusion_dependency": "RustyFusion routes/warps, mission stages, persistence",
+      "differences": "Preserve repairs; label authored extensions separate from historical parity",
+      "preferred_version": "Preserve repairs; label authored extensions separate from historical parity",
+      "reason": "Preserve accepted product intent; see evidence and unresolved coverage.",
+      "status": "partial",
+      "confidence": "observed",
+      "evidence": [
+        "../RustyFusion/docs/instance-route-repairs.md"
+      ],
+      "coverage": "Initial system/selected-object audit; current runtime not exhaustively verified."
+    },
+    {
+      "id": "P-010",
+      "name": "Network protocol and sessions",
+      "sources": [
+        "primary"
+      ],
+      "object_identity": "0104, frame4096, active2700/2688, roster204, names UTF16LE",
+      "hashes": [],
+      "unity": "Code/golden tests present; fresh Unity tests pending",
+      "ffoneclient": "Shared Rust protocol/net implementations",
+      "rustyfusion_dependency": "Authority, session transaction ownership, checksum asymmetry",
+      "differences": "Keep accepted active wire layouts and extensions",
+      "preferred_version": "Keep accepted active wire layouts and extensions",
+      "reason": "Preserve accepted product intent; see evidence and unresolved coverage.",
+      "status": "implemented",
+      "confidence": "observed",
+      "evidence": [
+        "Docs/Studio/client-server-contract.md"
+      ],
+      "coverage": "Initial system/selected-object audit; current runtime not exhaustively verified."
+    },
+    {
+      "id": "P-011",
+      "name": "Nano acquisition vs progression",
+      "sources": [
+        "primary",
+        "alternate"
+      ],
+      "object_identity": "Growth vs quest/item paths; mission841 tasks5213–5215",
+      "hashes": [],
+      "unity": "Client migration coverage scoped, not full parity",
+      "ffoneclient": "Accepted Nano ownership and level distinctions",
+      "rustyfusion_dependency": "FM/item costs, requirements, exactly-once rewards",
+      "differences": "Never infer level from Nano ID",
+      "preferred_version": "Never infer level from Nano ID",
+      "reason": "Preserve accepted product intent; see evidence and unresolved coverage.",
+      "status": "implemented",
+      "confidence": "observed",
+      "evidence": [
+        "../RustyFusion/src/server/shard/nano_acquisition_tests.rs"
+      ],
+      "coverage": "Initial system/selected-object audit; current runtime not exhaustively verified."
+    },
+    {
+      "id": "P-012",
+      "name": "EN/RU text voice and fonts",
+      "sources": [
+        "primary",
+        "previous"
+      ],
+      "object_identity": "Semantic voice/portrait identity and independent locale preference",
+      "hashes": [
+        {
+          "scope": "FFOneClient and Unity Russian current_mission.png bytes",
+          "sha256": "d134cec3b90fc24c4c40eceb8cd943eff4b134f7d2bc619965db4f730408aaaf"
+        }
+      ],
+      "unity": "Ten RU PNGs and 2,988 RU OGGs are byte-identical and have registered addresses; three source fonts are byte-identical. Mission badges, loading and reward counters use locale-specific artwork.",
+      "ffoneclient": "Accepted localization/font decisions; comparison scoped to asset subrepository 38ef1db401d56be4afad152047f79ebc3b8312bb and its working locale JSON",
+      "rustyfusion_dependency": "Server IDs preserved; localization client-owned",
+      "differences": "Retrobution remains the EN loading art and the fallback for absent RU loading art. The three newer editor keys and the related timeline hint are synchronized in both source and native locale documents.",
+      "preferred_version": "Preserve accepted fonts and selected variant before locale fallback",
+      "reason": "Preserve accepted product intent; see evidence and unresolved coverage.",
+      "status": "partial",
+      "confidence": "observed",
+      "evidence": [
+        "../FFOneClient/docs/localization-and-voice.md",
+        "Docs/Studio/asset-audit-2026-11-16.md",
+        "Docs/Studio/asset-cleanup-2026-11-17.md",
+        "Docs/Studio/asset-cleanup-expanded-2026-11-17.md"
+      ],
+      "coverage": "Audit on 2026-11-16 and focused Unity publication and presentation work on 2026-11-17. See the follow-up receipt for execution scope."
+    },
+    {
+      "id": "P-013",
+      "name": "Inventory trade social and services",
+      "sources": [
+        "primary"
+      ],
+      "object_identity": "Equipment9 inventory50 bank200; trade/mail/friends/groups",
+      "hashes": [],
+      "unity": "Code and historical scoped acceptance",
+      "ffoneclient": "Working network/UI implementations reference",
+      "rustyfusion_dependency": "Server transaction/persistence/service outcomes",
+      "differences": "Keep server authority and existing service extensions",
+      "preferred_version": "Keep server authority and existing service extensions",
+      "reason": "Preserve accepted product intent; see evidence and unresolved coverage.",
+      "status": "partial",
+      "confidence": "observed",
+      "evidence": [
+        "Docs/Studio/client-server-contract.md"
+      ],
+      "coverage": "Initial system/selected-object audit; current runtime not exhaustively verified."
+    },
+    {
+      "id": "P-014",
+      "name": "Rust server extensions and shared crate",
+      "sources": [],
+      "object_identity": "Rust/Tokio, Luau, SQLite/PostgreSQL, ffone-runtime-contracts",
+      "hashes": [],
+      "unity": "Client consumes existing server; not all server paths verified",
+      "ffoneclient": "Shared crate is live RustyFusion dependency",
+      "rustyfusion_dependency": "Full product server, no replacement with OpenFusion",
+      "differences": "Retain shared crate and extensions",
+      "preferred_version": "Retain shared crate and extensions",
+      "reason": "Preserve accepted product intent; see evidence and unresolved coverage.",
+      "status": "implemented",
+      "confidence": "observed",
+      "evidence": [
+        "../RustyFusion/Cargo.toml"
+      ],
+      "coverage": "Initial system/selected-object audit; current runtime not exhaustively verified."
+    },
+    {
+      "id": "P-015",
+      "name": "Combat buffs vehicles and Recall",
+      "sources": [
+        "primary"
+      ],
+      "object_identity": "Weapons, PvP privilege, buffs, Nano revive/Recall, Slider/vehicles",
+      "hashes": [],
+      "unity": "Focused docs/historical evidence; handler gaps remain",
+      "ffoneclient": "Accepted prior implementation reference",
+      "rustyfusion_dependency": "Damage, skills, movement/travel, registration vs recall warp",
+      "differences": "Preserve existing functionality; audit missing handlers individually",
+      "preferred_version": "Preserve existing functionality; audit missing handlers individually",
+      "reason": "Preserve accepted product intent; see evidence and unresolved coverage.",
+      "status": "partial",
+      "confidence": "observed",
+      "evidence": [
+        "Docs/weapon-combat-runtime.md"
+      ],
+      "coverage": "Initial system/selected-object audit; current runtime not exhaustively verified."
+    },
+    {
+      "id": "P-016",
+      "name": "Loading stalls and resource lifetime",
+      "sources": [],
+      "object_identity": "Non-appearance sync waits; long creation frames in historical receipt",
+      "hashes": [],
+      "unity": "Historical measured issue; reproduce current baseline first",
+      "ffoneclient": "Prior caching ideas are engineering references",
+      "rustyfusion_dependency": "Loading/session lifecycle",
+      "differences": "Improve only after current measured reproduction",
+      "preferred_version": "Improve only after current measured reproduction",
+      "reason": "Preserve accepted product intent; see evidence and unresolved coverage.",
+      "status": "partial",
+      "confidence": "observed",
+      "evidence": [
+        "Docs/Studio/unity-discovery.md"
+      ],
+      "coverage": "Initial system/selected-object audit; current runtime not exhaustively verified."
+    },
+    {
+      "id": "P-017",
+      "name": "Missing combat and Nano behavior",
+      "sources": [
+        "primary"
+      ],
+      "object_identity": "BulletTable170–174, grenade parity, Dash/BuffHeal/ExtraBank coverage",
+      "hashes": [],
+      "unity": "Documented gaps; do not infer absence from class search",
+      "ffoneclient": "Compare prior implementations before replacement",
+      "rustyfusion_dependency": "Skills/buffs/damage authority",
+      "differences": "Bound one missing behavior and obtain evidence",
+      "preferred_version": "Bound one missing behavior and obtain evidence",
+      "reason": "Preserve accepted product intent; see evidence and unresolved coverage.",
+      "status": "partial",
+      "confidence": "observed",
+      "evidence": [
+        "Docs/weapon-combat-runtime.md"
+      ],
+      "coverage": "Initial system/selected-object audit; current runtime not exhaustively verified."
+    },
+    {
+      "id": "P-018",
+      "name": "Additional Academy quests",
+      "sources": [
+        "alternate"
+      ],
+      "object_identity": "Quest IDs not yet bounded",
+      "hashes": [],
+      "unity": "Unassessed",
+      "ffoneclient": "Some Academy content accepted, not all quest/progression rules",
+      "rustyfusion_dependency": "Quest dependencies, rewards and growth rules",
+      "differences": "Candidate until per-quest review",
+      "preferred_version": "Candidate until per-quest review",
+      "reason": "Preserve accepted product intent; see evidence and unresolved coverage.",
+      "status": "planned",
+      "confidence": "observed",
+      "evidence": [
+        "../FusionForge/docs/source-contract.md"
+      ],
+      "coverage": "Initial system/selected-object audit; current runtime not exhaustively verified."
+    },
+    {
+      "id": "P-019",
+      "name": "Reborn future mechanics",
+      "sources": [
+        "reborn-cache"
+      ],
+      "object_identity": "Cache attribution incomplete; main bundle unconfirmed",
+      "hashes": [],
+      "unity": "Not integrated by this task",
+      "ffoneclient": "Unknown",
+      "rustyfusion_dependency": "Unknown until bounded research",
+      "differences": "Candidate, never default authority",
+      "preferred_version": "Candidate, never default authority",
+      "reason": "Preserve accepted product intent; see evidence and unresolved coverage.",
+      "status": "planned",
+      "confidence": "observed",
+      "evidence": [
+        "../FusionForge/tools/legacy-sources/sources.json"
+      ],
+      "coverage": "Initial system/selected-object audit; current runtime not exhaustively verified."
+    },
+    {
+      "id": "P-020",
+      "name": "Fusion Kimchi mixed donor atlas",
+      "sources": [
+        "alternate"
+      ],
+      "object_identity": "NPC 3460. Academy Kimchi body with beta-20101123 Texture2D 1238925593 at texture/fusion_kimchi.dds.",
+      "hashes": [
+        {
+          "scope": "beta-20101123/NpcTexture.resourceFile",
+          "sha256": "75572d2cea620e6a320ef7303424b655ca515279492ee0e6a97d4078d1aedb99"
+        },
+        {
+          "scope": "Accepted and assigned fusion_kimchi.png",
+          "sha256": "2617fe0aba23496809ae24f98ac21b17c38ccb5fab09d92c18583e4b1f6f4d22"
+        }
+      ],
+      "unity": "The Windows player resolves model 3460, binds the accepted fusion_kimchi atlas on admission and renders the donor body with the matching full-resolution RGBA texture.",
+      "ffoneclient": "Accepted mixed donor identity",
+      "rustyfusion_dependency": "NPC/mesh/atlas identity",
+      "differences": "The accepted Academy body uses the original beta-20101123 Fusion atlas.",
+      "preferred_version": "Keep the Academy body and verified Fusion atlas.",
+      "reason": "The alternate atlas matches the source container and the accepted appearance.",
+      "status": "preserved",
+      "confidence": "observed",
+      "evidence": [
+        "../FusionForge/docs/source-contract.md",
+        "Docs/Studio/actor-presentation-audit-2026-11-20.md",
+        "Docs/Studio/actor-repair-2026-11-20.md"
+      ],
+      "coverage": "Model 3460 in the final Windows catalog. The first-frame binding, full-resolution RGBA and two rendered backgrounds confirm the accepted Fusion variant."
+    },
+    {
+      "id": "P-021",
+      "name": "FutureNano research specimen",
+      "sources": [
+        "primary"
+      ],
+      "object_identity": "CAB CustomAssetBundle-50513e574023b4e259c6fd245ae5bc06 pathId481 GameObject",
+      "hashes": [
+        {
+          "scope": "primary/FutureNano.resourceFile",
+          "sha256": "ec9427c7037308a35f4d7fcb3162ef6be793a501019d8e7cf06afa8d4b3a25a1"
+        }
+      ],
+      "unity": "No runtime claim",
+      "ffoneclient": "No runtime claim",
+      "rustyfusion_dependency": "No server behavior derivable from skeleton node",
+      "differences": "Evidence specimen only, no publication",
+      "preferred_version": "Evidence specimen only, no publication",
+      "reason": "Preserve accepted product intent; see evidence and unresolved coverage.",
+      "status": "partial",
+      "confidence": "observed",
+      "evidence": [
+        "Docs/Studio/forge-discovery.md"
+      ],
+      "coverage": "Initial system/selected-object audit; current runtime not exhaustively verified."
+    },
+    {
+      "id": "P-022",
+      "name": "Missing XDT NPC and mob models",
+      "sources": ["primary", "previous", "alternate", "beta-20100104", "reborn-cache"],
+      "object_identity": "24 NPC type IDs resolved through the numbered XDT mesh table and exact legacy model paths; seven verified donor roots",
+      "hashes": [
+        { "scope": "Unity imported XDT source JSON", "sha256": "191a9d17f4d233270cceb574a9087990e1526ae697174655203fbb1c6116955c" },
+        { "scope": "alternate/DongResources_12_15.resourceFile", "sha256": "ef07acb95179e4657b55ad53529c7ea84cb35db7ae7927bed1179e397f080d47" },
+        { "scope": "Internet Archive beta-20100119/DongResources_07_06.resourceFile", "sha256": "d275e024c265c093965e7092b23ed50d855a86b50968ab20a5251cf9508f6a52" }
+      ],
+      "unity": "Editable prefabs and Animator Controllers routed by exact XDT logical identity; see publication and execution receipts",
+      "ffoneclient": "Accepted asset and identity reference; no corresponding accepted prefab mapping for these 24 types at baseline",
+      "rustyfusion_dependency": "Existing 0104 NPC type IDs and world-interest packets",
+      "differences": "Academy and Turner donors for absent models; Time Deviant uses the original same-model Academy palette recorded in P-023; retired event variants still unresolved",
+      "preferred_version": "Use proven model donors and retain separate identities",
+      "reason": "Exact serialized model bindings, with the original body materials and clip data where preserved",
+      "status": "partial",
+      "confidence": "observed",
+      "evidence": ["Docs/Studio/xdt-model-recovery.md", "Docs/Studio/actor-repair-2026-11-20.md"],
+      "coverage": "The seven exact donor roots are preserved across roster publication. A further search of 2,582 distinct historical Turner bundles and original/current containers could not confirm exact bodies for 14 IDs including the empty HNPC 3428."
+    },
+    {
+      "id": "P-023",
+      "name": "Original Time Deviant texture pair",
+      "sources": ["alternate", "primary", "reborn-cache"],
+      "object_identity": "Academy XDT 3370/3371 mesh row 496, mob_fusionparadox; Texture2D IDs 272270088217192 and 160962644483365. Donor for native 3254/3255 mesh row 234.",
+      "hashes": [
+        { "scope": "alternate/Character_Texture_npc2.resourceFile", "sha256": "55271aaca9357de437215771fec61fd9a7de6379376f4465af23c44d9e5d850d" },
+        { "scope": "Internet Archive beta-20100322/NpcTexture.resourceFile", "sha256": "bc4dc95e89898551532ef2c1a8aee00ec9f59daaaea8283104cd8f493f594f4a" },
+        { "scope": "original mob_timedeviant Texture2D DXT5 bytes", "sha256": "17c561f4c30392c4cee7cd2844b77ed10e41181cc0dd48cf959cbd1651c7c2f4" },
+        { "scope": "original mob_timedeviantjelly Texture2D DXT5 bytes", "sha256": "19be2ef11284f53f28e06f129c9a373ca552311d596d6d9c5a7254e91198c504" }
+      ],
+      "unity": "Native material _MainTex binds the exact compressed base and secondary textures with all original mips and sampler settings",
+      "ffoneclient": "Earlier blocked logical texture override documents the absent legacy key; Unity adopts the verified original Academy palette for the same model",
+      "rustyfusion_dependency": "Existing NPC type IDs 3254 and 3255",
+      "differences": "The Academy donor uses a base atlas and a second jelly texture. The older key mob_fusionparadox.dds remains unresolved.",
+      "preferred_version": "Original two-texture Time Deviant appearance from the matching Academy body",
+      "reason": "Exact same-body and same-name XDT binding with original byte-identical Turner textures and verified material slot assignments",
+      "status": "implemented",
+      "confidence": "observed",
+      "evidence": ["Docs/Studio/xdt-model-recovery.md"],
+      "coverage": "Only Time Deviant 3254/3255 appearance; historical 3370/3371 are provenance IDs."
+    },
+    {
+      "id": "P-024",
+      "name": "Semantic Nano portraits and ready icons",
+      "sources": ["primary", "previous", "alternate"],
+      "object_identity": "67 semantic normal and ready pairs in FFOneClient; portrait scope excludes model, skill, tune and ownership identity.",
+      "hashes": [
+        {
+          "scope": "FFOneClient and Unity normal nanoicon_finn.png bytes",
+          "sha256": "838f9c8edf021819758202cf33860440077a78d53fd249e851725a91c81b0ec3"
+        },
+        {
+          "scope": "FFOneClient and Unity normal nanoicon_jake.png bytes",
+          "sha256": "1c44aa58722ad09977bd26cabd9bea0f3bcfa67c6f61f2b886bbea8961d02474"
+        }
+      ],
+      "unity": "134 PNGs byte-identical; unique registered addresses and corresponding .meta GUIDs. GameplayUiCatalog resolves semantic overrides.",
+      "ffoneclient": "Accepted shipped PNGs from asset revision 38ef1db401d56be4afad152047f79ebc3b8312bb.",
+      "rustyfusion_dependency": "Existing separately validated Nano IDs, no server resource changes.",
+      "differences": "Academy Nano 71/72 resolve the shared fallback pair because the current reference has no authored portraits for them.",
+      "preferred_version": "Preserve the FFOneClient portraits and independently mapped Finn/Jake icons.",
+      "reason": "Exact PNG matches and distinct semantic addresses preserve project-specific portraits.",
+      "status": "partial",
+      "confidence": "observed",
+      "evidence": ["Docs/Studio/asset-audit-2026-11-16.md"],
+      "coverage": "2026-11-16 source, GUID and static consumer inspection; rendered gallery and HUD not executed."
+    },
+    {
+      "id": "P-025",
+      "name": "Humanoid walk and hit reaction",
+      "sources": ["primary"],
+      "object_identity": "Accepted male and female player skeletons, glTF animation 167 walk and 165 woundupper.",
+      "hashes": [
+        {"scope": "FFOneClient and Unity male_skeleton.glb bytes", "sha256": "dd7efcb3d9001cf47b9f7916f8dfaa7e85700069e6e1ce1afdd20fa806a9bf63"},
+        {"scope": "FFOneClient and Unity female_skeleton.glb bytes", "sha256": "4ba61a1804bd8b252f3bbc4bde504bef07bf2700346d5f243486d5533bc6a79a"},
+        {"scope": "Unity locomotion extension catalog", "sha256": "88c30644491b182423d755a38a23659284b7b3c448223fb307ebc5bf3753162c"},
+        {"scope": "Unity damage extension catalog", "sha256": "7468ff65b74d27133edb3ce18189f6e6c7ffb9c89658cb0fd59194640c3c501a"}
+      ],
+      "unity": "Editable male and female Generic Animator Controllers and profiles select walk on Base Motion and woundupper on the upper layer. The walk motion loops every 0.966667 seconds. Woundupper reaches Empty after the 0.466667 second clip.",
+      "ffoneclient": "The two existing extension catalogs refer to names and indices in the accepted male and female skeleton files.",
+      "rustyfusion_dependency": "Existing 0104 NPC movement speed and style, and authoritative PC health events.",
+      "differences": "Walk receives the production base pose completion. The hit reaction retains its sparse upper-body channels.",
+      "preferred_version": "Accepted FFOneClient rig clips.",
+      "reason": "The published rig already carries both motions. The animation profiles control access to their editable states.",
+      "status": "implemented",
+      "confidence": "observed",
+      "evidence": ["Assets/FFOne/Content/Characters/Humanoids/Animation/Definitions/locomotion_animations.json", "Assets/FFOne/Content/Characters/Humanoids/Animation/Definitions/damage_animations.json", "Assets/FFOne/Tests/Editor/PlayerAnimatorTests.cs"],
+      "coverage": "The isolated Unity player rendered moving NPC 2895 with walk at server speed 200. Unity sampled woundupper on the two accepted rigs."
+    },
+    {
+      "id": "P-026",
+      "name": "Original Chowder 3148 atlas",
+      "sources": ["primary"],
+      "object_identity": "Primary XDT type 3148 selects npc_chowder with texture npc_chowder2. The supplemental archive FussionFall assets sort/RAW_FILES/CustomAssetBundle-d304c52c4bae348e38c743762c1bd818 contains the exact path texture/npc_chowder2.dds, Texture2D 514.",
+      "hashes": [
+        { "scope": "Supplemental serialized asset, 41442477 bytes", "sha256": "20f9c639317359ebb6f3d9f5f0df7ee61ab5012cce392f9c611545a572004280" },
+        { "scope": "Serialized Texture2D 514", "sha256": "740bd71080f496a29d9ffd5553c776e1d3e56cb9c866fe437f26d70681a509c3" },
+        { "scope": "Decoded top-left-origin RGBA8 at 256x256", "sha256": "be1e495fbdbac6cffa2ebd986aba0fe9842674aed225fbf65bc462631b52c564" }
+      ],
+      "unity": "Native Texture2D asset preserves nine DXT1 mip levels, source sampler and byte stream. The shared material binds it to the base slot of NPC 3148.",
+      "ffoneclient": "The retained character repair plan names this atlas. The prior asset installation contains the distinct npc_chowder atlas.",
+      "rustyfusion_dependency": "Existing 0104 NPC type 3148",
+      "differences": "Event type 3395 asks for a different body and texture.",
+      "preferred_version": "Source DXT1 data bound by the exact historical resource path.",
+      "reason": "Restores the texture named by the original mesh table.",
+      "status": "implemented",
+      "confidence": "observed",
+      "evidence": ["Docs/Studio/actor-repair-2026-11-20.md", "Assets/FFOne/Content/Characters/NPCs/npc_chowder/Textures/npc_chowder2.asset"],
+      "coverage": "Type 3148 resolved in the final Windows client with the atlas bound on its first visible frame. All nine mip levels matched original DXT1 data sampled on Direct3D 11, including every alpha value."
+    },
+    {
+      "id": "P-027",
+      "name": "Original Cheese Nano skill2 and skill3",
+      "sources": ["primary", "alternate"],
+      "object_identity": "The accepted Cheese model and the Academy nano/nano_cheese.kfm share the complete rest hierarchy, skin, geometry and twelve common authored animations. Academy Nano_041.resourceFile links skill2 to AnimationClip 1835128276 and skill3 to AnimationClip 1848709271.",
+      "hashes": [
+        { "scope": "OG-academy/Nano_041.resourceFile", "sha256": "0e4810aef59c9a21a8a63672585be0f3ca426d4904d708e91717ac8f50177082" },
+        { "scope": "Accepted Cheese source GLB in FFOneClient and FFOneUnity", "sha256": "712b484fd69f11eb7ba043444536d93d80c90e6a41c3ff75c12ce2448b25f1ac" }
+      ],
+      "unity": "Two editable clips are bound to the retained Cheese prefab. WorldNanoPresentation dispatches the corresponding source sound cues.",
+      "ffoneclient": "Retained model identity nano_cheese and twelve common authored motions.",
+      "rustyfusion_dependency": "Existing Nano tune and skill IDs.",
+      "differences": "The Academy container adds two authored ability clips to the twelve shared movements.",
+      "preferred_version": "Retained Cheese body with the two compatible Academy motions.",
+      "reason": "The selected model shares all 743 vertex positions, UVs, normals, influences, bind matrices, node transforms and all 2,361 indices with the donor. The skill slots are referenced by the gameplay table.",
+      "status": "implemented",
+      "confidence": "observed",
+      "evidence": ["Docs/Studio/actor-repair-2026-11-20.md", "Tools/recover_cheese_skills.py", "Assets/FFOne/Content/Characters/Nanos/Cheese/Prefabs/Cheese.prefab"],
+      "coverage": "All 764 authored keys and all 743 deformed vertices at six phases of each recovered ability matched the donor. The final Windows client exercised all three Cheese skills through the world Nano presentation and rendered both recovered moves."
+    },
+    {
+      "id": "P-028",
+      "name": "Player and HNPC cosmetic skin ownership",
+      "sources": ["primary", "previous"],
+      "object_identity": "Retrobution 0104 player accessory sockets, player Back equipType, HNPC clothes ownership and source-authored model-local joints",
+      "hashes": [
+        { "scope": "retrobution-20260821 Retro_shared.resourceFile", "sha256": "2ca4147c3705fdd3a0fc0ec44e088da6e87279e978e73b19701b0d29babbfc33" },
+        { "scope": "retrobution-20260613 Retro_shared.resourceFile", "sha256": "2bc0dedc1ad569739ae2845976ee747cd6668a60fc3ebb18b049e4faa7075b57" }
+      ],
+      "unity": "Player equipment follows equipType and HNPCs follow declared clothes ownership. Both bind the authored primary, secondary and auxiliary material roles.",
+      "ffoneclient": "Archived accepted catalogue, attachment placement and material role reference",
+      "rustyfusion_dependency": "Accepted equipment and NPC appearance identities. No wire change.",
+      "differences": "Back 75 has an original model-local Y offset. HNPC 203 retains the accepted Unity hair restoration.",
+      "preferred_version": "Preserve original internal transforms and independently skinned accessories.",
+      "reason": "An accessory can carry its own weighted joints while attaching to a single player socket.",
+      "status": "implemented",
+      "confidence": "observed",
+      "evidence": ["Docs/Studio/cosmetics-audit-2026-11-21.md"],
+      "coverage": "Static inventory of catalogued assets and skeleton paths. The report lists unoffered and incomplete entries."
+    }
+  ]
+}

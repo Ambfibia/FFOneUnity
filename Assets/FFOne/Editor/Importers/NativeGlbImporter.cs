@@ -134,10 +134,19 @@ namespace FFOne.Editor
                 var material = new Material(shader) { name = (string)definition["name"] ?? "material" + index };
                 var native = definition["extras"]?["ffone"];
                 string shaderName = (string)native?["declaredShaderName"] ?? "";
+                // These source shader families include the fixed-function global ambient light.
+                bool additiveAmbient = shaderName is "normal_blendOneOne" or "normal_blendOneOne_cullOff"
+                    or "normal_blendOneOne_zwriteOff" or "normal_blendOneOne_zwriteOff_cullOff";
+                bool ambient = additiveAmbient || shaderName is "Skin_DirLight_AmbLight_blendSrcalphaInvsrcalpha"
+                    or "normal_blendSrcalphaInvsrcalpha" or "normal_glow_blendSrcalphaInvsrcalpha"
+                    or "normal_blendSrcalphaOneTest_cullOff";
+                material.SetFloat("_AmbientEnabled", ambient ? 1 : 0);
+                if (additiveAmbient) material.SetVector("_AmbColor", Vector4.one);
                 material.SetFloat("_VertexColorAD", shaderName.StartsWith("normal_", StringComparison.Ordinal) &&
                     shaderName.EndsWith("_vertexColorAD", StringComparison.Ordinal) ? 1 : 0);
                 bool toon = shaderName.Contains("ToonShading", StringComparison.Ordinal);
                 material.SetFloat("_Toon", toon ? 1 : 0);
+                material.SetFloat("_FusionMatter", shaderName.Contains("FusionMatterLightDir", StringComparison.Ordinal) ? 1 : 0);
                 material.SetFloat("_Comic", toon || (string)native?["nativeSurfaceStyle"] == "cel" ? 1 : 0);
                 material.SetFloat("_InkRim", (bool?)native?["nativeInkRim"] == true ? 1 : 0);
                 material.SetFloat("_RimIntensity", shaderName.Contains("_Rim", StringComparison.Ordinal) ? 2 : 0);
@@ -147,6 +156,20 @@ namespace FFOne.Editor
                 bool blend = (bool?)pass?["blend"]?["enabled"] ?? ((string)definition["alphaMode"] == "BLEND");
                 material.SetFloat("_SrcBlend", blend ? (int)BlendMode.SrcAlpha : (int)BlendMode.One);
                 material.SetFloat("_DstBlend", blend ? (int)BlendMode.OneMinusSrcAlpha : (int)BlendMode.Zero);
+                // Effect meshes use their fixed-function RGB addition even when the glTF
+                // compatibility surface reports only alphaMode=BLEND.
+                if (context.assetPath.StartsWith("Assets/FFOne/Content/VFX/", StringComparison.Ordinal) &&
+                    NativeWorldMaterialImport.IsActorAdditiveMesh(shaderName) && blend &&
+                    (string)pass?["blend"]?["destinationColor"] == "one" &&
+                    (string)pass["blend"]["sourceColor"] is "one" or "sourceAlpha")
+                {
+                    material.SetFloat("_SrcBlend", (int)NativeWorldMaterialImport.Blend((string)pass["blend"]["sourceColor"]));
+                    material.SetFloat("_DstBlend", (int)BlendMode.One);
+                    material.SetFloat("_ColorMask", FFOne.World.WorldMaterialState.UnityColorMask((int?)pass["colorMask"] ?? 15));
+                    var alphaTest = pass["alphaTest"];
+                    if ((string)alphaTest?["compare"] == "greater" && alphaTest["reference"] is JObject reference)
+                        material.SetFloat("_Cutoff", (float?)reference["resolved_value"] ?? (float)reference["value"]);
+                }
                 material.renderQueue = (int?)native?["renderQueue"] ?? (blend ? 3000 : 2000);
                 foreach (var color in native?["colors"] ?? new JArray())
                 {
@@ -215,6 +238,7 @@ namespace FFOne.Editor
                     }
                 }
                 clip.EnsureQuaternionContinuity();
+                AnimationUtility.SetAnimationEvents(clip, TutorialAnimationEventImport.AttachedEffects(definition));
                 player.AddClip(clip, name);
                 if (name == "stand1") { player.clip = clip; player.playAutomatically = true; }
                 context.AddObjectToAsset("animation_" + name, clip);

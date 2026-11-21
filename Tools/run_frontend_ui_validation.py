@@ -7,8 +7,9 @@ import struct
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
-SCREENS = ("login", "selection", "selection-occupied", "delete-character",
-           "generated-name", "custom-name", "appearance", "appearance-girl", "quit")
+SCREENS = ("login", "loading-resources", "loading-background-only", "selection",
+           "selection-occupied", "delete-character", "generated-name", "custom-name",
+           "appearance", "appearance-girl", "selection-after-appearance", "quit")
 
 
 def main():

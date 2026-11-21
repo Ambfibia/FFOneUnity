@@ -619,7 +619,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6960858975612710184}
-  - component: {fileID: 517737070497297833}
+  - component: {fileID: 9070351612908205598}
+  - component: {fileID: 5126985650643926041}
   m_Layer: 0
   m_Name: model
   m_TagString: Untagged
@@ -643,27 +644,43 @@ Transform:
   - {fileID: 4705219674233790048}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!111 &517737070497297833
-Animation:
+--- !u!95 &9070351612908205598
+Animator:
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2504325988168298005}
   m_Enabled: 1
-  serializedVersion: 4
-  m_Animation: {fileID: 7400000, guid: 3388a057e6f4c9f48a021a199dac4f81, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: 2e65d501113b7774ead974bec0835c36, type: 2}
-  - {fileID: 7400000, guid: 3388a057e6f4c9f48a021a199dac4f81, type: 2}
-  - {fileID: 7400000, guid: 10a52b8bc062bc34da3b922177c8e294, type: 2}
-  - {fileID: 7400000, guid: 3ecc71b69271a564887caea5e3e6a6b7, type: 2}
-  - {fileID: 7400000, guid: 6b533bffe2fc59140b4f3139c132a343, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: b73d4aeb388505e49ae3cdcf477234f0, type: 2}
+  m_CullingMode: 0
   m_UpdateMode: 0
-  m_CullingType: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 1
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &5126985650643926041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2504325988168298005}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b7ac68c382befc4d9fc82662c17e418, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.Content.NativeNpcAnimator
+  animator: {fileID: 9070351612908205598}
+  AnimationSounds: []
+  Faces: []
 --- !u!1 &2728306067164846880
 GameObject:
   m_ObjectHideFlags: 0

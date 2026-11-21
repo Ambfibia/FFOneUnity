@@ -3,6 +3,9 @@ using System.Linq;
 using FFOne.Network;
 using FFOne.UI;
 using NUnit.Framework;
+using UnityEngine;
+using UnityEditor;
+using FFOne.Content;
 using UnityEngine.UIElements;
 
 namespace FFOne.Tests
@@ -88,16 +91,37 @@ namespace FFOne.Tests
         }
         [UnityEngine.TestTools.UnityTest] public System.Collections.IEnumerator NewWindowsExposeConcreteActionsAndShareTheWindowLifetime()
         {
+            UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,
+                UnityEditor.SceneManagement.NewSceneMode.Single);
             yield return new UnityEngine.TestTools.EnterPlayMode();
-            var root = new VisualElement(); var session = Session(); using var ui = new GameplayUiController(root, session, "ru", null, null);
+            var settings = UnityEngine.Object.Instantiate(AssetDatabase.LoadAssetAtPath<PanelSettings>(
+                ContentPaths.Resolve("Assets/UI/MainPanel.asset")));
+            var target = new RenderTexture(1280, 720, 0);
+            target.Create();
+            settings.targetTexture = target;
+            settings.scaleMode = PanelScaleMode.ConstantPixelSize;
+            settings.scale = 1;
+            var owner = new GameObject("Mail acceptance");
+            owner.SetActive(false);
+            var document = owner.AddComponent<UIDocument>();
+            document.panelSettings = settings;
+            owner.SetActive(true);
+            yield return null;
+            var root = document.rootVisualElement;
+            var session = Session();
+            using var ui = new GameplayUiController(root, session, "ru", null, null);
             Assert.True(ui.Windows.Open(GameplayWindow.Contacts)); Assert.NotNull(ui.Windows.View.Q<Button>("friend-add-name")); Assert.NotNull(ui.Windows.View.Q<Button>("group-leave"));
-            var input = ui.Windows.View.Q<TextField>("friend-first").Q<VisualElement>("unity-text-input");
-            Assert.NotNull(input); Assert.Less(input.style.backgroundColor.value.r, .1f, "Runtime input must keep contrast with the HUD's light text.");
+            yield return null; yield return null;
+            var input = ui.Windows.View.Q<TextField>("friend-first").Q<VisualElement>(className: "unity-base-text-field__input");
+            Assert.NotNull(input);
+            Assert.That(input.resolvedStyle.backgroundColor, Is.EqualTo((Color)new Color32(6, 26, 41, 255)),
+                "The contacts stylesheet must provide a contrasting input background.");
             Assert.True(ui.Windows.Open(GameplayWindow.Mail)); Assert.NotNull(ui.Windows.View.Q<Button>("mail-compose")); Assert.NotNull(ui.Windows.View.Q<Button>("mail-take-all"));
             Assert.NotNull(ui.Windows.View.Q<Button>("inventory-slot-49"), "Mail keeps the shared 50-slot equipment cabinet.");
             Assert.IsNull(ui.Windows.View.Q("inventory-avatar"), "Mail reserves the entire left panel for letters.");
-            Assert.AreEqual(DisplayStyle.None, ui.Windows.View.Q("mail-message").style.display.value);
-            Assert.AreEqual(DisplayStyle.Flex, ui.Windows.View.Q("mail-empty-folder").style.display.value);
+            yield return null; yield return null;
+            Assert.AreEqual(DisplayStyle.None, ui.Windows.View.Q("mail-message").resolvedStyle.display);
+            Assert.AreEqual(DisplayStyle.Flex, ui.Windows.View.Q("mail-empty-folder").resolvedStyle.display);
             typeof(GameplayUiController).GetMethod("SelectMailFolder", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).Invoke(ui, new object[] { false });
             var summary = new byte[1024]; summary[0] = 1;
             Protocol0104.Write64(summary, 4, 1); Protocol0104.Write64(summary, 12, 777);
@@ -107,10 +131,11 @@ namespace FFOne.Tests
             typeof(GameplayUiController).GetField("mailSelected", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(ui, 1L);
             var letter = new byte[1084]; Protocol0104.Write64(letter, 0, 1); Protocol0104.WriteUtf16(letter, 8, 512, "Текст <b>письма</b>\nВторая строка.");
             ui.ReceiveSocial(Frame(ProtocolMail.ReadOk, letter));
-            Assert.AreEqual(DisplayStyle.Flex, ui.Windows.View.Q("mail-message").style.display.value);
+            yield return null; yield return null;
+            Assert.AreEqual(DisplayStyle.Flex, ui.Windows.View.Q("mail-message").resolvedStyle.display);
             Assert.False(ui.Windows.View.Q<Label>("mail-detail-body").enableRichText);
             Assert.AreEqual("Текст <b>письма</b>\nВторая строка.", ui.Windows.View.Q<Label>("mail-detail-body").text);
-            Assert.AreEqual(DisplayStyle.None, ui.Windows.View.Q("mail-claims").style.display.value, "Letters without attachments keep the full reading area.");
+            Assert.AreEqual(DisplayStyle.None, ui.Windows.View.Q("mail-claims").resolvedStyle.display, "Letters without attachments keep the full reading area.");
             Assert.True(ui.Windows.Open(GameplayWindow.Nanos));
             Assert.AreEqual(GameplayUiCatalog.Load().NanoIds.Count(), ui.Windows.View.Q("nano-inventory-slots").childCount);
             Assert.Greater(ui.Windows.View.Q("nano-inventory-slots").childCount, 36);
@@ -121,6 +146,10 @@ namespace FFOne.Tests
             Assert.AreEqual(session.Snapshot.Taros.ToString("D9"), ui.Windows.View.Q<Label>("inventory-taros").text);
             Assert.True(ui.InputBlocked); ui.Windows.Close(); Assert.False(ui.InputBlocked);
             ui.Dispose();
+            UnityEngine.Object.Destroy(owner);
+            UnityEngine.Object.Destroy(settings);
+            target.Release();
+            UnityEngine.Object.Destroy(target);
             yield return new UnityEngine.TestTools.ExitPlayMode();
         }
     }

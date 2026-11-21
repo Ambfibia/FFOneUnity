@@ -1,7 +1,91 @@
 /* Screen-local positions remain editable in CharacterSelection.uxml. */
-#character-selection .ff-label, #character-selection .ff-button { position: absolute; font-size: 12px; }
-#character-selection .ff-label { color: rgb(204, 255, 255); -unity-text-align: middle-center; }
-#character-selection .selection-padded { padding: 4px 6px 6px 10px; }
-#character-selection .selection-detail { -unity-text-align: middle-left; }
-#character-selection #selection-title { color: rgb(0, 0, 103); }
-#character-selection #selected-avatar-name, #character-selection #enter-world { font-size: 14px; }
+.roster-character-selection .ff-label, .roster-character-selection .ff-button { position: absolute; font-size: 12px; }
+.roster-character-selection .ff-label { color: rgb(204, 255, 255); -unity-text-align: middle-center; }
+.roster-character-selection .selection-padded { padding: 4px 6px 6px 10px; }
+.roster-character-selection .selection-detail { -unity-text-align: middle-left; padding-top:0; padding-bottom:1px; }
+.roster-character-selection .roster-selected-avatar-name { padding-top:0; padding-bottom:0; overflow:visible; }
+.roster-character-selection .ff-label--chalet { -unity-font-definition: url("../Fonts/chaletbook-regular-sdf.asset"); }
+.roster-character-selection .roster-selection-title { color: rgb(0, 0, 103); }
+.roster-character-selection .roster-selected-avatar-name, .roster-character-selection .roster-selected-avatar-status, .roster-character-selection .roster-enter-world { font-size: 14px; }
+.roster-character-selection .selection-preview-status {
+    display: none;
+    white-space: normal;
+    padding: 6px;
+    background-color: rgba(6, 11, 20, 0.92);
+}
+.roster-character-selection .selection-preview-pending .selection-preview-status { display: flex; }
+.roster-character-selection .selection-preview-pending .selection-avatar-preview { opacity: 0; }
+
+.selection-slot { position: absolute; left: 0; width: 478px; height: 130px; }
+.selection-slot .selection-slot-button { top: 43px; }
+.selection-slot .selection-slot-button {
+    background-image: url("../Artwork/en/character/selection/controls/CSCharButtonEmpty.png");
+    -unity-slice-left: 5; -unity-slice-right: 5; -unity-slice-top: 5; -unity-slice-bottom: 5;
+}
+.selection-slot-occupied .selection-slot-button {
+    background-image: url("../Artwork/en/character/selection/controls/CSCharButtonNormal.png");
+}
+.selection-slot-occupied .selection-slot-button:hover,
+.selection-slot-occupied .selection-slot-button:focus,
+.selection-slot-selected .selection-slot-button {
+    background-image: url("../Artwork/en/character/selection/controls/CSCharButtonOver.png");
+}
+.roster-character-selection .selection-slot-name { color: rgb(229, 229, 229); }
+.roster-character-selection .selection-slot-level,
+.roster-character-selection .selection-slot-location { color: rgb(0, 204, 255); }
+.roster-character-selection .selection-slot-highlight .selection-detail { color: rgb(0, 46, 142); }
+.selection-slot .selection-slot-preview { display: none; }
+.selection-slot-occupied .selection-slot-preview { display: flex; }
+.selection-slot-occupied .selection-slot-empty { display: none; }
+.selection-slot.selection-slot-second .selection-slot-button { top: 44px; }
+.selection-slot .selection-slot-empty { top: 71px; }
+.selection-slot.selection-slot-second .selection-slot-empty { top: 72px; }
+
+.selection-disk {
+    -unity-slice-left: 5; -unity-slice-right: 5; -unity-slice-top: 5; -unity-slice-bottom: 5;
+}
+.selection-slot .selection-disk-back {
+    top: 93px;
+    background-image: url("../Artwork/en/gameplay/player/DiskBack.png");
+}
+.selection-slot.selection-slot-fourth .selection-disk-back { top: 92px; }
+.selection-slot .selection-slot-preview { top: 31px; }
+.selection-slot.selection-slot-fourth .selection-slot-preview { top: 30px; }
+.selection-slot .selection-disk-front {
+    top: 106px;
+    background-image: url("../Artwork/en/gameplay/player/DiskFront.png");
+}
+.selection-slot.selection-slot-fourth .selection-disk-front { top: 105px; }
+.selection-slot .selection-slot-name { top: 52px; }
+.selection-slot.selection-slot-second .selection-slot-name { top: 51px; }
+.selection-slot.selection-slot-third .selection-slot-name, .selection-slot.selection-slot-fourth .selection-slot-name { top: 50px; }
+.selection-slot .selection-slot-level { top: 70px; }
+.selection-slot.selection-slot-second .selection-slot-level { top: 69px; }
+.selection-slot.selection-slot-third .selection-slot-level, .selection-slot.selection-slot-fourth .selection-slot-level { top: 68px; }
+.selection-slot .selection-slot-location { top: 87px; }
+.selection-slot.selection-slot-third .selection-slot-location, .selection-slot.selection-slot-fourth .selection-slot-location { top: 86px; }
+
+.roster-background, .roster-selection-chrome { -unity-background-scale-mode:stretch-to-fill; }
+.roster-selection-chrome { background-image:url("../Artwork/en/character/selection/background/CSBG.png"); }
+
+.roster-character-selection .ff-button { -unity-background-scale-mode:stretch-to-fill; }
+.roster-rotate-left { background-image:url("../Artwork/en/character/creation/camera/CCRotateLeftNormal.png"); -unity-slice-left:5; -unity-slice-bottom:5; -unity-slice-right:5; -unity-slice-top:5; }
+.roster-rotate-left:hover, .roster-rotate-left:focus, .roster-rotate-left:active { background-image:url("../Artwork/en/character/creation/camera/CCRotateLeftOver.png"); -unity-slice-left:5; -unity-slice-bottom:5; -unity-slice-right:5; -unity-slice-top:5; }
+.roster-rotate-right { background-image:url("../Artwork/en/character/creation/camera/CCRotateRightNormal.png"); -unity-slice-left:5; -unity-slice-bottom:5; -unity-slice-right:5; -unity-slice-top:5; }
+.roster-rotate-right:hover, .roster-rotate-right:focus, .roster-rotate-right:active { background-image:url("../Artwork/en/character/creation/camera/CCRoatateRightOver.png"); -unity-slice-left:5; -unity-slice-bottom:5; -unity-slice-right:5; -unity-slice-top:5; }
+.roster-delete-character { background-image:url("../Artwork/en/character/selection/controls/red_button_normal.png"); -unity-slice-left:5; -unity-slice-bottom:5; -unity-slice-right:5; -unity-slice-top:5; }
+.roster-delete-character:hover, .roster-delete-character:focus, .roster-delete-character:active { background-image:url("../Artwork/en/character/selection/controls/red_button_over.png"); -unity-slice-left:5; -unity-slice-bottom:5; -unity-slice-right:5; -unity-slice-top:5; }
+.roster-create-character { background-image:url("../Artwork/en/character/selection/controls/blue_button_normal.png"); -unity-slice-left:5; -unity-slice-bottom:5; -unity-slice-right:5; -unity-slice-top:5; }
+.roster-create-character:hover, .roster-create-character:focus, .roster-create-character:active { background-image:url("../Artwork/en/character/selection/controls/blue_button_over.png"); -unity-slice-left:5; -unity-slice-bottom:5; -unity-slice-right:5; -unity-slice-top:5; }
+.roster-enter-world { background-image:url("../Artwork/en/character/selection/controls/CSEnterButton.png"); }
+.roster-enter-world:hover, .roster-enter-world:focus, .roster-enter-world:active { background-image:url("../Artwork/en/character/selection/controls/CSEnterGameOver.png"); }
+.roster-quit { background-image:url("../Artwork/en/character/selection/controls/red_button_normal.png"); -unity-slice-left:5; -unity-slice-bottom:5; -unity-slice-right:5; -unity-slice-top:5; }
+.roster-quit:hover, .roster-quit:focus, .roster-quit:active { background-image:url("../Artwork/en/character/selection/controls/red_button_over.png"); -unity-slice-left:5; -unity-slice-bottom:5; -unity-slice-right:5; -unity-slice-top:5; }
+.roster-fullscreen { background-image:url("../Artwork/en/character/selection/controls/CSFullScreenButton.png"); }
+.roster-fullscreen:hover, .roster-fullscreen:focus, .roster-fullscreen:active { background-image:url("../Artwork/en/character/selection/controls/FullscreenModeButton_Over.png"); }
+.roster-fullscreen.roster-fullscreen--windowed { background-image:url("../Artwork/en/character/selection/controls/CSFullToWindow.png"); }
+.roster-fullscreen.roster-fullscreen--windowed:hover, .roster-fullscreen.roster-fullscreen--windowed:focus, .roster-fullscreen.roster-fullscreen--windowed:active { background-image:url("../Artwork/en/character/selection/controls/FullscreenModeButton_Over.png"); }
+.roster-music-toggle.roster-music--on { background-image:url("../Artwork/en/character/selection/controls/musicoff.png"); }
+.roster-music-toggle.roster-music--off { background-image:url("../Artwork/en/character/selection/controls/musicon.png"); }
+.roster--ru .roster-music-toggle.roster-music--on { background-image:url("../Artwork/ru/character/selection/controls/musicon.png"); }
+.roster--ru .roster-music-toggle.roster-music--off { background-image:url("../Artwork/ru/character/selection/controls/musicoff.png"); }

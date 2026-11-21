@@ -50,6 +50,11 @@ namespace FFOne.Tests
             var collision = NativeModelAssets.Load(ProtocolSlider.Model.Replace(".glb", ".collision.glb")); Assert.IsNotNull(collision);
             var mesh = collision.GetComponentsInChildren<MeshFilter>(true).Single().sharedMesh;
             Assert.AreEqual(134, mesh.vertexCount); Assert.AreEqual(531, mesh.triangles.Length);
+            var native = prefab.GetComponentsInChildren<MeshCollider>(true).Single();
+            Assert.IsTrue(native.enabled); Assert.IsFalse(native.convex); Assert.IsFalse(native.isTrigger);
+            Assert.AreEqual(UnityEditor.AssetDatabase.GetAssetPath(prefab), UnityEditor.AssetDatabase.GetAssetPath(native.sharedMesh));
+            CollectionAssert.AreEqual(mesh.triangles, native.sharedMesh.triangles);
+            CollectionAssert.AreEqual(mesh.vertices, native.sharedMesh.vertices);
         }
         [TestCase(true)] [TestCase(false)]
         public void PassengerUsesBusPositionFromTheSameFrameRegardlessOfInterestArrivalOrder(bool passengerFirst)

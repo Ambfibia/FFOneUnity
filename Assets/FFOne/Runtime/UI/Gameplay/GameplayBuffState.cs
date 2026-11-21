@@ -46,6 +46,8 @@ namespace FFOne.UI
                 Publish(usedState); return true;
             }
             if (ProtocolBuff.TryUpdate(frame, out var buff)) { Publish(Snapshot.WithCondition(buff.Condition)); return true; }
+            if (ProtocolBuff.TryNanoCondition(frame, Snapshot.PlayerId, out int nanoCondition))
+            { Publish(Snapshot.WithCondition(nanoCondition)); return true; }
             if (!ProtocolBuff.TryEffects(frame, out var effects)) return false;
             var next = Snapshot;
             foreach (var effect in effects)

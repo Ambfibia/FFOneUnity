@@ -4,7 +4,7 @@ namespace FFOne.Network
 {
     // Quest counters are not movable slots. Bank access has a separate NPC/session contract.
     public enum ItemContainer { Equipment = 0, Inventory = 1, Bank = 3 }
-    public enum InventoryUpdateKind { Move, EquipmentChanged }
+    public enum InventoryUpdateKind { Move, EquipmentChanged, Delete }
 
     public sealed class InventoryUpdate
     {
@@ -22,6 +22,13 @@ namespace FFOne.Network
     public static class ProtocolInventory
     {
         public const uint MoveRequest = 0x1300000a, MoveSuccess = 0x3100001a, EquipmentChanged = 0x3100001b;
+        public const uint DeleteRequest = 0x13000019, DeleteSuccess = 0x31000039;
+
+        public static byte[] DeletePayload(int slot)
+        {
+            ValidateSlot(ItemContainer.Inventory, slot);
+            return ProtocolTravel.Words((int)ItemContainer.Inventory, slot);
+        }
 
         public static byte[] MovePayload(ItemContainer from, int fromSlot, ItemContainer to, int toSlot)
         {
@@ -35,6 +42,15 @@ namespace FFOne.Network
         public static bool TryDecode(ProtocolFrame frame, out InventoryUpdate update)
         {
             update = null;
+            if (frame?.PacketType == DeleteSuccess)
+            {
+                Protocol0104.RequireSize(frame.Payload, 8);
+                int slot = Protocol0104.Read32(frame.Payload, 4);
+                if (Protocol0104.Read32(frame.Payload, 0) != (int)ItemContainer.Inventory || slot < 0 || slot >= 50)
+                    throw new ProtocolException("Invalid inventory item deletion reply.");
+                update = new InventoryUpdate { Kind = InventoryUpdateKind.Delete, FromContainer = ItemContainer.Inventory, FromSlot = slot };
+                return true;
+            }
             if (frame == null || (frame.PacketType != MoveSuccess && frame.PacketType != EquipmentChanged)) return false;
             bool move = frame.PacketType == MoveSuccess;
             Protocol0104.RequireSize(frame.Payload, move ? 40 : 20);

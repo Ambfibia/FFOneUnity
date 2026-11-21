@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Разработка · FusionFall Studio</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <header class="mast"><div class="wrap mast-inner">
+    <a href="#overview" class="brand" aria-label="FusionFall Studio — обзор"><strong>FusionFall</strong><small>STUDIO</small></a>
+    <span class="project">FFOneUnity <i></i> RustyFusion</span>
+  </div></header>
+  <div class="wrap">
+    <div class="heading"><h1>Разработка</h1><span id="connection" role="status">Подключение…</span></div>
+    <nav aria-label="Разделы проекта">
+      <a href="#overview">Обзор</a><a href="#bugs">Баги</a><a href="#plan">План</a><a href="#inbox">Входящие</a><a href="#research">Исследования</a>
+      <a href="/architecture" target="ffone-architecture" rel="noopener" class="architecture">Архитектура <span aria-hidden="true">↗</span></a>
+    </nav>
+    <div id="error" class="notice" role="alert" hidden></div>
+    <main id="main"><p class="empty">Загружаем реестр проекта…</p></main>
+    <footer><span>FusionFall Studio</span><button type="button" id="refresh">Обновить данные ↻</button></footer>
+  </div>
+  <dialog id="dialog" aria-labelledby="dialog-title"><div id="dialog-content"></div></dialog>
+  <div id="toast" role="status"></div>
+</body>
+</html>

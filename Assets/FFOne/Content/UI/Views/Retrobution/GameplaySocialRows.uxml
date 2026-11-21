@@ -1,0 +1,40 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+  <ui:VisualElement name="social-friend-row" class="social-friend-row" picking-mode="Ignore">
+    <ui:Label name="social-row-name" class="social-row-name social-copy social-copy--body" picking-mode="Ignore" enable-rich-text="false" />
+    <ui:Button name="social-row-chat" class="social-row-chat ff-button social-button" />
+    <ui:Button name="social-row-block" class="social-row-block ff-button social-button" />
+    <ui:Button name="social-row-remove" class="social-row-remove ff-button social-button" />
+  </ui:VisualElement>
+  <ui:VisualElement name="social-peer-row" class="social-peer-row" picking-mode="Ignore">
+    <ui:Label name="social-peer-name" class="social-peer-name social-copy social-copy--body" picking-mode="Ignore" enable-rich-text="false" />
+    <ui:Button name="social-peer-buddy" class="social-peer-buddy ff-button social-button" />
+    <ui:Button name="social-peer-group" class="social-peer-group ff-button social-button" />
+  </ui:VisualElement>
+  <ui:Label name="social-member-row" class="social-member-row social-copy social-copy--body" picking-mode="Ignore" enable-rich-text="false" />
+  <ui:VisualElement name="social-group-npc-row" class="social-group-npc-row" picking-mode="Ignore">
+    <ui:Label name="social-group-npc-name" class="social-group-npc-name social-copy social-copy--body" picking-mode="Ignore" enable-rich-text="false" />
+    <ui:Button name="social-group-npc-remove" class="social-group-npc-remove ff-button social-button" />
+  </ui:VisualElement>
+  <ui:Label name="social-history-row" class="social-history-row social-copy social-copy--body" picking-mode="Ignore" enable-rich-text="false" />
+  <ui:Button name="social-buddy-row" class="social-buddy-row ff-button">
+    <ui:VisualElement name="social-buddy-online-icon" class="social-buddy-online-icon" picking-mode="Ignore" />
+  </ui:Button>
+  <ui:VisualElement class="party-member-row" picking-mode="Ignore">
+    <ui:VisualElement class="party-member-frame" picking-mode="Ignore" />
+    <ui:Label class="party-name social-copy social-copy--body" picking-mode="Ignore" enable-rich-text="false" />
+    <ui:Label class="party-level social-copy social-copy--body" picking-mode="Ignore" />
+    <ui:VisualElement class="party-health party-member-health" picking-mode="Ignore" />
+    <ui:VisualElement class="party-nano" picking-mode="Ignore">
+      <ui:Label class="party-nano-name social-copy social-copy--body" picking-mode="Ignore" enable-rich-text="false" />
+      <ui:VisualElement class="party-nano-frame" picking-mode="Ignore" />
+      <ui:VisualElement class="party-health party-nano-health" picking-mode="Ignore" />
+      <ui:Image class="party-nano-skill" picking-mode="Ignore" scale-mode="StretchToFill" />
+    </ui:VisualElement>
+  </ui:VisualElement>
+  <ui:VisualElement class="party-npc-row" picking-mode="Ignore">
+    <ui:VisualElement class="party-npc-frame" picking-mode="Ignore" />
+    <ui:Label class="party-npc-name social-copy social-copy--body" picking-mode="Ignore" enable-rich-text="false" />
+    <ui:VisualElement class="party-health party-npc-hp" picking-mode="Ignore" />
+  </ui:VisualElement>
+  <ui:VisualElement class="party-gap" picking-mode="Ignore" />
+</ui:UXML>

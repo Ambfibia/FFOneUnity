@@ -6,6 +6,33 @@ namespace FFOne.Network
 {
     public sealed partial class FusionClient
     {
+        public Task SetFirstUseAsync(int condition, CancellationToken token)
+        {
+            if (condition < 1 || condition > 128) throw new System.ArgumentOutOfRangeException(nameof(condition));
+            var data = new byte[4];
+            Protocol0104.Write32(data, 0, condition);
+            return SendGameplayAsync(0x13000086, data, token);
+        }
+
+        internal const uint AmbientBarkRequest = 0x130000a8, AmbientBarkReply = 0x3100013d, MissionBarkReply = 0x310000b9;
+        internal Task RequestAmbientBarkAsync(int npc, int set, CancellationToken token)
+        {
+            if (npc <= 0 || set <= 0 || set > int.MaxValue / 4) throw new ArgumentOutOfRangeException();
+            var data = new byte[12];
+            ProtocolGameplay.I(data, 0, npc);
+            ProtocolGameplay.I(data, 4, set);
+            return SendGameplayAsync(AmbientBarkRequest, data, token);
+        }
+
+        internal Task RequestMissionBarkAsync(int task, int npc, CancellationToken token)
+        {
+            if (task <= 0 || npc <= 0) throw new ArgumentOutOfRangeException();
+            var data = new byte[8];
+            ProtocolGameplay.I(data, 0, task);
+            ProtocolGameplay.I(data, 4, npc);
+            return SendGameplayAsync(0x13000065, data, token);
+        }
+
         public Task StartTaskAsync(int taskId, int npcId, int escortId = 0, CancellationToken cancellationToken = default)
         {
             if (taskId <= 0 || npcId < 0 || escortId < 0) throw new ArgumentOutOfRangeException(nameof(taskId));

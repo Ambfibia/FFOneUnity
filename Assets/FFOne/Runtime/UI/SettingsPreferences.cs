@@ -31,7 +31,15 @@ namespace FFOne.UI
                     if ((string)saved["schema"] != Schema) throw new InvalidDataException("Unsupported options schema.");
                     var merged = Defaults(displayWidth, displayHeight);
                     merged.Merge(saved, new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Replace, MergeNullValueHandling = MergeNullValueHandling.Merge });
+                    (merged["display"] as JObject)?.Remove("new_chat");
                     Validate(merged);
+                    var bindings = merged["input"]["bindings"];
+                    foreach (var action in GameplayInput.Map.actions)
+                    {
+                        var row = bindings[action.name];
+                        foreach (var slot in action.bindings)
+                            row[slot.name] = SettingsInputDefaults.ControlPath((string)row[slot.name], slot.name);
+                    }
                     Committed = merged;
                 }
                 catch (Exception e) { LoadError = e.Message; }
@@ -47,7 +55,7 @@ namespace FFOne.UI
           'sound':{'master':5,'effects':5,'voice':5,'ambient':5,'music':5,
             'master_enabled':true,'effects_enabled':true,'voice_enabled':true,'ambient_enabled':true,'music_enabled':true},
           'display':{'my_name':false,'other_name':false,'group_name':false,'npc_name':false,'monster_name':false,
-            'floating_numbers':false,'balloon':true,'scale_ui':true,'new_chat':true,'game_hint':true,
+            'floating_numbers':false,'balloon':true,'scale_ui':true,'game_hint':true,
             'npc_messages_in_chat':true,'combat_in_chat':false,'animated_nanos':true},
           'colors':{'general':1,'buddy':2,'group':3},
           'social':{'group':true,'buddy':true,'trade':true},

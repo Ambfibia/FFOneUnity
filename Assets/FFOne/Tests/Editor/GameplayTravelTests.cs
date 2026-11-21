@@ -93,5 +93,30 @@ namespace FFOne.Tests
             Assert.IsTrue(data.Trips.Any(t => t.Type == 1 && t.Npc == 967)); Assert.IsTrue(data.Trips.Any(t => t.Type == 2));
             Assert.AreEqual(1, data.Croc[0].LooksCost); Assert.AreEqual(3, data.Croc[0].StatsCost); Assert.AreEqual(.95f, data.Croc[0].Rarity[0], .0001);
         }
+
+        [TestCase(1, 5, "Peach Creek Commons", "Пич-Крик", "Будущее")]
+        [TestCase(2, 8, "Genius Grove", "Роща Гениев", "Будущее")]
+        [TestCase(1, 8, "Endsville", "Эндсвилль", "Пригород")]
+        [TestCase(1, 6, "City Station", "Городская Станция", "Город")]
+        [TestCase(2, 4, "Pimpleback Mountains", "Запрыщенные Горы", "Природа")]
+        [TestCase(2, 26, "Forsaken Valley", "Забытая Долина", "Темные земли")]
+        public void TransportStopsUseServiceSpecificNamesAndLocalizedRegions(
+            int type, int id, string english, string russian, string region)
+        {
+            var stop = WorldTravelCatalog.Load().Locations.Single(l => l.Type == type && l.Id == id);
+            Assert.AreEqual(english, GameplayUiController.TransportLocationName(stop, "en"));
+            Assert.AreEqual(russian, GameplayUiController.TransportLocationName(stop, "ru"));
+            Assert.AreEqual(region, GameplayUiController.TransportRegionName(stop, "ru"));
+        }
+
+        [Test]
+        public void FutureRegionUsesTransportZoneWhenDistrictIsUnknown()
+        {
+            var stop = WorldTravelCatalog.Load().Locations.Single(l => l.Type == 1 && l.Id == 5);
+            Assert.IsTrue(stop.IsFuture);
+            var outsideNamedDistricts = new TravelLocation { X = 1, Y = 1, IsFuture = stop.IsFuture };
+            Assert.AreEqual("Будущее", GameplayUiController.TransportRegionName(outsideNamedDistricts, "ru"));
+            Assert.AreEqual("The Future", GameplayUiController.TransportRegionName(outsideNamedDistricts, "en"));
+        }
     }
 }

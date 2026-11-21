@@ -15,7 +15,8 @@ namespace FFOne.UI
         readonly GameplayUiCatalog catalog;
         readonly Slot[] slots = new Slot[3];
         readonly GameplayNanoRenderStage renderStage;
-        bool disposed;
+        bool disposed, animated = true;
+        GameplayUiState lastState;
         sealed class Slot
         {
             public VisualElement Root, Clip, StaminaBack;
@@ -52,11 +53,6 @@ namespace FFOne.UI
                     slot.Style[style] = FFView.Require<Image>(View, prefix + "-style-" + style);
                 }
             }
-            foreach (string kind in new[] { "nano", "weapon" })
-            {
-                var label = FFView.Require<Label>(View, kind + "-battery-count");
-                label.enableRichText = false; FFWidgets.Font(label, false, 12);
-            }
             geometry = _ => Layout();
             parent.RegisterCallback(geometry);
             parent.Add(View);
@@ -66,6 +62,7 @@ namespace FFOne.UI
         public void Bind(GameplayUiState state)
         {
             if (disposed) return;
+            lastState = state;
             View.style.display = state.IsActive ? DisplayStyle.Flex : DisplayStyle.None;
             for (int i = 0; i < slots.Length; i++)
             {
@@ -74,7 +71,7 @@ namespace FFOne.UI
                 GameplayNanoState? value = null;
                 foreach (var nano in state.Nanos) if (nano.IsOwned && nano.Id == id) { value = nano; break; }
                 var content = value.HasValue ? catalog.Nano(value.Value.Id) : null;
-                slot.Root.style.display = content?.NanoModelResource != null ? DisplayStyle.Flex : DisplayStyle.None;
+                slot.Root.style.display = (animated ? content?.NanoModelResource != null : content?.IconAddress != null) ? DisplayStyle.Flex : DisplayStyle.None;
                 slot.Root.tooltip = content?.Name ?? "";
                 bool active = i == state.ActiveNanoSlot;
                 float? remaining = value.HasValue && content?.NanoMaxStamina > 0
@@ -82,7 +79,8 @@ namespace FFOne.UI
                 for (int style = 0; style < 3; style++)
                     slot.Back[style].style.display = slot.Front[style].style.display = slot.Style[style].style.display
                         = content?.NanoStyle == style ? DisplayStyle.Flex : DisplayStyle.None;
-                renderStage.Bind(i, slot.Portrait, content?.NanoModelResource, GameplayNanoRenderStage.StaminaCameraOffset(remaining, active));
+                renderStage.Bind(i, slot.Portrait, animated ? content?.NanoModelResource : null, GameplayNanoRenderStage.StaminaCameraOffset(remaining, active));
+                if (!animated) slot.Portrait.image = Load(content?.IconAddress);
                 bool bar = remaining.HasValue && !active && remaining.Value < .99f;
                 slot.StaminaBack.style.display = slot.Stamina.style.display = bar ? DisplayStyle.Flex : DisplayStyle.None;
                 slot.Stamina.style.width = 40 * (remaining ?? 0);
@@ -94,13 +92,21 @@ namespace FFOne.UI
             BindBattery("weapon", state.WeaponBattery);
         }
 
+        internal void SetAnimated(bool value)
+        {
+            if (animated == value) return;
+            animated = value;
+            if (animated)
+                foreach (var slot in slots) slot.Portrait.image = null;
+            if (lastState != null) Bind(lastState);
+        }
+
         void BindBattery(string kind, int amount)
         {
             FFView.Require<VisualElement>(View, kind + "-battery").style.display = amount > 0 ? DisplayStyle.Flex : DisplayStyle.None;
             FFView.Require<Label>(View, kind + "-battery-count").text = amount.ToString("0000", CultureInfo.InvariantCulture);
         }
         static Texture2D Load(string address) => string.IsNullOrEmpty(address) ? null : ContentAssets.Load<Texture2D>(address);
-        public void SetVisible(bool visible) => View.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
         public void Layout()
         {
             float width = parent.resolvedStyle.width, height = parent.resolvedStyle.height;

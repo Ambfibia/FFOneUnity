@@ -93,6 +93,7 @@ namespace FFOne.UI
         public long CharacterUid { get; private set; }
         public string DisplayName { get; private set; } = "";
         public int Level { get; private set; }
+        public int Gender { get; private set; }
         public int Hp { get; private set; }
         public int? MaxHp { get; private set; }
         public float? HealthFraction => MaxHp.HasValue && MaxHp.Value > 0 ? Mathf.Clamp01((float)Hp / MaxHp.Value) : (float?)null;
@@ -122,9 +123,9 @@ namespace FFOne.UI
             int fusionMatter, GameplayLevelLimits? limits, int taros, int weaponBattery, int nanoBattery, int mapNumber, Vector3 worldPosition,
             GameplayItemState[] equipment, GameplayItemState[] inventory, GameplayItemState[] questInventory,
             GameplayNanoState[] nanos, int[] nanoSlots, int activeNanoSlot, bool nanoBankComplete,
-            GameplayQuestState[] quests, int currentMissionId, bool isTutorial = false)
+            GameplayQuestState[] quests, int currentMissionId, bool isTutorial = false, int gender = 0)
         {
-            IsTutorial = isTutorial;
+            IsTutorial = isTutorial; Gender = gender;
             IsActive = true; PlayerId = playerId; CharacterUid = characterUid; DisplayName = displayName;
             Level = level; Hp = hp; HealthOrigin = GameplayHealthOrigin.ServerEntry;
             MaxHp = limits?.MaxHp; MaxFusionMatter = limits?.MaxFusionMatter;

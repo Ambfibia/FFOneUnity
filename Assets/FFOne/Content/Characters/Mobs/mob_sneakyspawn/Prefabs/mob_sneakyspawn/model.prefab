@@ -664,7 +664,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5652620939256099767}
-  - component: {fileID: 4563799701741965006}
+  - component: {fileID: 7364286983404911968}
+  - component: {fileID: 1289461416299611192}
   m_Layer: 0
   m_Name: model
   m_TagString: Untagged
@@ -688,37 +689,121 @@ Transform:
   - {fileID: 1980571073689628730}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!111 &4563799701741965006
-Animation:
+--- !u!95 &7364286983404911968
+Animator:
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8050677844129114483}
   m_Enabled: 1
-  serializedVersion: 4
-  m_Animation: {fileID: 7400000, guid: dd84e01dbe7c2734ca71e6e7023da2fe, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: 7b3b51681f4d9dd4bbf24766cc9ff1e3, type: 2}
-  - {fileID: 7400000, guid: 532eb3daa4c2c1042b8b9ed2a2aa78d3, type: 2}
-  - {fileID: 7400000, guid: d7e4694498f891a458dd5361867d98be, type: 2}
-  - {fileID: 7400000, guid: dde40cb9af201f94b81d4eadf9b78539, type: 2}
-  - {fileID: 7400000, guid: 8302b9dd13cb59648ba69681e70d5f7c, type: 2}
-  - {fileID: 7400000, guid: 899ab3e5e8bf9664aaa2fba5bf7f57e4, type: 2}
-  - {fileID: 7400000, guid: ffc6532f62f894543ba38dc7a23e3b89, type: 2}
-  - {fileID: 7400000, guid: 9a5b2ab3dcc06bc448938b271d297792, type: 2}
-  - {fileID: 7400000, guid: 074fac647a3a9d241afd2f062782d334, type: 2}
-  - {fileID: 7400000, guid: dd84e01dbe7c2734ca71e6e7023da2fe, type: 2}
-  - {fileID: 7400000, guid: e8f2bf4f99f111644990bf62dfd6d86b, type: 2}
-  - {fileID: 7400000, guid: 73007f8a08293694b92c737504b4c8d6, type: 2}
-  - {fileID: 7400000, guid: 3e2a2c55ab45b6c469c7224e8b14666e, type: 2}
-  - {fileID: 7400000, guid: c603b5e7e9051394483de0471373853d, type: 2}
-  - {fileID: 7400000, guid: 7308fc368ba6cb44fa5ec44b3d68709a, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 2e7403b5146143d4aafab7e9fadb380a, type: 2}
+  m_CullingMode: 0
   m_UpdateMode: 0
-  m_CullingType: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 1
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1289461416299611192
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8050677844129114483}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b7ac68c382befc4d9fc82662c17e418, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.Content.NativeNpcAnimator
+  animator: {fileID: 7364286983404911968}
+  AnimationSounds:
+  - Cue: Spawn_CS_Corruptak.wav
+    Variants:
+    - {fileID: 8300000, guid: 3facbf0d005c8fe4fbfb038dca8be51e, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: Spawn_CS_Skill1.wav
+    Variants:
+    - {fileID: 8300000, guid: 6461dbe5a7b9c6145bba6fb44b849dbd, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: Spawn_CS_Death.wav
+    Variants:
+    - {fileID: 8300000, guid: 8b78868729b4ddb4eafc6863870a8202, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: Spawn_CS_Melee1_(RAND:1-3).wav
+    Variants:
+    - {fileID: 8300000, guid: ffa9629d97d0b0a4bb9edd88ccb45ded, type: 3}
+    - {fileID: 8300000, guid: 97bd51c51a1914f4f9f6da7fa51fc27d, type: 3}
+    - {fileID: 8300000, guid: 7d0dc3b9c38d6bc41bddc9ab7d962189, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+  - Cue: Spawn_CS_Dodge.wav
+    Variants:
+    - {fileID: 8300000, guid: 84400acd8efbd8c43af4d00761f228bb, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: Spawn_CS_Melee2_(RAND:1-3).wav
+    Variants:
+    - {fileID: 8300000, guid: b3c23da3211225944b9b41a2ffd081b6, type: 3}
+    - {fileID: 8300000, guid: f147702e71aff53428d4872bebeccd49, type: 3}
+    - {fileID: 8300000, guid: 167e83aa459efd149bcf9b768e34fceb, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+  - Cue: Spawn_CS_Ready.wav
+    Variants:
+    - {fileID: 8300000, guid: a0d554d4c9848f348be5bdeff85e3ce0, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: Spawn_CS_Run1_(RAND:1-2).wav
+    Variants:
+    - {fileID: 8300000, guid: 8ea1c8882f190bb43b9440eede2ea3e6, type: 3}
+    - {fileID: 8300000, guid: 6e8b3258053eb5c4d94bd87e7b9a077f, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+    - {fileID: 0}
+  - Cue: Spawn_CS_Skill0.wav
+    Variants:
+    - {fileID: 8300000, guid: c72b3cbcfada7c64cbd2a5da45be5f1d, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: Spawn_CS_Stand1_(RAND:1-2).wav
+    Variants:
+    - {fileID: 8300000, guid: 3f2d338439536f948b43984ba59f7765, type: 3}
+    - {fileID: 8300000, guid: f4ad86c49778e514aa09d6d22a0b1019, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+    - {fileID: 0}
+  - Cue: Spawn_CS_Stand(RAND:2-4).wav
+    Variants:
+    - {fileID: 8300000, guid: 13d74afaf03ac104e938f9925f95ed7f, type: 3}
+    - {fileID: 8300000, guid: 0b819d067f5cba04f9945e9e90536542, type: 3}
+    - {fileID: 8300000, guid: c4551ec7fc6a65647b6720bccb19b6ad, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+  - Cue: Spawn_CS_Walk1_(RAND:1-2).wav
+    Variants:
+    - {fileID: 8300000, guid: 495a1888b06f825499a871cb2e3cc655, type: 3}
+    - {fileID: 8300000, guid: b2f035cf6abb08841bdf15881d770d0b, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+    - {fileID: 0}
+  Faces: []
 --- !u!1 &8433148912024918443
 GameObject:
   m_ObjectHideFlags: 0

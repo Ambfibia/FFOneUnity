@@ -14,7 +14,7 @@ namespace FFOne.Content
     public static class ContentPaths
     {
         public const string Receipt = "Tools/ContentMigration/layout.json.gz";
-        [Serializable] public sealed class Entry { public string old, path, guid, sha256; }
+        [Serializable] public sealed class Entry { public string old, path, guid, sha256; public bool addressAlias; }
         [Serializable] public sealed class Layout { public Entry[] entries; public Dictionary<string,string> directories, previousPaths; }
         static Layout layout;
         static Dictionary<string,string> forward, reverse;
@@ -44,10 +44,13 @@ namespace FFOne.Content
             {
                 forward[e.old] = e.path;
                 originals[e.old]=e;
-                if(!string.IsNullOrEmpty(e.guid))byGuid[e.guid]=e;
-                reverse[e.path] = e.old;
                 forward[e.old+".meta"] = e.path+".meta";
-                reverse[e.path+".meta"] = e.old+".meta";
+                if (!e.addressAlias)
+                {
+                    if (!string.IsNullOrEmpty(e.guid)) byGuid[e.guid] = e;
+                    reverse[e.path] = e.old;
+                    reverse[e.path + ".meta"] = e.old + ".meta";
+                }
                 const string prefix="Assets/Resources/";
                 if(e.old.StartsWith(prefix,StringComparison.Ordinal))
                     resources.TryAdd(e.old.Substring(prefix.Length,e.old.LastIndexOf('.')-prefix.Length),e);
@@ -199,6 +202,7 @@ namespace FFOne.Content
         }
         public static string ResourcePath(string key)
         {
+            if(key=="Tutorial/DexterShipHologram")return "Assets/FFOne/Rendering/Shaders/DexterShipHologram.shader";
             if(key.StartsWith("ffone/",StringComparison.Ordinal))return UnityEditor.AssetDatabase.GUIDToAssetPath(key.Substring(6));
             Ensure(); if(resources.TryGetValue(key,out var entry))return CurrentPath(entry);
             // New authored views have stable addresses independent of the legacy migration receipt.

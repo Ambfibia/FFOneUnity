@@ -23,6 +23,7 @@ Shader "FFOne/NativeWorld"
         [HideInInspector] _ColorMask("Color writes", Float) = 15
         [HideInInspector] _GlowMask("Legacy glow stage", Float) = 0
         [HideInInspector] _FixedFogMode("Source fog off, scene, black", Float) = 0
+        [PerRendererData] _AvatarVisibility("Avatar visibility", Range(0,1)) = 1
         [HideInInspector] _FFObjectRange("Native logical object center and end", Vector) = (0,0,0,0)
     }
     SubShader
@@ -36,6 +37,7 @@ Shader "FFOne/NativeWorld"
         CBUFFER_START(UnityPerMaterial)
         float4 _MainTex_ST, _MainTexPivot, _Color, _Emission, _AmbColor;
         float _MainTexRotation, _VertexColorAD, _AmbientEnabled, _AlphaTest, _DepthCutout, _Cutoff, _GlowMask, _FixedFogMode;
+        float _AvatarVisibility;
         CBUFFER_END
         float4 _FFWorldFog;
         UNITY_INSTANCING_BUFFER_START(FFWorldRange)
@@ -65,6 +67,11 @@ Shader "FFOne/NativeWorld"
         }
         void RangeDither(Varyings input)
         {
+            if (_AvatarVisibility < 1)
+            {
+                float threshold = frac(52.9829189 * frac(dot(floor(input.positionCS.xy), float2(.06711056, .00583715))));
+                clip(_AvatarVisibility - max(threshold, .00001));
+            }
             if (input.rangeLevel<=0) return;
             clip(15.5-input.rangeLevel);
             uint2 coordinates=(uint2)floor(input.positionCS.xy)%4;

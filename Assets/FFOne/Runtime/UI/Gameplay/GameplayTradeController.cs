@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using FFOne.Content;
 using FFOne.Network;
@@ -24,6 +25,9 @@ namespace FFOne.UI
         GameplayPrompt prompt;
         bool tradeSending;
         bool TradeWindowActive => trade?.Snapshot.Phase == GameplayTradePhase.Active || trade?.Snapshot.Phase == GameplayTradePhase.AwaitingSettlement;
+        string TradePlayerName(int playerId) => playerId == session.Snapshot.PlayerId ? session.Snapshot.DisplayName :
+            socialPeers?.Invoke()?.FirstOrDefault(peer => peer.Id == playerId && peer.Kind == WorldEntityKind.Player)?.Character?.DisplayName
+            ?? playerId.ToString(CultureInfo.InvariantCulture);
 
         public void ConfigureTrade(GameplayTradeSession value, GameplayTradeActions actions)
         {
@@ -59,9 +63,10 @@ namespace FFOne.UI
                     return;
                 }
                 ShowPrompt(language == "ru" ? "ОБМЕН" : "TRADE",
-                    (language == "ru" ? "Игрок предлагает обмен: " : "Trade request from player ") + state.PeerId, null,
+                    (language == "ru" ? "Игрок предлагает обмен: " : "Trade request from ") + TradePlayerName(state.PeerId), null,
                     _ => tradeActions.Accept(state.FromId, state.ToId),
-                    async () => { await tradeActions.Refuse(state.FromId, state.ToId); trade.MarkRefusalSent(); });
+                    async () => { await tradeActions.Refuse(state.FromId, state.ToId); trade.MarkRefusalSent(); }, "ui/en/gameplay/system/messicon_trade");
+                playSound?.Invoke("affirmation_screen_popup");
                 return;
             }
             if (state.Phase == GameplayTradePhase.Active || state.Phase == GameplayTradePhase.AwaitingSettlement)
@@ -83,10 +88,11 @@ namespace FFOne.UI
             session.ApplyTradeReceipt(state.Receipt, state.OwnItems);
         }
 
-        void ShowPrompt(string title, string body, string value, Func<string, Task> yes, Func<Task> no)
+        void ShowPrompt(string title, string body, string value, Func<string, Task> yes, Func<Task> no,
+            string icon = "ui/en/gameplay/journal/messicon_warning", bool deleteMission = false, bool deleteItem = false, int quantity = 0)
         {
             prompt?.Dispose();
-            var next = new GameplayPrompt(parent, title, body, language == "ru", value, yes, no, message => Error?.Invoke(message));
+            var next = new GameplayPrompt(layers.Host(UiLayer.Dialog), title, body, language == "ru", value, yes, no, message => Error?.Invoke(message), playSound, icon, deleteMission, deleteItem, quantity);
             prompt = next;
             next.View.SetEnabled(!interactionSuspended);
             next.Closed += () => { if (prompt == next) prompt = null; InputGateChanged?.Invoke(); };
@@ -116,14 +122,11 @@ namespace FFOne.UI
 
         void BindTrade(VisualElement root)
         {
-            var bag = FFView.Instantiate("ui/views/Retrobution/Inventory", "inventory-root");
+            var bag = FFView.InstantiateClass("ui/views/Retrobution/Inventory", "inventory-screen");
             BindInventory(bag, false, () => _ = CancelTrade());
-            bag.Q("inventory-character")?.SetEnabled(false);
-            if (bag.Q("inventory-character") != null) bag.Q("inventory-character").style.display = DisplayStyle.None;
-            bag.Q("inventory-character-background").style.display = DisplayStyle.None;
-            bag.Q("equipment-panel").style.display = DisplayStyle.None;
-            bag.Q<Button>("tab-nanos").SetEnabled(false);
-            root.Insert(0, bag);
+            bag.AddToClassList("inventory-trade");
+            FFView.RequireClass<Button>(bag, "inventory-nanos-tab").SetEnabled(false);
+            FFView.RequireClass<Button>(bag, "inventory-redeem").SetEnabled(false);
             for (int i = 0; i < ProtocolTrade.OfferSlots; i++)
             {
                 int slot = i;
@@ -149,7 +152,9 @@ namespace FFOne.UI
                 }, () => Task.CompletedTask);
             };
             BindTradeChat(root);
+            FFView.Require<Label>(root, "trade-add-taros-label").text = T("ADD TAROS", "ДОБАВИТЬ ТАРО");
             root.Query<TextElement>().ForEach(text => FFWidgets.Font(text, false, 12));
+            root.Insert(0, bag);
         }
 
         void RefreshTrade()
@@ -158,7 +163,7 @@ namespace FFOne.UI
             var root = Windows.View; var state = trade.Snapshot;
             FFView.Require<Label>(root, "trade-own-name-label").text = session.Snapshot.DisplayName;
             FFView.Require<Image>(root, "trade-own-portrait").image = Hud.Portrait.image;
-            FFView.Require<Label>(root, "trade-other-name-label").text = state.PeerId.ToString();
+            FFView.Require<Label>(root, "trade-other-name-label").text = TradePlayerName(state.PeerId);
             FFView.Require<Label>(root, "trade-own-taros-label").text = state.OwnTaros.ToString();
             FFView.Require<Label>(root, "trade-other-taros-label").text = state.OtherTaros.ToString();
             FFView.Require<Label>(root, "trade-status-name-label").text = state.OtherConfirmed ? (language == "ru" ? "ПАРТНЁР ПОДТВЕРДИЛ" : "PARTNER CONFIRMED") : "";
@@ -178,7 +183,8 @@ namespace FFOne.UI
                     button.tooltip = info?.Name ?? "";
                     FFView.Require<Image>(button, name + "-image").image = info?.IconAddress == null ? null : ContentAssets.Load<Texture2D>(info.IconAddress);
                     FFView.Require<Label>(button, name + "-count").text = info?.MaxStack > 1 && item.Quantity > 1 ? item.Quantity.ToString() : "";
-                    if (side == "own") button.SetEnabled(active && tradeActions?.AddItem != null);
+                    if (side == "own") button.SetEnabled(active &&
+                        (item.IsEmpty ? tradeActions?.AddItem != null : tradeActions?.RemoveItem != null));
                 }
         }
 
@@ -187,7 +193,8 @@ namespace FFOne.UI
             if (Windows.Current != GameplayWindow.Trade || from != ItemContainer.Inventory || trade?.Snapshot.Phase != GameplayTradePhase.Active) return false;
             while (target != null && !target.name.StartsWith("trade-own-slot-", StringComparison.Ordinal)) target = target.parent;
             if (target == null) return false;
-            if (!int.TryParse(target.name.Substring("trade-own-slot-".Length), out int slot) || slot < 0 || slot >= 5) return false;
+            if (!int.TryParse(target.name.Substring("trade-own-slot-".Length), out int slot) ||
+                slot < 0 || slot >= ProtocolTrade.OfferSlots) return false;
             var state = trade.Snapshot; var item = session.Snapshot.Inventory[sourceSlot];
             if (!state.OwnItems[slot].IsEmpty || item.IsEmpty || tradeActions?.AddItem == null) return true;
             var offer = new TradeItem(item.ItemType, item.ItemId, item.Quantity, sourceSlot, slot);

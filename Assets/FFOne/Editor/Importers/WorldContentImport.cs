@@ -241,7 +241,8 @@ namespace FFOne.Editor
                     .FirstOrDefault(m => m.vertexCount == vertices && m.GetIndexCount(0) == indices)
                     ?? throw new InvalidDataException("Missing exact collider mesh: " + id + " " + key);
                 string name = (string)definition["name"];
-                var collider = new WorldCollider { Name = name, Mesh = EnvironmentSharedAssets.PublishedMesh(mesh), Trigger = (bool?)definition["isTrigger"] ?? false, SourceNode = Node(name) };
+                var collider = new WorldCollider { Name = name, Mesh = NativeWorldColliderImport.Publish(mesh,
+                    (string)modelDefinitions[key]["rootName"] is "ffWater" or "ffPoison"), Trigger = (bool?)definition["isTrigger"] ?? false, SourceNode = Node(name) };
                 if (collisionSources.TryGetValue(collider.SourceNode + "|" + key, out var originalRoute)) collider.LegacyId = Legacy(id, originalRoute);
                 Pose(definition["transform"]!, out collider.Position, out collider.Rotation, out collider.Scale); colliders.Add(collider);
             }

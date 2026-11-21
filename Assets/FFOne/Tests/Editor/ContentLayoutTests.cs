@@ -4,6 +4,7 @@ using FFOne.Content;
 using FFOne.Editor;
 using NUnit.Framework;
 using UnityEditor;
+using UnityEditor.AddressableAssets;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -11,6 +12,33 @@ namespace FFOne.Tests
 {
     public sealed class ContentLayoutTests
     {
+        [Test]
+        public void RecoveredContentHasStableAddressesOutsideResourcesAndSourceMipsStayEditorOnly()
+        {
+            Assert.False(File.Exists("Assets/FFOne/Settings/Resources/FFOneContentIndex.json"));
+            Assert.That(Directory.GetFiles("Assets/FFOne/Content/Incoming", "*", SearchOption.AllDirectories)
+                .Where(path => !path.EndsWith(".meta")), Is.Empty);
+            var settings = AddressableAssetSettingsDefaultObject.Settings;
+            var entries = ContentPaths.Entries.Where(e => e.path.Contains("/RecoveredScamper/") ||
+                e.path.Contains("/Creatures/SpawnCs/") || e.old.Contains("/npc_numbuhtwo_face_talk")).ToArray();
+            Assert.AreEqual(39, entries.Length);
+            foreach (var entry in entries)
+            {
+                string path = ContentPaths.CurrentPath(entry);
+                Assert.That(path, Does.Not.Contain("/Resources/"));
+                Assert.That(AssetDatabase.AssetPathToGUID(path), Is.EqualTo(entry.guid));
+                var address = settings.FindAssetEntry(entry.guid);
+                if (path.Contains("/Editor/") || path.EndsWith(".glb")) Assert.IsNull(address, path);
+                else
+                {
+                    Assert.IsNotNull(address, path);
+                    Assert.AreEqual(ContentPaths.Resource(entry.old), address.address, path);
+                    Assert.That(ContentAssets.Load<UnityEngine.Object>(address.address), Is.Not.Null, path);
+                }
+            }
+            Assert.That(ContentAssets.Load<Shader>("Tutorial/DexterShipHologram"), Is.Not.Null);
+        }
+
         [Test]
         public void AcceptedAssetLookupFollowsGuidAfterAnEditorMove()
         {

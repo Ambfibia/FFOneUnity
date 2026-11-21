@@ -25,11 +25,12 @@ namespace FFOne.Tutorial
             missionSelected = accepted = rewardClaimed = warped = false;
             marker = null;
             instruction = LocalizeLiteral(Stage.Instruction);
-            subtitle = "";
+            subtitle = ""; voiceSubtitles.Clear();
             if (!string.IsNullOrEmpty(Stage.Voice) && TutorialAuxiliaryTimeline.ForStage(chapter, step) == TutorialAuxiliarySequence.None) PlayVoice(Stage.Voice);
             if (Stage.Scene != TutorialScene.None)
             {
                 interacting = 0; mainMenu = journal = false;
+                avatar?.PlayerAnimation?.ResetLocomotion();
                 cinematics.Begin(Stage.Scene);
             }
             if (chapter == 0)
@@ -52,7 +53,8 @@ namespace FFOne.Tutorial
             if (string.IsNullOrEmpty(value)) return "";
             if (!Russian) return value;
             englishText ??= FFOne.Content.NativeData.Object("localization/en")["entries"] as JObject;
-            string key = englishText?.Properties().FirstOrDefault(p => (string)p.Value == value && p.Name.StartsWith("content.tutorial.", StringComparison.Ordinal))?.Name;
+            string key = englishText?.Properties().FirstOrDefault(p => string.Equals((string)p.Value, value, StringComparison.OrdinalIgnoreCase) &&
+                (p.Name.StartsWith("tutorial.", StringComparison.Ordinal) || p.Name.StartsWith("content.tutorial.", StringComparison.Ordinal)))?.Name;
             return key == null ? value : Localized(key);
         }
         bool Near(int id, float radius)
@@ -67,7 +69,12 @@ namespace FFOne.Tutorial
             {
                 pendingWarp += Time.deltaTime; fade = Mathf.Clamp01(pendingWarp / .75f);
                 if (pendingWarp < 1.5f) return;
-                WarpPlayer(warpTarget); pendingWarp = -1; fade = 0; interacting = 0; warped = true;
+                bool bridgeScene = Stage.Chapter == 4 && Stage.Step == 16;
+                WarpPlayer(warpTarget);
+                // Present the destination camera before lifting the overlay.
+                // NanoPowerA owns the cave exit's subsequent fade-in.
+                UpdateCamera();
+                pendingWarp = -1; fade = bridgeScene ? 1 : 0; interacting = 0; warped = true;
             }
             switch (Stage.Chapter)
             {
@@ -79,24 +86,26 @@ namespace FFOne.Tutorial
                 case 5: NanoProgress(); break;
             }
         }
+        bool GuidanceVoiceFinished => !VoiceRussian || !voice || !voice.isPlaying;
+
         void MovementProgress()
         {
             switch (Stage.Step)
             {
                 case 0: SetStage(0, 1); break;
                 case 1: if (SceneDone) SetStage(0, 2); break;
-                case 2: if (stageTime >= 1.5f) SetStage(0, 3); break;
+                case 2: if (stageTime >= 1.5f && GuidanceVoiceFinished) SetStage(0, 3); break;
                 case 3: case 4: case 5: case 6:
                     Vector3 position = ViewCamera.WorldToScreenPoint(marker!.Value - (Stage.Step == 3 || Stage.Step == 4 || Stage.Step == 6 ? Vector3.up : Vector3.zero));
                     float halfWidth = Stage.Step < 5 ? 300 : Screen.width / 2f;
                     float halfHeight = Stage.Step < 5 ? float.PositiveInfinity : Stage.Step == 5 ? 150 : 50;
-                    if (stageTime > .3f && position.z > 0 && Mathf.Abs(position.x - Screen.width / 2f) < halfWidth && Mathf.Abs(position.y - Screen.height / 2f) < halfHeight) SetStage(0, Stage.Step + 1);
+                    if (stageTime > .3f && GuidanceVoiceFinished && position.z > 0 && Mathf.Abs(position.x - Screen.width / 2f) < halfWidth && Mathf.Abs(position.y - Screen.height / 2f) < halfHeight) SetStage(0, Stage.Step + 1);
                     break;
                 case 7: if (Vector3.Distance(Player.position, StartPosition + new Vector3(9, 1, 0)) < 3) SetStage(0, 8); break;
                 case 8: if (HorizontalDistance(Player.position, stageOrigin) > 5) SetStage(0, 9); break;
                 case 9: if (HorizontalDistance(Player.position, stageOrigin) > 5 && Mathf.Abs(Mathf.DeltaAngle(yaw, stageOriginYaw)) > 40) SetStage(0, 10); break;
                 case 10: if (Vector3.Distance(Player.position, new Vector3(555.82f, -105, 654.2f)) < 3) SetStage(0, 11); break;
-                case 11: if (Vector3.Distance(Player.position, new Vector3(566, -99, 665)) < 3 && jumped && motor.isGrounded) SetStage(1, 0); break;
+                case 11: if (Vector3.Distance(Player.position, new Vector3(566, -99, 665)) < 3 && jumped && IsPlayerGrounded()) SetStage(1, 0); break;
             }
         }
         static float HorizontalDistance(Vector3 a, Vector3 b) => Vector2.Distance(new Vector2(a.x, a.z), new Vector2(b.x, b.z));
@@ -136,8 +145,8 @@ namespace FFOne.Tutorial
                 case 0: if (Near(1005, 5)) SetStage(3, 1); break;
                 case 1: if (interacting == 1005) SetStage(3, 3); break;
                 case 3: if (missionSelected) SetStage(3, 100); break;
-                case 100: if (stageTime >= 9) SetStage(3, 101); break;
-                case 101: if (accepted) { currentTask = 2248; SetStage(3, 102); } break;
+                case 100: if (stageTime >= 9 && GuidanceVoiceFinished) SetStage(3, 101); break;
+                case 101: if (accepted) { AdvanceTutorialTask(2248); SetStage(3, 102); } break;
                 case 102:
                     if (interacting == 0)
                     {
@@ -147,7 +156,7 @@ namespace FFOne.Tutorial
                     }
                     break;
                 case 4: if (currentTask == 2249) SetStage(3, 5); break;
-                case 5: if (stageTime >= 3.5f) SetStage(3, 6); break;
+                case 5: if (stageTime >= 3.5f && GuidanceVoiceFinished) SetStage(3, 6); break;
                 case 6: if (mainMenu) { RemoveActor(1100); SetStage(3, 7); } break;
                 case 7: if (journal) { mainMenu = false; SetStage(3, 8); } break;
                 case 8: if (journal && stageTime >= 4) SetStage(3, 9); break;
@@ -158,12 +167,19 @@ namespace FFOne.Tutorial
                 case 13: if (Near(1005, 15)) SetStage(3, 14); break;
                 case 14: if (interacting == 1005) SetStage(3, 16); break;
                 case 16: if (missionSelected) SetStage(3, 17); break;
-                case 17: if (rewardClaimed) SetStage(3, 18); break;
+                case 17:
+                    if (rewardClaimed)
+                    {
+                        var completion = ContentAssets.Load<AudioClip>("audio/sfx/ui/mission_completed");
+                        if (completion && sound) sound.PlayOneShot(completion);
+                        SetStage(3, 18);
+                    }
+                    break;
                 case 18:
                     if (interacting == 0)
                     {
                         SpawnActor(1007, 2672, new Vector3(624, -82, 772), 275);
-                        SpawnActor(1008, 2375, new Vector3(596, -82, 784)); currentTask = 2250; SetStage(4, 0);
+                        SpawnActor(1008, 2375, new Vector3(596, -82, 784)); AdvanceTutorialTask(2250); SetStage(4, 0);
                     }
                     break;
             }
@@ -174,7 +190,7 @@ namespace FFOne.Tutorial
             {
                 case 0: if (Near(1007, 10)) SetStage(4, 1); break;
                 case 1: if (interacting == 1007) SetStage(4, 2); break;
-                case 2: if (accepted) { currentTask = 2251; SetStage(4, 101); } break;
+                case 2: if (accepted) { AdvanceTutorialTask(2251); SetStage(4, 101); } break;
                 case 101: if (stageTime >= 6.3f) SetStage(4, 102); break;
                 case 102:
                     if (interacting == 0) { SpawnActor(1009, 2694, new Vector3(596, -82, 784), 291); SetStage(4, 3); }
@@ -191,7 +207,7 @@ namespace FFOne.Tutorial
                         SpawnActor(1010, 2376, new Vector3(595, -92, 745));
                         SpawnActor(1011, 2377, new Vector3(564.5f, -91, 724));
                         SpawnActor(1012, 2695, new Vector3(564.31f, -91, 724.16f));
-                        RemoveActor(1005); currentTask = 2252; SetStage(4, 8);
+                        RemoveActor(1005); AdvanceTutorialTask(2252); SetStage(4, 8);
                     }
                     break;
                 case 8: if (Near(1012, 15)) SetStage(4, 200); break;
@@ -200,11 +216,11 @@ namespace FFOne.Tutorial
                     if (warped)
                     {
                         SpawnActor(3001, 2378, new Vector3(587, -133, 984));
-                        SpawnActor(3000, 2673, new Vector3(587, -133, 984), 262); currentTask = 2253; SetStage(4, 9);
+                        SpawnActor(3000, 2673, new Vector3(587, -133, 984), 262); AdvanceTutorialTask(2253); SetStage(4, 9);
                     }
                     break;
                 case 9: if (interacting == 3000) SetStage(4, 109); break;
-                case 109: if (accepted) { currentTask = 2254; SetStage(4, 210); } break;
+                case 109: if (accepted) { AdvanceTutorialTask(2254, beginsCinematic: true); SetStage(4, 210); } break;
                 case 210:
                     if (SceneDone)
                     {

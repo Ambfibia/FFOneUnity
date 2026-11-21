@@ -74,11 +74,7 @@ namespace FFOne.UI
             var list = FFView.Require<ScrollView>(root, "trade-chat-history"); list.Clear();
             foreach (var message in tradeChatHistory)
             {
-                string sender = message.SenderId == session.Snapshot.PlayerId ? session.Snapshot.DisplayName : message.SenderId.ToString();
-                var row = FFView.Instantiate("ui/views/Retrobution/ChatRow", "chat-row");
-                var label = FFView.Require<Label>(row, "chat-message");
-                label.text = sender + ": " + message.Text; label.enableRichText = false;
-                FFWidgets.Font(label, true, 12); list.Add(row);
+                GameplayChatPresentation.AddLine(list, TradePlayerName(message.SenderId) + ": " + message.Text);
             }
             if (list.contentContainer.childCount > 0) list.schedule.Execute(() => {
                 if (list.contentContainer.childCount > 0) list.ScrollTo(list.contentContainer[list.contentContainer.childCount - 1]);

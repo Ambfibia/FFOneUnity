@@ -2,77 +2,103 @@ using System;
 using System.Linq;
 using FFOne.Content;
 using FFOne.Network;
+using FFOne.World;
 using UnityEngine;
 using UnityEngine.UIElements;
 namespace FFOne.UI
 {
     public sealed partial class FrontendController
     {
+        const string BuffHudAddress = "ui/views/Retrobution/GameplayHud";
+        readonly Label[] buffTimers = new Label[26];
         BuffState worldBuffs;
         VisualElement buffStrip;
         int displayedBuffFlags = -1;
         readonly System.Collections.Generic.Dictionary<int, ShinyInterest> detectorShinies = new();
+        NativeWorldShinies worldShinies;
         VisualElement detectorPanel;
         Label detectorText;
         bool itemUserConfigured;
         void StartBuffEffects(WorldEntry entry)
         {
             worldBuffs = ProtocolBuff.FromEntry(entry, Time.unscaledTimeAsDouble);
-            buffStrip = new VisualElement { name = "gameplay-buffs", pickingMode = PickingMode.Ignore };
-            buffStrip.style.position = Position.Absolute; buffStrip.style.left = 28; buffStrip.style.top = 260;
-            buffStrip.style.flexDirection = FlexDirection.Row; Root.Add(buffStrip);
-            detectorPanel = new ScrollView { name = "gameplay-detectors", pickingMode = PickingMode.Ignore };
-            detectorPanel.style.position = Position.Absolute; detectorPanel.style.right = 24; detectorPanel.style.top = 140;
-            detectorPanel.style.width = 230; detectorPanel.style.maxHeight = 240;
-            detectorText = new Label(); detectorText.style.whiteSpace = WhiteSpace.Normal; detectorText.style.fontSize = 12;
-            detectorPanel.Add(detectorText); Root.Add(detectorPanel); detectorShinies.Clear();
+            buffStrip = FFView.InstantiateClass(BuffHudAddress, "gameplay-buffs");
+            detectorPanel = FFView.InstantiateClass(BuffHudAddress, "gameplay-detectors");
+            detectorText = FFView.RequireClass<Label>(detectorPanel, "gameplay-detector-copy");
+            var layers = UiLayers.For(Root);
+            layers.Add(buffStrip, UiLayer.Hud);
+            layers.Add(detectorPanel, UiLayer.Hud);
+            detectorShinies.Clear();
             networkWorld?.SetBuffState(worldBuffs); displayedBuffFlags = -1; TickBuffEffects();
             if (entry.BootstrapPackets != null) foreach (var frame in entry.BootstrapPackets) ApplyBuffPacket(frame);
         }
         void StopBuffEffects()
         {
+            if (worldShinies) { worldShinies.Clear(); Destroy(worldShinies.gameObject); worldShinies = null; }
             buffStrip?.RemoveFromHierarchy(); buffStrip = null; worldBuffs = null; displayedBuffFlags = -1; itemUserConfigured = false;
             detectorPanel?.RemoveFromHierarchy(); detectorPanel = null; detectorText = null; detectorShinies.Clear();
+            Array.Clear(buffTimers, 0, buffTimers.Length);
             networkWorld?.SetBuffState(null);
         }
         void TickBuffEffects()
         {
             if (worldBuffs == null || buffStrip == null) return;
+            if (!worldShinies && networkWorld && networkWorld.Player)
+            {
+                var holder = new GameObject("Network E.G.G. interests");
+                holder.transform.SetParent(networkWorld.transform, false);
+                worldShinies = holder.AddComponent<NativeWorldShinies>();
+                worldShinies.Initialize(networkWorld);
+                foreach (var value in detectorShinies.Values) worldShinies.Apply(value);
+            }
+            if (worldShinies) worldShinies.Tick(gameplayState.Snapshot.Hp > 0, worldBuffs.Has(14), RequestShiny);
             if (!itemUserConfigured && gameplayUi != null)
             { gameplayUi.SetItemUser((slot, nano) => Session.UseItemAsync(slot, nano, worldLifetime.Token)); itemUserConfigured = true; }
             gameplayUi?.TickItemUse();
             if (displayedBuffFlags != worldBuffs.Condition)
             {
-                buffStrip.Clear(); displayedBuffFlags = worldBuffs.Condition;
-                for (int id = 1; id <= 25; id++) if (worldBuffs.Has(id))
+                buffStrip.Clear();
+                Array.Clear(buffTimers, 0, buffTimers.Length);
+                displayedBuffFlags = worldBuffs.Condition;
+                var catalog = GameplayUiCatalog.Load();
+                for (int id = 1; id < buffTimers.Length; id++)
                 {
-                    var cell = new VisualElement { name = "buff-" + id, pickingMode = PickingMode.Ignore };
-                    cell.style.width = 34; cell.style.height = 48; cell.style.marginRight = 3;
-                    string address = GameplayUiCatalog.Load().BuffIcon(id);
-                    var icon = new Image { name = "icon", image = string.IsNullOrEmpty(address) ? null : ContentAssets.Load<Texture2D>(address), scaleMode = ScaleMode.ScaleToFit };
-                    icon.style.width = icon.style.height = 32; cell.Add(icon);
-                    var timer = new Label { name = "remaining" }; timer.style.fontSize = 10; timer.style.unityTextAlign = TextAnchor.MiddleCenter;
-                    cell.Add(timer); buffStrip.Add(cell);
+                    if (!worldBuffs.Has(id)) continue;
+                    var cell = FFView.InstantiateClass(BuffHudAddress, "gameplay-buff-cell");
+                    cell.name = "buff-" + id;
+                    string address = catalog.BuffIcon(id);
+                    FFView.RequireClass<Image>(cell, "gameplay-buff-icon").image = FFWidgets.Texture(address);
+                    buffTimers[id] = FFView.RequireClass<Label>(cell, "gameplay-buff-timer");
+                    buffStrip.Add(cell);
                 }
             }
             networkWorld?.RefreshBuffPresentation();
             RefreshBuffDetectors();
-            for (int id = 1; id <= 25; id++)
+            for (int id = 1; id < buffTimers.Length; id++)
             {
-                var timer = buffStrip.Q<VisualElement>("buff-" + id)?.Q<Label>("remaining");
+                var timer = buffTimers[id];
                 if (timer == null) continue;
                 var remaining = worldBuffs.RemainingSeconds(id, Time.unscaledTimeAsDouble);
                 timer.text = remaining.HasValue ? Math.Ceiling(remaining.Value).ToString(System.Globalization.CultureInfo.InvariantCulture) : "";
             }
         }
+        System.Threading.Tasks.Task RequestShiny(int id) => Session.PickupShinyAsync(id, worldLifetime.Token);
         void ApplyBuffPacket(ProtocolFrame frame)
         {
             if (worldBuffs == null) return;
-            if (frame.PacketType == ProtocolTravel.WarpOk) detectorShinies.Clear();
+            if (frame.PacketType == ProtocolTravel.WarpOk) { detectorShinies.Clear(); if (worldShinies) worldShinies.Clear(); }
             if (ProtocolShiny.TryDecode(frame, out var shinyUpdates))
-                foreach (var shiny in shinyUpdates) { if (shiny.Removed) detectorShinies.Remove(shiny.Id); else detectorShinies[shiny.Id] = shiny; }
+                foreach (var shiny in shinyUpdates)
+                {
+                    if (shiny.Removed) detectorShinies.Remove(shiny.Id); else detectorShinies[shiny.Id] = shiny;
+                    if (worldShinies) worldShinies.Apply(shiny);
+                }
+            if (worldShinies && frame.PacketType is ProtocolShiny.PickupOk or ProtocolShiny.PickupFail)
+                worldShinies.Acknowledged(frame.PacketType == ProtocolShiny.PickupOk, PlayUiSound, () => gameplayUi?.ShowEggPickupChat());
             gameplayUi?.ReceiveItemUse(frame);
             if (ProtocolItemUse.TryDecode(frame, out var item)) ApplyBuffConditions(item.Effects);
+            if (ProtocolBuff.TryNanoCondition(frame, gameplayState.Snapshot.PlayerId, out int nanoCondition))
+                worldBuffs.SetCondition(nanoCondition);
             if (ProtocolBuff.TryUpdate(frame, out var update)) worldBuffs.Apply(update, Time.unscaledTimeAsDouble);
             if (ProtocolBuff.TryEffects(frame, out var periodic)) ApplyBuffConditions(periodic);
             if (ProtocolNpcSkill.TryDecode(frame, out var npc)) ApplyBuffConditions(npc);
@@ -90,7 +116,7 @@ namespace FFOne.UI
         {
             if (detectorPanel == null || detectorText == null || !networkWorld || !networkWorld.Player) return;
             bool enemies = worldBuffs.Has(13), treasures = worldBuffs.Has(14);
-            detectorPanel.style.display = enemies || treasures ? DisplayStyle.Flex : DisplayStyle.None;
+            detectorPanel.EnableInClassList("ui-suppressed", !enemies && !treasures);
             if (!enemies && !treasures) return;
             var origin = networkWorld.Player.position;
             var lines = new System.Collections.Generic.List<(float distance, string text)>();

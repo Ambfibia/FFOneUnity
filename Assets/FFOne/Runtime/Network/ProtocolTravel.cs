@@ -83,8 +83,28 @@ namespace FFOne.Network
             => SendGameplayAsync(0x13000068, ProtocolTravel.Words(type, npc, location), token);
         public Task TravelAsync(int npc, int trip, CancellationToken token = default)
             => SendGameplayAsync(0x13000069, ProtocolTravel.Words(npc, trip, 4, 0), token);
+        internal Task RaceStartAsync(int npc, bool record, int ticket, CancellationToken token)
+            => SendGameplayAsync(0x1300005b, ProtocolTravel.Words(npc, record ? 1 : 0, ticket), token);
+        internal Task RaceEndAsync(int npc, int ticket, CancellationToken token)
+            => SendGameplayAsync(0x1300005c, ProtocolTravel.Words(npc,ticket), token);
+        internal Task RaceCancelAsync(int npc, CancellationToken token)
+            => SendGameplayAsync(0x1300005d, ProtocolTravel.Words(npc), token);
+        internal Task RaceRingAsync(int id, CancellationToken token)
+            => SendGameplayAsync(0x1300005e, ProtocolTravel.Words(id), token);
         public Task WarpNpcAsync(int npc, int warp, int requiredLocation = 4, int requiredSlot = 0, int consumedSlot = -1, CancellationToken token = default)
             => SendGameplayAsync(0x1300004b, ProtocolTravel.Words(npc, warp, requiredLocation, requiredSlot, consumedSlot < 0 ? 4 : 1, Math.Max(0, consumedSlot)), token);
+        public Task ChangeMentorAsync(int mentor, CancellationToken token = default)
+        {
+            if (mentor < 1 || mentor > 4) throw new ArgumentOutOfRangeException(nameof(mentor));
+            var payload = new byte[2];
+            Protocol0104.Write16(payload, 0, mentor);
+            return SendGameplayAsync(0x13000054, payload, token);
+        }
+        public Task RequestMapPresenceAsync(ulong lastSync, CancellationToken token)
+        {
+            var payload = new byte[8]; Protocol0104.Write64(payload, 0, unchecked((long)lastSync));
+            return SendGameplayAsync(0x130000a7, payload, token);
+        }
         public Task CombineItemsAsync(int looks, int stats, CancellationToken token = default)
             => SendGameplayAsync(0x13000098, ProtocolCroc.Combine(looks, stats), token);
         public Task InviteNpcAsync(int npc, CancellationToken token = default) => SendGameplayAsync(0x13000084, ProtocolSocial.Id(npc), token);

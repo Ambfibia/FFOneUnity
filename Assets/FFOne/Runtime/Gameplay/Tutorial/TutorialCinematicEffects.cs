@@ -9,7 +9,11 @@ namespace FFOne.Tutorial
     /// <summary>Exact tutorial ES identity, attachment and lifetime adapter.</summary>
     public sealed class TutorialCinematicEffects : MonoBehaviour
     {
-        static readonly int[] EffectIds = { 10, 372, 668, 705, 739, 740, 741, 742, 767, 771 };
+        static readonly int[] EffectIds = { 3, 4, 10, 21, 38, 50, 372, 503, 530, 566, 592, 593,
+            547, 548, 668, 705, 734, 736, 737, 739, 740, 741, 742, 750, 751, 767, 768, 769, 771 };
+        static readonly int[] AnimationEffectIds = { 3, 4, 21, 38, 50, 503, 530, 547, 548, 566, 592, 593, 734, 736, 737, 751, 768, 769 };
+        public int RootAnimationEffectsPlayed { get; private set; }
+        public int NativeProjectileTrailsSpawned { get; private set; }
         readonly Dictionary<int, TutorialEffectAssets> assets = new Dictionary<int, TutorialEffectAssets>();
         readonly List<GameObject> instances = new List<GameObject>();
         readonly List<GameObject> tracked = new List<GameObject>();
@@ -20,6 +24,28 @@ namespace FFOne.Tutorial
         bool russian;
         public bool UseRussianVoice { get => russian; set => russian = value; }
 
+        public static System.Threading.Tasks.Task PreloadAnimationEffectsAsync(System.Threading.CancellationToken cancellation)
+            => System.Threading.Tasks.Task.WhenAll(AnimationEffectIds.Select(id => TutorialEffectAssets.PreloadAsync(id, cancellation))
+                .Concat(AnimationEffectIds.Select(ModelPath).Where(p => p != null).Select(p => FFOne.Content.NativeModelAssets.PreloadAsync(p, cancellation)))
+                .Append(FFOne.Content.ContentAssets.GetAsync<Shader>("World/Particle", cancellation)));
+
+        public static System.Threading.Tasks.Task PreloadAllAsync(System.Threading.CancellationToken cancellation)
+            => System.Threading.Tasks.Task.WhenAll(EffectIds.Concat(new[] { 15, 391 })
+                .Select(id => TutorialEffectAssets.PreloadAsync(id, cancellation))
+                .Concat(EffectIds.Concat(new[] { 15, 391 }).Select(ModelPath).Where(p => p != null)
+                    .Select(p => FFOne.Content.NativeModelAssets.PreloadAsync(p, cancellation)))
+                .Append(FFOne.Content.ContentAssets.GetAsync<Shader>("World/Particle", cancellation)));
+
+        public async System.Threading.Tasks.Task PrepareAllAsync(System.Threading.CancellationToken cancellation)
+        {
+            foreach (int id in EffectIds.Concat(new[] { 15, 391 }))
+            {
+                cancellation.ThrowIfCancellationRequested();
+                Preload(id);
+                await System.Threading.Tasks.Task.Yield();
+            }
+        }
+
         public void Initialize(Func<int, Transform> actor, Func<JToken, Vector3> resolvePosition, Camera camera, bool useRussian = false)
         { npc = actor; position = resolvePosition; view = camera; russian = useRussian; }
 
@@ -29,7 +55,9 @@ namespace FFOne.Tutorial
             {
                 yield return "map/shared/effects/es" + id + ".closure.json";
                 string model = ModelPath(id);
-                if (model != null) yield return model + ".glb";
+                // ES768 is recovered directly into this Unity project's editable
+                // publication; the accepted native tree has no model carrier.
+                if (model != null && id != 768) yield return model + ".glb";
             }
             foreach (int id in new[] { 15, 391 })
             {
@@ -42,17 +70,24 @@ namespace FFOne.Tutorial
             391 => "map/shared/projectiles/effects/models/es391/tail2",
             668 => "map/shared/effects/models/es668/patrol_elena7",
             705 => "map/shared/effects/models/es705/nano_get",
+            547 => "map/shared/effects/models/es547/f_buttercup_corruptak",
+            548 => "map/shared/effects/models/es548/f_buttercup_megatak",
+            734 => "map/shared/effects/models/es734/T_pistol",
+            736 => "map/shared/effects/models/es736/t_bubbles",
             739 => "map/shared/effects/models/es739/Tutorial_dexterhologram",
             740 => "map/shared/effects/models/es740/m_inven",
             741 => "map/shared/effects/models/es741/Tutorial_dexterhologram_1",
             742 => "map/shared/effects/models/es742/T_electric gun",
+            751 => "map/shared/effects/models/es751/npc_samuraijack_event_eff",
+            768 => "map/shared/effects/models/es768/EP_DL_Scamper_tail",
             771 => "map/shared/effects/models/es771/tutorialstone",
             _ => null
         };
 
         public void Preload(int id)
         {
-            if (!assets.ContainsKey(id)) assets.Add(id, TutorialEffectAssets.Load(id, ModelPath(id)));
+            bool animationEffect = AnimationEffectIds.Contains(id);
+            if (!assets.ContainsKey(id)) assets.Add(id, TutorialEffectAssets.Load(id, ModelPath(id), id == 15 || id == 391, worldShader: animationEffect));
         }
         public GameObject Spawn(int id, Vector3 location, float scale = 1, bool track = false, string instanceName = null)
         {
@@ -93,6 +128,30 @@ namespace FFOne.Tutorial
         }
         void Add(JToken data) => Spawn((int)data["effect_id"], position(data["position"]),
             (float?)data["scale"] ?? 1, (bool?)data["tracked"] ?? false, (string)data["name"]);
+        public void AttachAnimationEffect(Transform model, string parameter)
+        {
+            int separator = parameter?.IndexOf(':') ?? -1;
+            if (separator <= 0 || !int.TryParse(parameter.Substring(0, separator), out int id) || !EffectIds.Contains(id))
+                throw new InvalidOperationException("Unsupported tutorial animation effect: " + parameter);
+            string node = parameter.Substring(separator + 1);
+            var bone = model.GetComponentsInChildren<Transform>(true).SingleOrDefault(t => t.name == node);
+            if (!bone) throw new InvalidOperationException("Tutorial animation effect bone is absent: " + node);
+            var instance = Spawn(id, bone.position, track: true);
+            instance.transform.SetParent(bone, true);
+            instance.transform.localPosition = Vector3.zero;
+            // AnimationEventHandler.PlayCharacterEffect supplies this basis
+            // whenever tag_p resolves a named attachment node.
+            instance.transform.localRotation = Quaternion.Euler(90, 0, 0);
+        }
+        public void AttachRootAnimationEffect(Transform model, int id)
+        {
+            if (!AnimationEffectIds.Contains(id)) throw new InvalidOperationException("Unsupported root animation effect: " + id);
+            var instance = Spawn(id, model.position, track: true);
+            instance.transform.SetParent(model, true);
+            instance.transform.localPosition = Vector3.zero;
+            instance.transform.localRotation = Quaternion.identity;
+            RootAnimationEffectsPlayed++;
+        }
         void Attach(JToken data)
         {
             var gate = data["locale_gate"];
@@ -130,6 +189,8 @@ namespace FFOne.Tutorial
             foreach (int id in new[] { 15, 391 })
             {
                 var instance = Spawn(id, source);
+                var playback = instance.GetComponent<TutorialEffectPlayback>();
+                if (playback.Trail != null && playback.Trail.Renderer) NativeProjectileTrailsSpawned++;
                 instance.AddComponent<TutorialOniProjectile>().Initialize(target, reverse);
             }
         }

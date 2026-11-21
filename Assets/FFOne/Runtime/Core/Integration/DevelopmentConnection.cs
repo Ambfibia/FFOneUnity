@@ -23,6 +23,16 @@ namespace FFOne.Integration
         }
         public static string ProfilesPath(string ordinaryDirectory) => Path.Combine(Enabled ?
             Environment.GetEnvironmentVariable(ProfilesVariable) : ordinaryDirectory, "login-profiles.json");
+
+        public static string OptionsPath(string ordinaryDirectory)
+        {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            var isolatedDirectory = Environment.GetEnvironmentVariable(ProfilesVariable);
+            if (!string.IsNullOrWhiteSpace(isolatedDirectory))
+                return Path.Combine(isolatedDirectory, "unity-options.json");
+#endif
+            return Path.Combine(ordinaryDirectory, "unity-options.json");
+        }
         public static void SelectServer(LoginProfiles profiles)
         {
             if (!Enabled) return;

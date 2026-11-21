@@ -13,11 +13,11 @@ namespace FFOne.Editor
 {
     public static class ContentLayoutSetup
     {
-        const string IndexPath="Assets/FFOne/Settings/Resources/FFOneContentIndex.json";
-        [Serializable] sealed class AddressIndex { public string[] keys; public string[] fonts; }
         [MenuItem("FFOne/Content/Rebuild Addressable Catalog")]
         public static void Rebuild()
         {
+            NativeEffectPublication.RebuildAll();
+            WorldCellPublication.RebuildAll();
             var settings=AddressableAssetSettingsDefaultObject.GetSettings(true);
             settings.BuildAddressablesWithPlayerBuild=AddressableAssetSettings.PlayerBuildOption.BuildWithPlayer;
             foreach(string original in new[]{"Assets/Resources/NativeEditable/Index.asset","Assets/Resources/World/Catalog.asset"})
@@ -28,21 +28,22 @@ namespace FFOne.Editor
                 if(catalog && catalog.name!=name){ catalog.name=name;EditorUtility.SetDirty(catalog); }
             }
             var keys=new HashSet<string>(StringComparer.Ordinal);
-            var fonts=new List<string>();
             var groups=new Dictionary<string,AddressableAssetGroup>();
             var registered=new HashSet<string>(StringComparer.Ordinal);
+            // Dependency queries can require an import. Resolve them before pausing
+            // the importer with StartAssetEditing, otherwise Unity can wait forever.
+            var sharedUiArtwork = AssetDatabase.GetDependencies(Directory.GetFiles("Assets/FFOne/Content/UI/Styles", "*.uss", SearchOption.AllDirectories)
+                .Select(path => path.Replace('\\', '/')).ToArray(), true);
+            var nativeDocuments = AssetDatabase.FindAssets("t:NativeDataDocument",new[]{"Assets/FFOne/Data/Tables"});
+            var authoredAssets = AssetDatabase.FindAssets("t:Prefab t:Scene t:ScriptableObject",new[]{"Assets/FFOne/Content","Assets/FFOne/Worlds","Assets/FFOne/Data"})
+                .Concat(AssetDatabase.FindAssets("t:AnimationClip",new[]{"Assets/FFOne/Content/Environment/Animation/Imported"})).ToArray();
+            Debug.Log("CONTENT CATALOG: discovery complete; publishing migrated addresses.");
             AddressableAssetGroup GetGroup(string name)
             {
                 if(groups.TryGetValue(name,out var result))return result;
                 result=settings.FindGroup(name);
                 if(!result)result=settings.CreateGroup(name,false,false,false,null,typeof(BundledAssetGroupSchema),typeof(ContentUpdateGroupSchema));
-                var schema=result.GetSchema<BundledAssetGroupSchema>();
-                schema.BuildPath.SetVariableByName(settings,AddressableAssetSettings.kLocalBuildPath);
-                schema.LoadPath.SetVariableByName(settings,AddressableAssetSettings.kLocalLoadPath);
-                schema.BundleMode=name=="Terrain-Materials" || name=="Terrain-Textures"
-                    ? BundledAssetGroupSchema.BundlePackingMode.PackSeparately
-                    : BundledAssetGroupSchema.BundlePackingMode.PackTogether;
-                schema.Compression=BundledAssetGroupSchema.BundleCompressionMode.LZ4;
+                ContentBundleLayout.Configure(settings,result);
                 groups.Add(name,result);return result;
             }
             AssetDatabase.StartAssetEditing();
@@ -50,7 +51,9 @@ namespace FFOne.Editor
             {
             foreach(var entry in ContentPaths.Entries)
             {
+                if (entry.addressAlias) continue;
                 string path=ContentPaths.CurrentPath(entry);
+                if(IsPublishedVfxSource(path)) { settings.RemoveAssetEntry(entry.guid,false); continue; }
                 if(path.Contains("/Editor/") || path.Contains("/Tests/") || path.Contains("/Runtime/"))
                 {
                     // A previously published source can become editor-only (for
@@ -66,13 +69,13 @@ namespace FFOne.Editor
                 if(string.IsNullOrEmpty(guid)) throw new InvalidDataException("Missing migrated asset: "+path);
                 string key=originalResource ? ContentPaths.Resource(entry.old) : "ffone/"+guid;
                 if(!keys.Add(key)) throw new InvalidDataException("Duplicate content address: "+key);
-                if(extension==".ttf" || extension==".otf") fonts.Add(key);
                 string groupName=Group(path);
                 var group=GetGroup(groupName);
                 var asset=settings.CreateOrMoveEntry(guid,group,false,false);
                 asset.SetAddress(key,false);
                 registered.Add(guid);
             }
+            Debug.Log("CONTENT CATALOG: migrated addresses complete; publishing native UI.");
             // Native UI authoring must not depend on adding fictitious legacy Resources entries.
             foreach(var route in new[]{("Views", "ui/views/", "*.uxml"), ("Styles", "ui/styles/", "*.uss")})
             {
@@ -102,13 +105,28 @@ namespace FFOne.Editor
                 string relative = path.Substring(artwork.Length + 1);
                 string key = "ui/en/" + relative.Substring(0, relative.LastIndexOf('.'));
                 if (!keys.Add(key)) throw new InvalidDataException("Duplicate UI artwork address: " + key);
-                settings.CreateOrMoveEntry(guid, GetGroup("UI-Artwork"), false, false).SetAddress(key, false);
+                settings.CreateOrMoveEntry(guid, GetGroup(Group(path)), false, false).SetAddress(key, false);
                 registered.Add(guid);
             }
             // Publish newly authored native documents by the same identity used
             // by NativeData.Load; GUID-only addresses cannot resolve those calls.
-            foreach(string guid in AssetDatabase.FindAssets("t:NativeDataDocument",new[]{"Assets/FFOne/Data/Tables"}))
+            // Source-bound USS and UXML can both reference the same native artwork.
+            // Give those textures a single explicit owner instead of implicit copies
+            // in UI-Styles and UI-Views bundles.
+            foreach (string path in sharedUiArtwork)
             {
+                if (!path.StartsWith("Assets/FFOne/Content/UI/Artwork/Retrobution/", StringComparison.Ordinal) ||
+                    !path.EndsWith(".png", StringComparison.OrdinalIgnoreCase)) continue;
+                string guid = AssetDatabase.AssetPathToGUID(path);
+                if (registered.Contains(guid)) continue;
+                string key = "ffone/" + guid;
+                settings.CreateOrMoveEntry(guid, GetGroup("UI-Artwork-Retrobution"), false, false).SetAddress(key, false);
+                registered.Add(guid); keys.Add(key);
+            }
+            Debug.Log("CONTENT CATALOG: native UI complete; publishing native documents.");
+            foreach(string guid in nativeDocuments)
+            {
+                if(IsPublishedVfxSource(AssetDatabase.GUIDToAssetPath(guid))) { settings.RemoveAssetEntry(guid,false); continue; }
                 if(registered.Contains(guid))continue;
                 string path=AssetDatabase.GUIDToAssetPath(guid);
                 var document=AssetDatabase.LoadAssetAtPath<NativeDataDocument>(path);
@@ -118,14 +136,24 @@ namespace FFOne.Editor
                 settings.CreateOrMoveEntry(guid,GetGroup(Group(path)),false,false).SetAddress(key,false);
                 registered.Add(guid);
             }
-            foreach(string guid in AssetDatabase.FindAssets("t:Prefab t:Scene t:ScriptableObject",new[]{"Assets/FFOne/Content","Assets/FFOne/Worlds","Assets/FFOne/Data"}))
+            Debug.Log("CONTENT CATALOG: native documents complete; publishing authored assets.");
+            foreach(string guid in authoredAssets)
             {
                 if(registered.Contains(guid))continue;
                 string path=AssetDatabase.GUIDToAssetPath(guid);
+                if(IsPublishedVfxSource(path)) { settings.RemoveAssetEntry(guid,false); continue; }
                 if(path.Contains("/Source/") || path.Contains("/Incoming/") || path.EndsWith(".glb",StringComparison.OrdinalIgnoreCase))continue;
                 string key="ffone/"+guid;
                 settings.CreateOrMoveEntry(guid,GetGroup(Group(path)),false,false).SetAddress(key,false);
                 registered.Add(guid);keys.Add(key);
+            }
+            foreach(string guid in AssetDatabase.FindAssets("t:NativeEffectDefinition t:Texture2D t:Material",new[]{NativeEffectPublication.Root}))
+            {
+                string path=AssetDatabase.GUIDToAssetPath(guid);
+                var definition=AssetDatabase.LoadAssetAtPath<NativeEffectDefinition>(path);
+                string key=definition?(definition.Identity.StartsWith("vfx/",StringComparison.Ordinal)?definition.Identity:NativeEffectDefinition.Resource(definition.Id,path.Contains("/Projectiles/"))):"ffone/"+guid;
+                settings.CreateOrMoveEntry(guid,GetGroup("VFX-Published-"+path.Substring(NativeEffectPublication.Root.Length+1).Split('/')[0]),false,false).SetAddress(key,false);
+                keys.Add(key);registered.Add(guid);
             }
             // Terrain detail shaders otherwise become implicit copies in every cell
             // containing Unity vegetation. Keep the package-owned originals shared.
@@ -138,16 +166,52 @@ namespace FFOne.Editor
                 settings.CreateOrMoveEntry(guid,GetGroup("Rendering-TerrainShaders"),false,false).SetAddress(key,false);
                 registered.Add(guid);keys.Add(key);
             }
-            Directory.CreateDirectory(Path.GetDirectoryName(IndexPath));
-            File.WriteAllText(IndexPath,JsonUtility.ToJson(new AddressIndex { keys=keys.OrderBy(k=>k,StringComparer.Ordinal).ToArray(), fonts=fonts.ToArray() }));
+            const string hologram = "Assets/FFOne/Rendering/Shaders/DexterShipHologram.shader";
+            string hologramGuid = AssetDatabase.AssetPathToGUID(hologram);
+            if (string.IsNullOrEmpty(hologramGuid)) throw new InvalidDataException("Missing tutorial hologram shader.");
+            settings.CreateOrMoveEntry(hologramGuid, GetGroup("Rendering-Shaders"), false, false).SetAddress("Tutorial/DexterShipHologram", false);
+            keys.Add("Tutorial/DexterShipHologram");
+            PublishAddressAliases(settings, keys);
+            Debug.Log("CONTENT CATALOG: authored assets complete; saving groups.");
+            // A rebuild can move the last entry out of a former broad group. Remove
+            // only our retired empty groups, preserving custom and default groups.
+            foreach (var group in settings.groups.ToArray())
+                if (group && group.entries.Count == 0 && group != settings.DefaultGroup &&
+                    new[] { "UI-Artwork", "UI-Icons", "Audio-Voice", "Characters-Humanoids-Equipment", "Characters-Humanoids-Base", "Environment-SourceLibrary" }.Contains(group.Name))
+                    settings.RemoveGroup(group);
             }
             finally { AssetDatabase.StopAssetEditing(); }
             settings.SetDirty(AddressableAssetSettings.ModificationEvent.BatchModification,null,true,true);
-            EditorUtility.SetDirty(settings); AssetDatabase.SaveAssets(); AssetDatabase.ImportAsset(IndexPath);
+            EditorUtility.SetDirty(settings); AssetDatabase.SaveAssets();
             Debug.Log("CONTENT LAYOUT: "+keys.Count+" stable addresses; "+groups.Count+" local groups.");
+        }
+        static void PublishAddressAliases(AddressableAssetSettings settings, HashSet<string> keys)
+        {
+            foreach (var entry in ContentPaths.Entries.Where(entry => entry.addressAlias))
+            {
+                string key = ContentPaths.Resource(entry.old);
+                var sharedAsset = settings.FindAssetEntry(entry.guid);
+                if (sharedAsset == null || !keys.Add(key))
+                    throw new InvalidDataException("Invalid shared Addressables alias: " + key);
+
+                // A unique label preserves the old lookup key while the bundles
+                // carry one copy under the shared asset's primary address.
+                settings.AddLabel(key, false);
+                sharedAsset.SetLabel(key, true, false, false);
+                sharedAsset.parentGroup.GetSchema<BundledAssetGroupSchema>().IncludeLabelsInCatalog = true;
+            }
+        }
+        static bool IsPublishedVfxSource(string path)
+        {
+            string normal=path.Replace('\\','/');
+            return normal.EndsWith(".closure.json",StringComparison.OrdinalIgnoreCase)||normal.EndsWith(".closure.json.asset",StringComparison.OrdinalIgnoreCase)
+                || normal.StartsWith("Assets/FFOne/Data/Tables/map/tiles/",StringComparison.Ordinal)&&normal.EndsWith("/behaviour.json.asset",StringComparison.Ordinal)
+                || normal.StartsWith("Assets/FFOne/Worlds/",StringComparison.Ordinal)&&normal.EndsWith("/Source/behaviour.json",StringComparison.Ordinal);
         }
         static string Group(string path)
         {
+            string specialized = ContentBundleLayout.SpecializedGroup(path);
+            if (specialized != null) return specialized;
             string relative=path.Replace("Assets/FFOne/","");
             var parts=relative.Split('/');
             // Bundle packing follows use and source identity, not an artist's folder move.

@@ -1358,7 +1358,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7108366939639373456}
-  - component: {fileID: 1102159099364920705}
+  - component: {fileID: 3167100722909035303}
+  - component: {fileID: 1341665139463357811}
+  - component: {fileID: 2008746834547928463}
   m_Layer: 0
   m_Name: model
   m_TagString: Untagged
@@ -1382,39 +1384,43 @@ Transform:
   - {fileID: 5822796277659665792}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!111 &1102159099364920705
-Animation:
+--- !u!95 &3167100722909035303
+Animator:
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6144905025657999364}
   m_Enabled: 1
-  serializedVersion: 4
-  m_Animation: {fileID: 7400000, guid: cf7b77eee855c684fa1b7605b4a30f7b, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: b40bd12bd140d5b4eacb29850eb1b21f, type: 2}
-  - {fileID: 7400000, guid: 3b438a812a2de574dae9f4027fae94b0, type: 2}
-  - {fileID: 7400000, guid: f8b80f9a469e12346ad48b38bd19f0b5, type: 2}
-  - {fileID: 7400000, guid: f1a37380acef2dd42a3bfd225901ccf4, type: 2}
-  - {fileID: 7400000, guid: ea151fe3f9b01374fabc0cfb509b32b0, type: 2}
-  - {fileID: 7400000, guid: b34bba75f8b3bd44f833d4b24b345641, type: 2}
-  - {fileID: 7400000, guid: 3e6f8265f9ad0c44ab0c8eacbaeecbdc, type: 2}
-  - {fileID: 7400000, guid: 95dfd4d4b322a984db21be9126354fe0, type: 2}
-  - {fileID: 7400000, guid: faaa96227236e3e44ba992c073fea89e, type: 2}
-  - {fileID: 7400000, guid: 16fad95036f4b68408696aac5707cb0e, type: 2}
-  - {fileID: 7400000, guid: 890ae70064d3a19468fa37488f152d68, type: 2}
-  - {fileID: 7400000, guid: cf7b77eee855c684fa1b7605b4a30f7b, type: 2}
-  - {fileID: 7400000, guid: a7c9aa8b179118745834e59ce44ad6fc, type: 2}
-  - {fileID: 7400000, guid: 7ec6effdf429cc94eb3486510932df71, type: 2}
-  - {fileID: 7400000, guid: 6570960c43424d7498c16ab24b25bafa, type: 2}
-  - {fileID: 7400000, guid: 06134ae5cb365aa429b30eff20c42e27, type: 2}
-  - {fileID: 7400000, guid: b11238517eb07d04c87528103a095f3b, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: e5be900911150e74c8fa097c0217462b, type: 2}
+  m_CullingMode: 0
   m_UpdateMode: 0
-  m_CullingType: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 1
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1341665139463357811
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6144905025657999364}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b7ac68c382befc4d9fc82662c17e418, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.Content.NativeNpcAnimator
+  animator: {fileID: 3167100722909035303}
+  AnimationSounds: []
+  Faces: []
 --- !u!1 &6267856571336422555
 GameObject:
   m_ObjectHideFlags: 0
@@ -2151,3 +2157,22 @@ Transform:
   - {fileID: 8580532631924821644}
   m_Father: {fileID: 6093847369120829436}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2008746834547928463
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6144905025657999364}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ee3989daf214b8c805f250337cb2f41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.World.WorldNpcSkins
+  surfaces:
+  - Renderer: {fileID: 2855410760488510044}
+    Slot: 0
+    Default: {fileID: 2100000, guid: 6f4a279cb50ab7145836388502a692ef, type: 2}
+    Choices:
+    - Types: 4402000045020000
+      Material: {fileID: 2100000, guid: 18efc9eee1805e33ba0f130a905bd8e6, type: 2}

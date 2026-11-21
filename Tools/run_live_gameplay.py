@@ -5,6 +5,11 @@ Two normal accounts are tested; the automatic first Master account is not used f
 """
 from datetime import datetime
 from pathlib import Path
+from contextlib import contextmanager
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from threading import Thread
+from urllib.parse import parse_qs
+from xml.sax.saxutils import escape
 import json
 import argparse
 import os
@@ -32,6 +37,53 @@ def port():
         return s.getsockname()[1]
 
 
+@contextmanager
+def rank_provider(database):
+    # Serve OFAPI's wire format from the disposable shard's actual finish records.
+    class Rankings(BaseHTTPRequestHandler):
+        def do_POST(self):
+            if self.path != '/getranks':
+                self.send_error(404)
+                return
+            fields = parse_qs(self.rfile.read(int(self.headers['Content-Length'])).decode())
+            uid, episode = int(fields['PCUID'][0]), int(fields['EP_ID'][0])
+            body = ['SUCCESS']
+            with sqlite3.connect(database) as connection:
+                for period, window in [('day', '-1 day'), ('week', '-7 days'), ('month', '-1 month'), ('alltime', '-999 years')]:
+                    rows = connection.execute("""
+                        SELECT r.PlayerID, MAX(r.Score), p.FirstName, p.LastName FROM RaceResults r
+                        JOIN Players p ON p.PlayerID=r.PlayerID
+                        WHERE r.EPID=? AND r.Timestamp >= strftime('%s','now',?)
+                        GROUP BY r.PlayerID ORDER BY MAX(r.Score) DESC, r.PlayerID
+                    """, (episode, window))
+                    all_scores, personal = [], []
+                    for rank, (player, score, first, last) in enumerate(rows, 1):
+                        tag = f'<score>PCUID="{player}" Score="{score}" Rank="{rank}" FirstName="{escape(first)}" LastName="{escape(last)}"</score>'
+                        if rank <= 10:
+                            all_scores.append(tag)
+                        if player == uid:
+                            personal.append(tag)
+                    for section, values in [('my'+period, personal), (period, all_scores)]:
+                        body.append(f'<{section}>'+''.join(values)+f'</{section}>')
+            data = ''.join(body).encode()
+            self.send_response(200)
+            self.send_header('Content-Length', str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
+
+        def log_message(self, *args):
+            pass
+
+    with ThreadingHTTPServer(('127.0.0.1', 0), Rankings) as server:
+        thread = Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        try:
+            yield f'http://127.0.0.1:{server.server_port}/getranks'
+        finally:
+            server.shutdown()
+            thread.join()
+
+
 def run(command, **kwargs):
     subprocess.run(command, check=True, creationflags=subprocess.CREATE_NO_WINDOW, **kwargs)
 
@@ -52,7 +104,15 @@ def main():
     parser.add_argument('--result-path', type=Path, default=ROOT / 'Logs/LiveGameplayResult.json')
     parser.add_argument('--skip-build', action='store_true', help='Use frozen validated server/harness binaries without replacing a running executable.')
     parser.add_argument('--instances', action='store_true', help='Run the separate source-map instance matrix as well.')
+    parser.add_argument('--automatic-revival', action='store_true', help='Wait for the player resurrection countdown to send the request.')
+    parser.add_argument('--player-interaction-input', action='store_true',
+                        help='Run the player interaction smoke in a visible, focused player window using the Input System.')
+    parser.add_argument('--zipline', action='store_true', help='Exercise the authored route and real inputs in a focused player window.')
     args = parser.parse_args()
+    if args.player_interaction_input and (args.player is None or args.automatic_revival):
+        parser.error('--player-interaction-input requires --player and runs independently of --automatic-revival.')
+    if args.zipline and (args.player is None or args.automatic_revival or args.player_interaction_input):
+        parser.error('--zipline requires --player and selects a separate player scenario.')
     folder = SERVER / 'target' / ('unity-gameplay-' + datetime.now().strftime('%Y%m%d-%H%M%S') + '-' + uuid.uuid4().hex[:6])
     folder.mkdir(parents=True)
     login, shard = port(), port()
@@ -67,11 +127,15 @@ def main():
     (tables / 'mobs.json').write_text(json.dumps(mobs), encoding='utf-8')
     npcs = json.loads((tables / 'npcs.json').read_text('utf-8'))
     next_npc = max(map(int, npcs['NPCs'])) + 1
-    for i, npc_type in enumerate((3076, 3075, 651, 686, 2586, 2507, 3124, 3129, 967, 968, 995, 2591, 680, 2567)):
+    for i, npc_type in enumerate((3076, 3075, 651, 686, 2586, 2507, 3124, 3129, 967, 968, 995, 2591, 680, 2567, 3133, 640)):
         npcs['NPCs'][str(next_npc + i)] = {'iNPCType': npc_type, 'iX': 632032, 'iY': 187277 + 100 * i,
                                           'iZ': -5500, 'iAngle': 0, 'iMapNum': 0}
     npcs['NPCs'][str(next_npc + 10)].update(iX=444813,iY=346594,iZ=-5264)
     (tables / 'npcs.json').write_text(json.dumps(npcs), encoding='utf-8')
+    drops_path = tables / 'drops.json'
+    drops = json.loads(drops_path.read_text('utf-8'))
+    drops['CodeItems'] = [{'Code': 'StudioUiSmoke', 'ItemReferenceIDs': [0]}]
+    drops_path.write_text(json.dumps(drops), encoding='utf-8')
     config = folder / 'config.toml'
     config.write_text((SERVER / 'config.toml').read_text('utf-8'), encoding='utf-8')
     if not args.skip_build:
@@ -159,10 +223,33 @@ def main():
                 profile.mkdir()
                 env = dict(os.environ, FFONE_DEV_SERVER='127.0.0.1:' + str(login), FFONE_DEV_PROFILES=str(profile))
                 startup = subprocess.STARTUPINFO()
-                startup.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-                startup.wShowWindow = subprocess.SW_HIDE
-                run([str(args.player.resolve()), '-batchmode', '--live-gameplay-smoke', '-screen-width', '1280',
-                     '-screen-height', '720', '-logFile', str(folder / 'player.log')], cwd=ROOT, env=env, startupinfo=startup, timeout=600)
+                if not (args.player_interaction_input or args.zipline):
+                    startup.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                    startup.wShowWindow = subprocess.SW_HIDE
+                with sqlite3.connect(database) as db:
+                    uid = db.execute("SELECT PlayerID FROM Players WHERE FirstName='Alice'").fetchone()[0]
+                    db.execute('INSERT OR REPLACE INTO Nanos(PlayerID,ID,Skill,Stamina) VALUES(?,2,0,150)', (uid,))
+                    db.execute('UPDATE Players SET FusionMatter=2000 WHERE PlayerID=?', (uid,))
+                    db.execute('INSERT OR REPLACE INTO Inventory(PlayerID,Slot,ID,Type,Opt,TimeLimit) VALUES(?,55,162,7,5,0)', (uid,))
+                    if args.player_interaction_input:
+                        db.executemany('INSERT OR REPLACE INTO Inventory(PlayerID,Slot,ID,Type,Opt,TimeLimit) VALUES(?,?,?,0,1,0)',
+                                       ((uid, 9 + slot, item) for slot, item in ((38, 706), (39, 781))))
+                    if args.zipline:
+                        db.execute('UPDATE Players SET Level=MAX(Level,6) WHERE PlayerID=?', (uid,))
+                        # Weapon 22 is the accepted grenade. Slot 0 is equipped; type 0 is weapon.
+                        db.execute('INSERT OR REPLACE INTO Inventory(PlayerID,Slot,ID,Type,Opt,TimeLimit) VALUES(?,0,22,0,1,0)', (uid,))
+                with rank_provider(database) as env['FFONE_RACE_RANK_URL']:
+                    command = [str(args.player.resolve()), '--live-gameplay-smoke', '-screen-width', '1280',
+                               '-screen-height', '720', '-logFile', str(folder / 'player.log')]
+                    if args.player_interaction_input:
+                        command.extend(['--live-player-interaction-input', '-screen-fullscreen', '0'])
+                    elif args.zipline:
+                        command.extend(['--live-zipline-smoke', '-screen-fullscreen', '0'])
+                    else:
+                        command.insert(1, '-batchmode')
+                    if args.automatic_revival:
+                        command.append('--automatic-revival')
+                    run(command, cwd=ROOT, env=env, startupinfo=startup, timeout=600)
                 result['player'] = json.loads((profile / 'result.json').read_text('utf-8'))
                 result['passed'] = result['passed'] and result['player']['passed']
                 log = (folder / 'player.log').read_text('utf-8', errors='replace')

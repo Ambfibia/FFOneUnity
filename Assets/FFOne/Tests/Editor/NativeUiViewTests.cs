@@ -62,8 +62,9 @@ namespace FFOne.Tests
             Assert.That(view.styleSheets.count, Is.GreaterThanOrEqualTo(2), "Detaching a view must retain its theme and screen styles.");
             root.Add(view);
             var group = FFView.Require<VisualElement>(view, "selection-group");
-            var button = FFView.Require<Button>(view, "character-slot-1");
-            var preview = FFView.Require<Image>(view, "slot-preview-1");
+            var slot = FFView.Require<TemplateContainer>(group, "roster-slot-1");
+            var button = FFView.Require<Button>(slot, "character-slot");
+            var preview = FFView.Require<Image>(slot, "slot-preview");
             Assert.That(preview.pickingMode, Is.EqualTo(PickingMode.Ignore));
             int clicks = 0; button.clicked += () => clicks++;
             foreach (var viewport in new[] { new Vector2(1264,681), new Vector2(1280,720), new Vector2(1920,1080) })
@@ -81,6 +82,13 @@ namespace FFOne.Tests
                 Assert.That(button.layout, Is.EqualTo(new Rect(43,43,413,67)), "UXML must retain the source logical rectangle before the parent transform.");
                 Assert.That(button.worldBound.width, Is.EqualTo(413 * scale).Within(.1));
                 Assert.That(root.panel.Pick(button.worldBound.center), Is.SameAs(button), "Decorative labels/images must not intercept the slot button.");
+                for (int i = 0; i < FrontendLayout.SlotY.Length; i++)
+                {
+                    var row = FFView.Require<TemplateContainer>(group, "roster-slot-" + (i + 1));
+                    var rowButton = FFView.Require<Button>(row, "character-slot");
+                    Assert.That(row.layout.y + rowButton.layout.y, Is.EqualTo(FrontendLayout.SlotY[i]));
+                    Assert.That(root.panel.Pick(rowButton.worldBound.center), Is.SameAs(rowButton));
+                }
                 Assert.That(button.resolvedStyle.borderTopWidth, Is.Zero);
                 using var submit = NavigationSubmitEvent.GetPooled(); submit.target = button; button.SendEvent(submit);
             }
@@ -96,12 +104,28 @@ namespace FFOne.Tests
                 root.Add(creation); yield return null; yield return null;
                 Assert.That(creation.resolvedStyle.width, Is.EqualTo(panel.Item2).Within(.1));
                 Assert.That(creation.resolvedStyle.height, Is.EqualTo(panel.Item3).Within(.1));
-                var wheel = creation.Q("name-wheel-0");
+                var wheel = creation.Q("name-wheel-0")?.Q("name-rows");
                 if (wheel != null)
                 {
                     Assert.That(wheel.resolvedStyle.height, Is.EqualTo(150));
-                    Assert.That(wheel.Q("name-0-0").layout.y, Is.EqualTo(-30));
-                    Assert.That(wheel.Q("name-0-6").layout.y, Is.EqualTo(150));
+                    Assert.That(wheel.Q("name-row-0").layout.y, Is.EqualTo(-30));
+                    Assert.That(wheel.Q("name-row-6").layout.y, Is.EqualTo(150));
+                }
+                var nameField = creation.Q<TextField>("custom-character-name");
+                if (nameField != null)
+                {
+                    Assert.That(nameField.resolvedStyle.unitySliceLeft, Is.EqualTo(2));
+                    Assert.That(nameField.resolvedStyle.unitySliceRight, Is.EqualTo(2));
+                    Assert.That(nameField.resolvedStyle.unitySliceTop, Is.EqualTo(2));
+                    Assert.That(nameField.resolvedStyle.unitySliceBottom, Is.EqualTo(2));
+                }
+                var bodySection = creation.Q("body-section");
+                if (bodySection != null)
+                {
+                    Assert.That(bodySection.resolvedStyle.unitySliceLeft, Is.EqualTo(5));
+                    Assert.That(bodySection.resolvedStyle.unitySliceBottom, Is.EqualTo(40));
+                    Assert.That(bodySection.resolvedStyle.unitySliceRight, Is.EqualTo(40));
+                    Assert.That(bodySection.resolvedStyle.unitySliceTop, Is.EqualTo(5));
                 }
             }
 
@@ -111,6 +135,18 @@ namespace FFOne.Tests
             // Exercise real bindings without connecting to a server or changing user preferences.
             void Invoke(string name) => typeof(FrontendController).GetMethod(name, BindingFlags.NonPublic | BindingFlags.Instance).Invoke(controller, null);
             Invoke("BuildSelection");
+            yield return CheckRosterMusicLabels(root, controller);
+            var roster = root.Q("roster-slot-1");
+            yield return null;
+            foreach (var disk in roster.Query<VisualElement>(className: "selection-disk").ToList())
+            {
+                Assert.That(disk.resolvedStyle.unitySliceLeft, Is.EqualTo(5));
+                Assert.That(disk.resolvedStyle.unitySliceBottom, Is.EqualTo(5));
+                Assert.That(disk.resolvedStyle.unitySliceRight, Is.EqualTo(5));
+                Assert.That(disk.resolvedStyle.unitySliceTop, Is.EqualTo(5));
+                var texture = disk.resolvedStyle.backgroundImage;
+                Assert.That(texture.sprite != null || texture.texture != null, Is.True);
+            }
             int requestedSlot = 0;
             controller.CreateCharacterRequested += slot => requestedSlot = slot;
             using (var submit = NavigationSubmitEvent.GetPooled())
@@ -137,6 +173,30 @@ namespace FFOne.Tests
                 using (var submit = NavigationSubmitEvent.GetPooled()) { submit.target = cancel; cancel.SendEvent(submit); }
                 Assert.That(root.Q("quit-root"), Is.Null, "Source cancel action must dismiss the runtime menu.");
                 yield return null;
+            }
+        }
+
+        static IEnumerator CheckRosterMusicLabels(VisualElement root, FrontendController controller)
+        {
+            const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
+            var language = typeof(FrontendController).GetField("language", flags);
+            var playMusic = typeof(FrontendController).GetField("playMusic", flags);
+            var refresh = typeof(FrontendController).GetMethod("RefreshSelectionControls", flags);
+            var button = root.Q<Button>(className: "roster-music-toggle");
+            foreach (var (locale, enabled, artwork) in new[] {
+                ("en", true, "musicon.png"), ("en", false, "musicoff.png"),
+                ("ru", false, "musicon.png"), ("ru", true, "musicoff.png")
+            })
+            {
+                language.SetValue(controller, locale);
+                playMusic.SetValue(controller, enabled);
+                refresh.Invoke(controller, new object[] { null });
+                yield return null;
+                var background = button.resolvedStyle.backgroundImage;
+                var asset = background.sprite ? (Object)background.sprite : background.texture;
+                Assert.That(AssetDatabase.GetAssetPath(asset), Is.EqualTo(
+                    $"Assets/FFOne/Content/UI/Artwork/{locale}/character/selection/controls/{artwork}"),
+                    $"The {locale} roster button must show the current music state (enabled: {enabled}).");
             }
         }
 

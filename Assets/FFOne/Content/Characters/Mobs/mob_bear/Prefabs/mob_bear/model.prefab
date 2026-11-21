@@ -261,7 +261,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3399833131998627147}
-  - component: {fileID: 4878280964203728967}
+  - component: {fileID: 4264682706606796171}
+  - component: {fileID: 8831340013348359461}
+  - component: {fileID: 2912884361423791346}
   m_Layer: 0
   m_Name: model
   m_TagString: Untagged
@@ -285,41 +287,43 @@ Transform:
   - {fileID: 3406210203881954405}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!111 &4878280964203728967
-Animation:
+--- !u!95 &4264682706606796171
+Animator:
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 317205803924564659}
   m_Enabled: 1
-  serializedVersion: 4
-  m_Animation: {fileID: 7400000, guid: c2a69b5fc0a21f14aafc513dab3f7ba0, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: 55778f754df9c3b48be802f146398eb5, type: 2}
-  - {fileID: 7400000, guid: 875ad3a8146e25d468744b0804fae020, type: 2}
-  - {fileID: 7400000, guid: 6a4b0db5e6a6ead478453e75370f4da7, type: 2}
-  - {fileID: 7400000, guid: 368f6e5c8bfa3144cbd959806b19f372, type: 2}
-  - {fileID: 7400000, guid: 5a696158e040f244faccbcd0f61d038d, type: 2}
-  - {fileID: 7400000, guid: 65cfb005e3f34ce40bb83048217ed5e0, type: 2}
-  - {fileID: 7400000, guid: 3fe73fde6386e5a4a9024df772b853b9, type: 2}
-  - {fileID: 7400000, guid: 1881a323a52d1624083ce2c7cb21d7fe, type: 2}
-  - {fileID: 7400000, guid: d87dd1fe679d59b4bb1ac6fcd0ad1697, type: 2}
-  - {fileID: 7400000, guid: 8432b1a6b3498b549ae3c9a52f50e08b, type: 2}
-  - {fileID: 7400000, guid: 454a8eb76fe8668429c14b17abf3d4ed, type: 2}
-  - {fileID: 7400000, guid: d45ac8139506b2543a6df94e2417b800, type: 2}
-  - {fileID: 7400000, guid: c2a69b5fc0a21f14aafc513dab3f7ba0, type: 2}
-  - {fileID: 7400000, guid: 341b96fedf063b84ba7af63046ca76b5, type: 2}
-  - {fileID: 7400000, guid: 8b4fde942b4f4ef41a62259de668e7e1, type: 2}
-  - {fileID: 7400000, guid: c08043409f687fb458b67435e6340bd2, type: 2}
-  - {fileID: 7400000, guid: 57c716df6961eb94aad0faba1a0c410e, type: 2}
-  - {fileID: 7400000, guid: f132c6d07d4e5ca40809c1a1b0d030fe, type: 2}
-  - {fileID: 7400000, guid: f585f9d3e6cb09a43a1a94d40930ebc7, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 400c4e432519efb4b865254c8b569ede, type: 2}
+  m_CullingMode: 0
   m_UpdateMode: 0
-  m_CullingType: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 1
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &8831340013348359461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 317205803924564659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b7ac68c382befc4d9fc82662c17e418, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.Content.NativeNpcAnimator
+  animator: {fileID: 4264682706606796171}
+  AnimationSounds: []
+  Faces: []
 --- !u!1 &399626048438421733
 GameObject:
   m_ObjectHideFlags: 0
@@ -2531,3 +2535,26 @@ Transform:
   - {fileID: 8822451729332078967}
   m_Father: {fileID: 7877511062679912383}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2912884361423791346
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 317205803924564659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ee3989daf214b8c805f250337cb2f41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.World.WorldNpcSkins
+  surfaces:
+  - Renderer: {fileID: 1628283913633920261}
+    Slot: 0
+    Default: {fileID: 2100000, guid: 4978f04e23919434587d96b761188ec9, type: 2}
+    Choices:
+    - Types: b600000078010000
+      Material: {fileID: 2100000, guid: c878c120af4f5e17b7e7ce74ba24b103, type: 2}
+    - Types: d300000095010000
+      Material: {fileID: 2100000, guid: b564624b765c5a89a5cd6fe6b2a733df, type: 2}
+    - Types: cf00000091010000
+      Material: {fileID: 2100000, guid: 4fe4a140afd050988e76a810fce14633, type: 2}

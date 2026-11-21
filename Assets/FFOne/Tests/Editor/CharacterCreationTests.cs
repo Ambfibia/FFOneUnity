@@ -1,9 +1,11 @@
 using ContentPaths = FFOne.Content.ContentPaths;
 using System;
+using System.Collections;
 using System.Linq;
 using FFOne.Creation;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace FFOne.Tests
 {
@@ -32,6 +34,55 @@ namespace FFOne.Tests
             Assert.That((string)catalog.Names(1)[1]["value"], Is.EqualTo(" "));
             Assert.That((string)catalog.Names(2)[1]["value"], Is.EqualTo(" "));
             Assert.Throws<InvalidOperationException>(() => CharacterCreationRules.CycleName(0, 1, 1));
+        }
+
+        [Test]
+        public void PendingAppearanceRetainsTheSelectionMadeBeforeAwaitingAssets()
+        {
+            var source = new FFOne.Network.CharacterInfo();
+            source.Style.Gender = 1; source.Style.Height = 2; source.Style.HairStyle = 3;
+            source.Equipment[1] = new FFOne.Network.EquipmentItem { ItemType = 1, ItemId = 12 };
+            var pending = FFOne.Content.NativeAvatarPreview.Snapshot(source);
+            source.Style.Gender = 2; source.Style.Height = 4; source.Style.HairStyle = 8;
+            source.Equipment[1] = new FFOne.Network.EquipmentItem { ItemType = 1, ItemId = 25 };
+            Assert.That(pending.Style.Gender, Is.EqualTo(1));
+            Assert.That(pending.Style.Height, Is.EqualTo(2));
+            Assert.That(pending.Style.HairStyle, Is.EqualTo(3));
+            Assert.That(pending.Equipment[1].ItemId, Is.EqualTo(12));
+        }
+
+        [UnityTest]
+        public IEnumerator ReservedRosterEntriesRenderBothGendersWithoutSavingAnAppearance()
+        {
+            foreach (int gender in new[] { 1, 2 })
+            {
+                var source = CreationCatalog.Preview(new FFOne.Network.CharacterCreation { Slot = 2, FirstName = "Pending", LastName = "Probe" });
+                source.Style.Gender = gender;
+                source.Style.FaceStyle = source.Style.HairStyle = source.Style.EyeColor = source.Style.SkinColor = source.Style.HairColor = 0;
+                var request = CreationCatalog.RosterPreviewAsync(source);
+                while (!request.IsCompleted) yield return null;
+                Assert.That(request.IsCompletedSuccessfully, Is.True, request.Exception?.ToString());
+                var preview = request.Result;
+                var preload = FFOne.Content.NativeAvatarPreview.PreloadAsync(preview);
+                while (!preload.IsCompleted) yield return null;
+                Assert.That(preload.IsCompletedSuccessfully, Is.True, preload.Exception?.ToString());
+                var host = new GameObject("reserved roster preview fixture");
+                try
+                {
+                    var avatar = host.AddComponent<FFOne.Content.NativeAvatarPreview>();
+                    avatar.Apply(preview);
+                    Assert.That(avatar.LastError, Is.Null);
+                    Assert.That(avatar.IsReady, Is.True);
+                    Assert.That(preview.Style.Gender, Is.EqualTo(gender));
+                    Assert.That(preview.Uid, Is.EqualTo(source.Uid));
+                    Assert.That(preview.DisplayName, Is.EqualTo(source.DisplayName));
+                    Assert.That(preview.Style.AppearanceComplete, Is.False);
+                    Assert.That(source.Style.FaceStyle, Is.Zero);
+                    Assert.That(source.Equipment[1].ItemId, Is.Zero, "Presentation must not write starter clothes into the server roster.");
+                    Assert.That(source.Style.AppearanceComplete, Is.False);
+                }
+                finally { UnityEngine.Object.DestroyImmediate(host); }
+            }
         }
 
         [TestCase("  Alice   Space Ranger  ", "Alice", "Space Ranger", true)]

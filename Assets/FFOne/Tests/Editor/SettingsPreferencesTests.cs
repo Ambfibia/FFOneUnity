@@ -49,6 +49,26 @@ namespace FFOne.Tests
             Assert.That((bool)prefs.Committed["graphics"]["toon"], Is.True);
             Assert.That((int)prefs.Committed["input"]["sensitivity"], Is.EqualTo(9));
         }
+
+        [Test]
+        public void LegacyChatOptionIsRemovedWhenAnExistingProfileIsSaved()
+        {
+            string file = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json");
+            try
+            {
+                var saved = SettingsPreferences.Defaults();
+                saved["display"]["new_chat"] = false;
+                saved["display"]["balloon"] = false;
+                File.WriteAllText(file, saved.ToString());
+
+                var preferences = new SettingsPreferences(file);
+                Assert.That(preferences.LoadError, Is.Null);
+                Assert.That(preferences.Get<bool>("display.balloon"), Is.False);
+                preferences.Apply();
+                Assert.That(JObject.Parse(File.ReadAllText(file)).SelectToken("display.new_chat"), Is.Null);
+            }
+            finally { if (File.Exists(file)) File.Delete(file); }
+        }
         [Test] public void SoundIsEagerAndDirtyCancelRestoresOpeningSound()
         {
             var prefs = new SettingsPreferences(); prefs.Set("sound.master", 2);
@@ -88,6 +108,33 @@ namespace FFOne.Tests
             prefs.Preset(2); Assert.That(prefs.Get<bool>("graphics.vegetation"), Is.False);
             prefs.Set("input.bindings.Up.primary", "T"); prefs.Reset("input");
             Assert.That(prefs.Get<string>("input.bindings.Up.primary"), Is.EqualTo("T"));
+        }
+
+        [Test] public void ExistingBindingsAndEmptySlotsMigrateToNativePaths()
+        {
+            string file = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json");
+            try
+            {
+                var saved = SettingsPreferences.Defaults();
+                var bindings = saved["input"]["bindings"];
+                bindings["Up"]["primary"] = "T";
+                bindings["Up"]["alternate"] = "";
+                bindings["Up"]["pad"] = "dpad/up";
+                bindings["Menu"]["primary"] = "Return";
+                bindings["Menu"]["alternate"] = "KeypadEnter";
+                bindings["Fire1"]["primary"] = "Wheel+";
+                File.WriteAllText(file, saved.ToString());
+
+                var preferences = new SettingsPreferences(file);
+                Assert.That(preferences.LoadError, Is.Null);
+                Assert.That(preferences.Get<string>("input.bindings.Up.primary"), Is.EqualTo("<Keyboard>/t"));
+                Assert.That(preferences.Get<string>("input.bindings.Up.alternate"), Is.Empty);
+                Assert.That(preferences.Get<string>("input.bindings.Up.pad"), Is.EqualTo("<Gamepad>/dpad/up"));
+                Assert.That(preferences.Get<string>("input.bindings.Menu.primary"), Is.EqualTo("<Keyboard>/enter"));
+                Assert.That(preferences.Get<string>("input.bindings.Menu.alternate"), Is.EqualTo("<Keyboard>/numpadEnter"));
+                Assert.That(preferences.Get<string>("input.bindings.Fire1.primary"), Is.EqualTo("<Mouse>/scroll/up"));
+            }
+            finally { if (File.Exists(file)) File.Delete(file); }
         }
     }
 }

@@ -22,6 +22,11 @@ namespace FFOne.Editor
             BuildContent();
             BuildWithCurrentContent();
         }
+        public static void BuildNativeVfxPublication()
+        {
+            BuildContent();
+            BuildWithCurrentContentAt(Path.GetFullPath("Builds/NativeVfxPublication/Windows/FFOne.exe"));
+        }
         public static void BuildContent()
         {
             ContentLayoutSetup.Rebuild();
@@ -33,7 +38,24 @@ namespace FFOne.Editor
             Debug.Log("NATIVE GAMEPLAY CONTENT BUILD SUCCEEDED");
         }
         public static void BuildWithCurrentContent()
+            => BuildWithCurrentContentAt(Path.Combine(Path.GetFullPath(
+                Environment.GetEnvironmentVariable("FFONE_VALIDATION_BUILD_DIR") ?? DevelopmentSettings.BuildDirectory), "FFOne.exe"));
+
+        public static void BuildNativeTutorialTimeline()
+            => BuildWithCurrentContentAt(Path.GetFullPath("Builds/NativeTutorialTimeline/Windows/FFOne.exe"));
+
+        public static void BuildNativeGameplayInput()
+            => BuildWithCurrentContentAt(Path.GetFullPath("Builds/NativeGameplayInput/Windows/FFOne.exe"));
+
+        public static void BuildNativeTutorialOverlay()
+            => BuildWithCurrentContentAt(Path.GetFullPath("Builds/NativeTutorialOverlay/Windows/FFOne.exe"));
+
+        public static void BuildMusicTransitions()
+            => BuildWithCurrentContentAt(Path.GetFullPath("Builds/MusicTransitions/Windows/FFOne.exe"));
+
+        static void BuildWithCurrentContentAt(string output)
         {
+            Directory.CreateDirectory(Path.GetDirectoryName(output));
             const string content = "Library/com.unity.addressables/aa/Windows/settings.json";
             if (!File.Exists(content)) throw new InvalidOperationException("Build the Windows Addressables content before code-only validation.");
             var settings = AddressableAssetSettingsDefaultObject.Settings;
@@ -42,7 +64,6 @@ namespace FFOne.Editor
             try
             {
                 settings.BuildAddressablesWithPlayerBuild = AddressableAssetSettings.PlayerBuildOption.DoNotBuildWithPlayer;
-                string output = Path.Combine(Path.GetFullPath(DevelopmentSettings.BuildDirectory), "FFOne.exe");
                 var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions {
                     scenes = new[] { FrontendProject.ScenePath }, locationPathName = output,
                     target = BuildTarget.StandaloneWindows64, options = BuildOptions.Development | BuildOptions.AllowDebugging

@@ -1,0 +1,38 @@
+.ff-resurrection { background-color:rgba(0,0,0,.5); }
+.gameplay-prompt-panel.ff-resurrection-window {
+    left:50%; top:50%; width:520px; height:164px;
+    transform-origin:50% 50%; translate:-50% -50%;
+}
+.ff-resurrection-grim, .ff-resurrection-emblem,
+.ff-resurrection-title, .ff-resurrection-question, .ff-resurrection-countdown,
+.ff-resurrection-choice, .ff-resurrection-phoenix,
+.ff-resurrection-phoenix-back, .ff-resurrection-phoenix-icon { position:absolute; }
+.ff-resurrection-grim { background-image:url("../Artwork/en/gameplay/resurrect/grim.png"); -unity-background-scale-mode:stretch-to-fill; left:132px; top:-171px; width:255px; height:196px; }
+.ff-resurrection-emblem { background-image:url("../Artwork/en/gameplay/resurrect/resurrect.png"); -unity-background-scale-mode:stretch-to-fill; left:60px; top:27px; width:62px; height:62px; }
+.ff-resurrection-title {
+    left:144px; top:21px; width:372px; height:21px;
+    font-size:12px; -unity-text-align:middle-left;
+}
+.ff-resurrection-question, .ff-resurrection-countdown {
+    left:140px; font-size:12px; -unity-text-align:middle-left;
+    -unity-font-definition:url("../Fonts/chaletbook-regular-sdf.asset");
+}
+.ff-resurrection-question { top:46px; width:373px; height:28px; }
+.ff-resurrection-countdown { top:75px; width:376px; height:20px; color:red; }
+.ff-resurrection-choice {
+    top:124px; height:25px;
+    background-image:url("../Artwork/en/character/selection/controls/blue_button_normal.png");
+    -unity-background-scale-mode:stretch-to-fill;
+    -unity-slice-left:5; -unity-slice-bottom:5; -unity-slice-right:5; -unity-slice-top:5;
+}
+.ff-resurrection-choice:hover, .ff-resurrection-choice:focus, .ff-resurrection-choice:active {
+    background-image:url("../Artwork/en/character/selection/controls/blue_button_over.png");
+    color:rgb(0,36,62);
+}
+.ff-resurrection-go { left:374px; width:110px; }
+.ff-resurrection-alternative { left:44px; width:150px; }
+.ff-resurrection-phoenix { left:0; top:0; right:0; bottom:0; }
+.ff-resurrection-phoenix > .ff-resurrection-choice { padding-left:34px; padding-right:5px; }
+.ff-resurrection-phoenix-back { background-image:url("../Artwork/en/gameplay/nano/skill/buff_icon_back.png"); -unity-background-scale-mode:stretch-to-fill; left:50px; top:127px; width:20px; height:20px; }
+.ff-resurrection-phoenix-icon { background-image:url("../Artwork/en/gameplay/nano/icons/skill/skillicon_23.png"); -unity-background-scale-mode:stretch-to-fill; left:44px; top:120px; width:32px; height:32px; }
+.ff-resurrection-hidden { display:none; }

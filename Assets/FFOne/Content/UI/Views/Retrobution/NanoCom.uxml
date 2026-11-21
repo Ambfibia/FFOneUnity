@@ -1,18 +1,44 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements">
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:ff="FFOne.UI">
   <Style src="../../Styles/Retrobution.uss" />
-  <ui:VisualElement name="nanocom-root" class="retro-screen" picking-mode="Ignore">
-    <ui:VisualElement name="nanocom-window" class="retro-control" style="left:0px; top:0px; width:174px; height:468px; overflow:visible;">
-      <ui:VisualElement name="nanocom-menu-background" class="retro-control" picking-mode="Ignore" style="left:-4px; top:114px; width:178px; height:294px; background-image:url('../../Artwork/Retrobution/25654d51b35f3a92002e55b0.png'); -unity-background-scale-mode:stretch-to-fill;" />
-      <ui:VisualElement name="nanocom-menu" class="retro-control" style="left:6px; top:164px; width:158px; height:244px; overflow:hidden;">
-      <ui:Button name="inventory" class="retro-control retro-style-4125566f46e18130" style="left:1px; top:21px; width:148px; height:26px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="inventory-label" class="retro-text" text="MY STUFF" picking-mode="Ignore" /></ui:Button>
-      <ui:Button name="journal" class="retro-control retro-style-4125566f46e18130" style="left:1px; top:50px; width:148px; height:26px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="journal-label" class="retro-text" text="JOURNAL" picking-mode="Ignore" /></ui:Button>
-      <ui:Button name="mail" class="retro-control retro-style-4125566f46e18130" style="left:1px; top:79px; width:148px; height:26px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="mail-label" class="retro-text" text="E-MAIL" picking-mode="Ignore" /></ui:Button>
-      <ui:Button name="map" class="retro-control retro-style-4125566f46e18130" style="left:1px; top:108px; width:148px; height:26px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="map-label" class="retro-text" text="MAP" picking-mode="Ignore" /></ui:Button>
-      <ui:Button name="settings" class="retro-control retro-style-4125566f46e18130" style="left:1px; top:137px; width:148px; height:26px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="settings-label" class="retro-text" text="SETTINGS" picking-mode="Ignore" /></ui:Button>
-      <ui:Button name="guide" class="retro-control retro-style-4125566f46e18130" style="left:1px; top:166px; width:148px; height:26px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="guide-label" class="retro-text" text="GAME GUIDE" picking-mode="Ignore" /></ui:Button>
-      <ui:Button name="quit" class="retro-control retro-style-83a71c6e109e2abf" style="left:1px; top:195px; width:148px; height:26px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="quit-label" class="retro-text" text="EXIT GAME" picking-mode="Ignore" /></ui:Button>
+  <Style src="../../Styles/FFTheme.uss" />
+  <Style src="../../Styles/Gameplay.uss" />
+  <Style src="../../Styles/GameplayGuide.uss" />
+  <ui:Template name="GameplayGuide" src="GameplayGuide.uxml" />
+  <ui:Instance template="GameplayGuide" class="guide-template" />
+  <ff:NanoComMessageCard class="nanocom-message-card retro-control" picking-mode="Ignore" style="width:372px; height:122px; overflow:hidden;">
+    <ui:VisualElement class="nanocom-message-frame-npc retro-control" picking-mode="Ignore" style="left:51px; top:3px; width:321px; height:119px; background-image:url('../../Artwork/en/gameplay/nanocom/message/npc.png'); -unity-background-scale-mode:stretch-to-fill;" />
+    <ui:VisualElement class="nanocom-message-frame-invitation retro-control" picking-mode="Ignore" style="left:51px; top:3px; width:321px; height:119px; display:none; background-image:url('../../Artwork/en/gameplay/nanocom/nanocom_message_etc.png'); -unity-background-scale-mode:stretch-to-fill;" />
+    <ui:Image class="nanocom-message-icon retro-control" scale-mode="StretchToFill" picking-mode="Ignore" style="left:60px; top:15px; width:64px; height:64px;" />
+    <ui:Label class="nanocom-message-heading ff-label retro-control" picking-mode="Ignore" style="left:130px; top:2px; width:200px; height:30px; color:cyan; -unity-text-align:middle-left;" />
+    <ui:Label class="nanocom-message-body ff-copy retro-control" picking-mode="Ignore" style="left:130px; top:29px; width:164px; height:60px; color:white; -unity-font-definition:url('../../Fonts/chaletbook-regular-sdf.asset');" />
+    <ui:Button class="nanocom-message-open ff-button retro-control" style="left:51px; top:3px; width:321px; height:119px; display:none;" />
+  </ff:NanoComMessageCard>
+  <ui:VisualElement name="nanocom-invitation" class="nanocom-invitation-dialog">
+    <ui:VisualElement name="message-dialog" class="nanocom-invitation-panel">
+      <ui:VisualElement name="message-area" class="nanocom-invitation-area" picking-mode="Ignore" />
+      <ui:Image class="nanocom-invitation-icon" scale-mode="StretchToFill" picking-mode="Ignore" />
+      <ui:Label class="ff-label nanocom-invitation-title" enable-rich-text="false" picking-mode="Ignore" />
+      <ui:Label class="ff-copy nanocom-invitation-body" enable-rich-text="false" picking-mode="Ignore" />
+      <ui:Label class="ff-label nanocom-invitation-expiration" enable-rich-text="false" picking-mode="Ignore" />
+      <ui:Button name="prompt-cancel" class="ff-button nanocom-invitation-decline" />
+      <ui:Button name="prompt-confirm" class="ff-button nanocom-invitation-accept" />
+    </ui:VisualElement>
+  </ui:VisualElement>
+  <ui:VisualElement name="nanocom-root" class="retro-screen nanocom-view" picking-mode="Ignore">
+    <ui:VisualElement name="nanocom-window" class="retro-control nanocom-window" picking-mode="Ignore" style="left:0px; top:0px; width:187px; height:477px; overflow:visible;">
+      <ui:VisualElement name="nanocom-menu-background" class="retro-control" picking-mode="Ignore" style="left:9px; top:116px; width:178px; height:294px; background-image:url('../../Artwork/Retrobution/25654d51b35f3a92002e55b0.png'); -unity-background-scale-mode:stretch-to-fill;" />
+      <ui:VisualElement name="nanocom-menu" class="retro-control nanocom-actions" style="left:19px; top:166px; width:158px; height:244px; overflow:hidden;">
+      <ui:Button name="inventory" class="retro-control nanocom-action-inventory retro-style-4125566f46e18130" style="left:1px; top:21px; width:156px; height:26px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="inventory-label" class="retro-text nanocom-label-inventory" text="MY STUFF" picking-mode="Ignore" /></ui:Button>
+      <ui:Button name="journal" class="retro-control nanocom-action-journal retro-style-4125566f46e18130" style="left:1px; top:50px; width:156px; height:26px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="journal-label" class="retro-text nanocom-label-journal" text="JOURNAL" picking-mode="Ignore" /></ui:Button>
+      <ui:Button name="mail" class="retro-control nanocom-action-mail retro-style-4125566f46e18130" style="left:1px; top:79px; width:156px; height:26px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="mail-label" class="retro-text nanocom-label-mail" text="E-MAIL" picking-mode="Ignore" /></ui:Button>
+      <ui:Button name="map" class="retro-control nanocom-action-map retro-style-4125566f46e18130" style="left:1px; top:108px; width:156px; height:26px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="map-label" class="retro-text nanocom-label-map" text="MAP" picking-mode="Ignore" /></ui:Button>
+      <ui:Button name="settings" class="retro-control nanocom-action-settings retro-style-4125566f46e18130" style="left:1px; top:137px; width:156px; height:26px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="settings-label" class="retro-text nanocom-label-settings" text="SETTINGS" picking-mode="Ignore" /></ui:Button>
+      <ui:Button name="guide" class="retro-control nanocom-action-guide retro-style-4125566f46e18130" style="left:1px; top:166px; width:156px; height:26px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="guide-label" class="retro-text nanocom-label-guide" text="GAME GUIDE" picking-mode="Ignore" /></ui:Button>
+      <ui:Button name="quit" class="retro-control nanocom-action-quit retro-style-83a71c6e109e2abf" style="left:1px; top:195px; width:156px; height:26px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="quit-label" class="retro-text nanocom-label-quit" text="EXIT GAME" picking-mode="Ignore" /></ui:Button>
       </ui:VisualElement>
-      <ui:Button name="close" class="retro-control retro-style-ec7e87a40ea141b5" style="left:162px; top:156px; width:23px; height:23px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="close-label" class="retro-text" text="" picking-mode="Ignore" /></ui:Button>
+      <ui:Button name="close" class="retro-control nanocom-action-close retro-style-ec7e87a40ea141b5" style="left:162px; top:158px; width:23px; height:23px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="close-label" class="retro-text nanocom-label-close" text="" picking-mode="Ignore" /></ui:Button>
+      <ui:Button name="minimap-zoom-in" class="retro-control nanocom-zoom-in" style="left:130px; top:68px; width:18px; height:18px; background-image:url('../../Artwork/en/gameplay/minimap/zoom-in.png'); -unity-background-scale-mode:scale-to-fit;" />
+      <ui:Button name="minimap-zoom-out" class="retro-control nanocom-zoom-out" style="left:130px; top:92px; width:18px; height:18px; background-image:url('../../Artwork/en/gameplay/minimap/zoom-out.png'); -unity-background-scale-mode:scale-to-fit;" />
     </ui:VisualElement>
   </ui:VisualElement>
 </ui:UXML>

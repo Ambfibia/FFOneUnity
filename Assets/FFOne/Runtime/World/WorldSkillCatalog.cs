@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Globalization;
 using FFOne.Content;
 
@@ -7,9 +8,10 @@ namespace FFOne.World
 {
     public sealed class WorldSkillDefinition
     {
-        public int Id, Type, TargetType, TargetingType, TargetCount;
-        public float Range, Cooldown;
+        public int Id, Type, TargetType, TargetingType, TargetCount, TargetEffect;
+        public float Range, Area, Angle, Cooldown;
         public bool Passive;
+        public int[] MovementPower;
     }
     public sealed class WorldSkillCatalog
     {
@@ -24,9 +26,14 @@ namespace FFOne.World
             {
                 int id = Number(d, row, "m_iSkillNumber"); if (id <= 0) continue;
                 result.skills[id] = new WorldSkillDefinition { Id = id, Type = Number(d, row, "m_iSkillType"), TargetType = Number(d, row, "m_iTargetType"),
-                    TargetingType = Number(d, row, "m_iEffectTarget"), TargetCount = Number(d, row, "m_iTargetNumber"),
-                    Range = Number(d, row, "m_iEffectRange") / 100f, Cooldown = Number(d, row, "m_iCoolTime") / 10f,
+                    TargetingType = Number(d, row, "m_iEffectTarget"), TargetCount = Number(d, row, "m_iTargetNumber"), TargetEffect = Number(d, row, "m_iTargetEffect"),
+                    Range = Number(d, row, "m_iEffectRange") / 100f, Area = Number(d, row, "m_iEffectArea") / 100f,
+                    Angle = Number(d, row, "m_iEffectAngle"), Cooldown = Number(d, row, "m_iCoolTime") / 10f,
                     Passive = Number(d, row, "m_iBatteryDrainType") == 2 };
+                var definition = result.skills[id];
+                int values = Child(d, row, "m_iValueA");
+                if (definition.Type is 29 or 40 && definition.TargetType == 2 && Number(d, row, "m_iEffectType") == 1 && values >= 0)
+                    definition.MovementPower = d.Children(values).Select(i => int.TryParse(d.Nodes[i].Value, out int power) ? power : 0).ToArray();
             }
             return result;
         }

@@ -1,0 +1,52 @@
+{
+  "kind": "task",
+  "status": "done",
+  "priority": "normal",
+  "verification": "passed",
+  "area": "Инструменты разработки",
+  "notes": "Сохранена пользовательская настройка TortoiseGit Icon Overlays → Status cache → Shell (HKCU, CacheType=2). Режим действует на профиль Windows. Значки папок учитывают статус на текущем уровне. Временная проверка ModifyExplorerTitle отменена.",
+  "evidence": "21.11.2026. TortoiseGit 2.19.1.0. В режиме Default TGitCache возвращал none для корня и файлов FFOneUnity, тогда как соседние репозитории получали статус. Установленная libgit2 прочитала HEAD и индекс на 546 015 записей. После перезапуска кэша значки FFOneUnity не восстановились. В режиме Shell Windows Shell вернул значок modified для корня, README.md и AddressableAssetSettings.asset и normal для ProjectVersion.txt. В Проводнике проверены красный значок на FFOneUnity и .gitignore, зелёный на .gitattributes.",
+  "source": "",
+  "historical": "",
+  "chat": "",
+  "triageChat": "",
+  "history": [
+    {
+      "time": "2026-11-21T08:30:25+00:00",
+      "changes": {
+        "area": "Инструменты разработки",
+        "kind": "task",
+        "status": "active",
+        "title": "Восстановить значки TortoiseGit для FFOneUnity"
+      }
+    },
+    {
+      "time": "2026-11-21T08:31:42+00:00",
+      "changes": {
+        "evidence": "21.11.2026. git status распознал FFOneUnity на main и показал 33 730 записей по отслеживаемым файлам. Индекс 114 354 619 байт. TGitCache запущен, Explorer загрузил TortoiseGit.dll и TortoiseOverlays.dll. В профиле TortoiseGit нет явных исключений для путей.",
+        "notes": "Пользователь остановил управление Проводником клавишей Escape. Отображение значков не подтверждено, причина не установлена. Настройки Git и TortoiseGit не менялись.",
+        "status": "review",
+        "verification": "tested"
+      }
+    },
+    {
+      "time": "2026-11-21T08:36:11+00:00",
+      "changes": {
+        "status": "active"
+      }
+    },
+    {
+      "time": "2026-11-21T08:40:12+00:00",
+      "changes": {
+        "evidence": "21.11.2026. TortoiseGit 2.19.1.0. В режиме Default TGitCache возвращал none для корня и файлов FFOneUnity, тогда как соседние репозитории получали статус. Установленная libgit2 прочитала HEAD и индекс на 546 015 записей. После перезапуска кэша значки FFOneUnity не восстановились. В режиме Shell Windows Shell вернул значок modified для корня, README.md и AddressableAssetSettings.asset и normal для ProjectVersion.txt. В Проводнике проверены красный значок на FFOneUnity и .gitignore, зелёный на .gitattributes.",
+        "notes": "Сохранена пользовательская настройка TortoiseGit Icon Overlays → Status cache → Shell (HKCU, CacheType=2). Режим действует на профиль Windows. Значки папок учитывают статус на текущем уровне. Временная проверка ModifyExplorerTitle отменена.",
+        "status": "done",
+        "verification": "passed"
+      }
+    }
+  ],
+  "updated": "2026-11-21T08:40:12+00:00",
+  "id": "studio-c6568d9ea84a",
+  "original": "Восстановить значки TortoiseGit для FFOneUnity",
+  "title": "Восстановить значки TortoiseGit для FFOneUnity"
+}

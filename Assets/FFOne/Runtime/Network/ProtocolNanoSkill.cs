@@ -17,6 +17,9 @@ namespace FFOne.Network
         public int? NanoStamina { get; internal set; }
         public bool NanoDeactivated { get; internal set; }
         public bool Resurrected { get; internal set; }
+        internal bool Protected { get; set; }
+        public int DrainedBoosts { get; internal set; }
+        public int DrainedPotions { get; internal set; }
         public int? WeaponBattery { get; internal set; }
         public int? NanoBattery { get; internal set; }
     }
@@ -72,6 +75,9 @@ namespace FFOne.Network
                     effects.Add(stamina); continue;
                 }
                 var effect = Effect(p, o, hp);
+                if (type is 1 or 3 or 4 or 5 or 8 or 21 or 22 or 38 or 39 ||
+                    hp < 0 && type is not (27 or 28))
+                    effect.Protected = ProtocolGameplay.I(p, o + 8) > 0;
                 effect.Resurrected = type == 26;
                 if (type == 27 || type == 28)
                 { effect.Map = ProtocolGameplay.I(p, o + 8); effect.X = ProtocolGameplay.I(p, o + 12); effect.Y = ProtocolGameplay.I(p, o + 16); effect.Z = ProtocolGameplay.I(p, o + 20); }
@@ -79,10 +85,12 @@ namespace FFOne.Network
                 { effect.Condition = ProtocolGameplay.I(p, o + 28); effect.NanoStamina = Protocol0104.Read16(p, o + 20); effect.NanoDeactivated = ProtocolGameplay.I(p, o + 24) != 0; }
                 else if (type == 21)
                 {
+                    effect.DrainedBoosts = ProtocolGameplay.I(p, o + 12);
+                    effect.DrainedPotions = ProtocolGameplay.I(p, o + 20);
                     effect.WeaponBattery = ProtocolGameplay.I(p, o + 16); effect.NanoBattery = ProtocolGameplay.I(p, o + 24);
                     effect.NanoStamina = Protocol0104.Read16(p, o + 28); effect.NanoDeactivated = ProtocolGameplay.I(p, o + 32) != 0;
                     effect.Condition = ProtocolGameplay.I(p, o + 36);
-                    if (effect.WeaponBattery < 0 || effect.NanoBattery < 0 || effect.NanoStamina < 0) throw new ProtocolException("Invalid drained battery/stamina post-state.");
+                    if (effect.DrainedBoosts < 0 || effect.DrainedPotions < 0 || effect.WeaponBattery < 0 || effect.NanoBattery < 0 || effect.NanoStamina < 0) throw new ProtocolException("Invalid drained battery/stamina post-state.");
                 }
                 else if (hp < 0 && type != 21 && type != 27 && type != 28) effect.Condition = ProtocolGameplay.I(p, o + 12);
                 effects.Add(effect);

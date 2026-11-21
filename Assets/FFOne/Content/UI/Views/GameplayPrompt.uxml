@@ -1,16 +1,32 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
   <Style src="../Styles/FFTheme.uss" />
   <Style src="../Styles/Gameplay.uss" />
-  <!-- Shared native dialog for gameplay controllers; the original NanoCom popup is not yet converted. -->
+  <Style src="../Styles/GameplayResurrection.uss" />
   <ui:VisualElement name="gameplay-prompt" class="gameplay-prompt">
     <ui:VisualElement class="gameplay-prompt-panel">
-      <ui:Label name="prompt-title" class="ff-label gameplay-prompt-title" />
-      <ui:Label name="prompt-body" class="ff-label gameplay-prompt-body" />
-      <ui:TextField name="prompt-value" class="ff-input" style="height:32px; display:none;" />
-      <ui:VisualElement class="gameplay-prompt-actions">
-        <ui:Button name="prompt-cancel" class="ff-button ff-button--primary" text="CANCEL" />
-        <ui:Button name="prompt-confirm" class="ff-button ff-button--primary" text="ACCEPT" />
+      <ui:Label name="prompt-title" class="ff-label gameplay-prompt-title" enable-rich-text="false" />
+      <ui:Label name="prompt-body" class="ff-copy gameplay-prompt-body" enable-rich-text="false" />
+      <ui:Image class="gameplay-prompt-icon" picking-mode="Ignore" scale-mode="StretchToFill" />
+      <ui:Label class="ff-label gameplay-prompt-stack" picking-mode="Ignore" />
+      <ui:TextField name="prompt-value" class="ff-input gameplay-prompt-value" max-length="10" />
+      <ui:Button name="prompt-cancel" class="ff-button gameplay-prompt-cancel" text="CANCEL" />
+      <ui:Button name="prompt-confirm" class="ff-button gameplay-prompt-confirm" text="ACCEPT" />
+    </ui:VisualElement>
+  </ui:VisualElement>
+  <ui:VisualElement name="resurrection" class="ff-screen ff-resurrection">
+    <ui:VisualElement name="resurrection-window" class="gameplay-prompt-panel ff-resurrection-window" picking-mode="Ignore">
+      <ui:VisualElement name="grim" class="ff-resurrection-grim" picking-mode="Ignore" />
+      <ui:VisualElement name="resurrect-em" class="ff-resurrection-emblem" picking-mode="Ignore" />
+      <ui:Label name="resurrection-title" class="ff-label ff-resurrection-title" picking-mode="Ignore" />
+      <ui:Label name="resurrection-question" class="ff-copy ff-resurrection-question" picking-mode="Ignore" />
+      <ui:Label name="resurrection-countdown" class="ff-label ff-resurrection-countdown" picking-mode="Ignore" />
+      <ui:Button name="prompt-confirm" class="ff-button ff-resurrection-choice ff-resurrection-go" />
+      <ui:VisualElement class="ff-resurrection-phoenix ff-resurrection-hidden" picking-mode="Ignore">
+        <ui:Button name="revive-phoenix" class="ff-button ff-resurrection-choice ff-resurrection-alternative" />
+        <ui:VisualElement name="phoenix-back" class="ff-resurrection-phoenix-back" picking-mode="Ignore" />
+        <ui:VisualElement name="phoenix-icon" class="ff-resurrection-phoenix-icon" picking-mode="Ignore" />
       </ui:VisualElement>
+      <ui:Button name="revive-item" class="ff-button ff-resurrection-choice ff-resurrection-alternative ff-resurrection-use-item ff-resurrection-hidden" />
     </ui:VisualElement>
   </ui:VisualElement>
 </ui:UXML>

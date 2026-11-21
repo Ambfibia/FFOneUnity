@@ -19,15 +19,7 @@ namespace FFOne.UI
 
         void InitializeOptions()
         {
-            string path = Path.Combine(Application.persistentDataPath, "unity-options.json");
-            var desktop = Screen.currentResolution;
-            preferences = new SettingsPreferences(path, desktop.width, desktop.height);
-            if (!File.Exists(path))
-            {
-                preferences.Committed["text_locale"] = language;
-                preferences.Committed["voice_locale"] = language;
-                preferences.Open();
-            }
+            PrepareAudioPreferences();
             // Explicit player launch dimensions also belong to validation tools and launchers.
             var args = Environment.GetCommandLineArgs();
             applySavedResolution = !Application.isEditor && !args.Any(arg =>
@@ -35,28 +27,65 @@ namespace FFOne.UI
                 arg.Equals("-screen-height", StringComparison.OrdinalIgnoreCase) ||
                 arg.Equals("-screen-fullscreen", StringComparison.OrdinalIgnoreCase));
             preferences.Changed += ApplyOptions;
-            settings = new SettingsWindow(Root, preferences);
+            settings = new SettingsWindow(UiLayers.For(Root).Host(UiLayer.Settings), preferences);
             settings.Closed += UpdateWorldInputGate;
+            settings.UnignoreRequested += slot => gameplayUi?.UnignorePlayer(slot);
             ApplyOptions();
+        }
+
+        void PrepareAudioPreferences()
+        {
+            if (preferences == null)
+            {
+                string path = Integration.DevelopmentConnection.OptionsPath(Application.persistentDataPath);
+                var desktop = Screen.currentResolution;
+                preferences = new SettingsPreferences(path, desktop.width, desktop.height);
+                if (!File.Exists(path))
+                {
+                    preferences.Committed["text_locale"] = language;
+                    preferences.Committed["voice_locale"] = language;
+                    preferences.Open();
+                }
+            }
+            var value = preferences.Committed;
+            AudioListener.volume = (bool)value["sound"]["master_enabled"] ? (float)value["sound"]["master"] / 10 : 0;
+            audio?.SetEffectsGain(AudioGain(value, "effects"));
+            audio?.SetGain(AudioGain(value, "music"), AudioGain(value, "ambient"), playMusic);
         }
 
         public void OpenSettings()
         {
             if (busy || settings == null || settings.Visible) return;
-            CloseWorldMenu(); settings.Open(); UpdateWorldInputGate();
+            CloseWorldMenu();
+            RefreshBlockedPlayers();
+            settings.Open();
+            UpdateWorldInputGate();
+        }
+
+        void RefreshBlockedPlayers()
+        {
+            if (settings == null) return;
+            settings.SetBlockedPlayers(gameplayUi?.Social.Friends
+                .Where(player => player?.Blocked == true)
+                .Select(player => (player.Slot, player.Name)) ?? Enumerable.Empty<(int, string)>());
         }
 
         void ApplyOptions()
         {
             var value = preferences.Committed;
+            GameplayInput.Apply(value);
+            bool scaleUi = (bool?)value["display"]?["scale_ui"] ?? true;
+            bool scaleChanged = RetrobutionLayout.AutomaticScale != scaleUi;
+            RetrobutionLayout.AutomaticScale = scaleUi;
             string nextLanguage = (string)value["text_locale"];
             if (nextLanguage != language) SetLanguage(nextLanguage);
-            AudioListener.volume = (bool)value["sound"]["master_enabled"] ? (float)value["sound"]["master"] / 10 : 0;
-            if (music) music.volume = AudioGain(value, "music");
-            tutorial?.ApplyPreferences(value);
+            PrepareAudioPreferences();
+            tutorial?.ApplyPreferences(value, playMusic);
+            gameplayUi?.ApplyDisplayPreferences(value);
             if (networkWorld)
             {
                 networkWorld.Preferences = value;
+                networkWorld.SetDanceMusicGain(playMusic ? AudioGain(value, "music") : 0);
                 networkWorld.MouseSensitivity = (float)value["input"]["sensitivity"] / 5;
                 networkWorld.InvertMouseY = (bool)value["input"]["invert_y"];
             }
@@ -69,9 +98,18 @@ namespace FFOne.UI
                     Screen.SetResolution((int)graphics["width"], (int)graphics["height"],
                         (bool)graphics["windowed"] ? FullScreenMode.Windowed : FullScreenMode.FullScreenWindow);
                 QualitySettings.anisotropicFiltering = (bool)graphics["anisotropic"] ? AnisotropicFiltering.Enable : AnisotropicFiltering.Disable;
+                Shader.SetGlobalFloat("_FFOneDisableTerrainAnisotropy", (bool)graphics["anisotropic"] ? 0 : 1);
+                Shader.SetGlobalFloat("_FFOneDisableToon", (bool)graphics["toon"] ? 0 : 1);
                 QualitySettings.globalTextureMipmapLimit = (int)graphics["texture"];
             }
             appliedGraphics = (JObject)graphics.DeepClone();
+            if (scaleChanged)
+            {
+                Layout();
+                LayoutLoadingScreen();
+                settings?.Layout();
+                gameplayUi?.RefreshViewport();
+            }
         }
 
         public static float AudioGain(JObject options, string channel) =>
@@ -86,9 +124,14 @@ namespace FFOne.UI
         void ApplyWorldInputGate()
         {
             bool modal = worldMenu != null || settings?.Visible == true || busy;
-            gameplayUi?.SetInteractionSuspended(modal);
+            gameplayUi?.SetInteractionSuspended(modal || revivePrompt != null || gameplayState?.Snapshot.Hp == 0);
             bool blocked = modal || gameplayUi?.InputBlocked == true || revivePrompt != null || gameplayState?.Snapshot.Hp == 0;
-            if (networkWorld) networkWorld.InputBlocked = blocked;
+            if (networkWorld)
+            {
+                networkWorld.InputBlocked = blocked;
+                networkWorld.MenuAutoRun = !modal && revivePrompt == null && gameplayState?.Snapshot.Hp > 0 && gameplayUi?.AllowsMenuAutoRun == true;
+                networkWorld.InventoryOpen = gameplayUi?.Windows.Current is GameplayWindow.Inventory or GameplayWindow.Nanos or GameplayWindow.Journal;
+            }
             if (tutorial) tutorial.ExternalInputBlocked = blocked;
         }
 
@@ -99,9 +142,9 @@ namespace FFOne.UI
             if (busy || !fromGameplayNavigation && Time.frameCount == menuDismissedFrame) return;
             if (settings?.Visible == true) { settings.Close(); return; }
             if (worldMenu != null) { CloseWorldMenu(); return; }
-            if (gameplayUi?.CloseWindow() == true && !fromGameplayNavigation) { UpdateWorldInputGate(); return; }
+            if (!fromGameplayNavigation && gameplayUi?.CloseWindow() == true) { UpdateWorldInputGate(); return; }
             worldMenu = FFView.Instantiate("ui/views/Retrobution/QuitMenu", "quit-root");
-            Root.Add(worldMenu);
+            UiLayers.For(Root).Add(worldMenu, UiLayer.Dialog);
             var dialog = FFView.Require<VisualElement>(worldMenu, "quit-dialog");
             var backdrop = FFView.Require<VisualElement>(worldMenu, "quit-backdrop");
             void Place()

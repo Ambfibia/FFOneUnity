@@ -1,0 +1,47 @@
+{
+  "status": "done",
+  "verification": "passed",
+  "notes": "Подтверждены короткое нажатие, удержание около секунды без выстрела с появлением прицела или траектории, единичный запуск при отпускании и повтор с учётом штатной перезарядки. RT проверен через виртуальное устройство.",
+  "evidence": "Граната 22 и ракета 781. В реальном клиенте мышь, клавиатура Z и виртуальный RT через Input System. Сервер подтвердил каждый ожидаемый запуск, включая буферизованный повтор. Кадры: Logs/Studio/DashboardFive-20261119/validation-harness/live/projectile/. 19.11.2026. Unity 6000.4.0f1, свежая Windows-сборка со свежим каталогом, реальный изолированный RustyFusion. Протокол: Logs/Studio/DashboardFive-20261119/verification-20261119.json; сборка: Logs/Studio/DashboardFive-20261119/rebuild/unity-build.log; SHA-256: Logs/Studio/DashboardFive-20261119/rebuild/artifact-sha256.json.",
+  "history": [
+    {
+      "time": "2026-11-18T14:14:50+00:00",
+      "changes": {
+        "evidence": "18.11.2026. FrontendGameplay и FrontendCombat вызывают FireProjectileAsync по Held(Fire1). В просмотренном пути нет ожидания секунды, дуги и выстрела при отпускании.",
+        "status": "ready",
+        "verification": "analyzed"
+      }
+    },
+    {
+      "time": "2026-11-19T10:13:49+00:00",
+      "changes": {
+        "status": "active"
+      }
+    },
+    {
+      "time": "2026-11-19T10:46:31+00:00",
+      "changes": {
+        "evidence": "Три ProjectileAttackInputTests прошли в EditMode и при прямом вызове NUnit. Проверены привязки Z/ЛКМ/RT, исходно скрытые UI-элементы и границы серверной перезарядки. 19.11.2026. Unity 6000.4.0f1, EditMode 40/40: Logs/Studio/DashboardFive-20261119/tests.xml. Компиляция Runtime Editor и Player через Roslyn: Logs/Studio/DashboardFive-20261119/roslyn-runtime.log, Logs/Studio/DashboardFive-20261119/roslyn-player.log. Сборка Windows прервана при Generate Bundle Packing: Logs/Studio/DashboardFive-20261119/unity-build.log.",
+        "notes": "Ракета использует существующий прицел HUD, граната получила новую дугу с маркером первого контакта. Повторный отпуск буферизуется до серверного интервала. Остаются видимый прогон тап/удержание/отпуск с клавиатуры, мыши и RT, повторный выстрел и скриншоты.",
+        "status": "review",
+        "verification": "tested"
+      }
+    },
+    {
+      "time": "2026-11-19T11:10:54+00:00",
+      "changes": {
+        "status": "active"
+      }
+    },
+    {
+      "time": "2026-11-19T11:44:03+00:00",
+      "changes": {
+        "evidence": "Граната 22 и ракета 781. В реальном клиенте мышь, клавиатура Z и виртуальный RT через Input System. Сервер подтвердил каждый ожидаемый запуск, включая буферизованный повтор. Кадры: Logs/Studio/DashboardFive-20261119/validation-harness/live/projectile/. 19.11.2026. Unity 6000.4.0f1, свежая Windows-сборка со свежим каталогом, реальный изолированный RustyFusion. Протокол: Logs/Studio/DashboardFive-20261119/verification-20261119.json; сборка: Logs/Studio/DashboardFive-20261119/rebuild/unity-build.log; SHA-256: Logs/Studio/DashboardFive-20261119/rebuild/artifact-sha256.json.",
+        "notes": "Подтверждены короткое нажатие, удержание около секунды без выстрела с появлением прицела или траектории, единичный запуск при отпускании и повтор с учётом штатной перезарядки. RT проверен через виртуальное устройство.",
+        "status": "done",
+        "verification": "passed"
+      }
+    }
+  ],
+  "updated": "2026-11-19T11:44:03+00:00"
+}

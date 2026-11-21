@@ -15,6 +15,7 @@ namespace FFOne.Network
     public sealed class GroupMember
     {
         public int Id, Level, Hp, MaxHp, Map, X, Y, Z;
+        public int NanoId, NanoSkill, NanoStamina;
         public long Uid;
         public string Name;
     }
@@ -38,7 +39,7 @@ namespace FFOne.Network
         public const uint List = 0x31000063, Added = 0x31000067, States = 0x3100006f,
             Blocked = 0x31000071, Removed = 0x31000073, Request = 0x3100007b, NamedRequest = 0x310000fe,
             Invite = 0x31000086, Join = 0x3100008b, Leave = 0x3100008c, Left = 0x3100008e, Members = 0x3100008f,
-            WhisperOk = 0x31000069, GroupChatOk = 0x310000b5;
+            WhisperOk = 0x31000069, GroupChatOk = 0x310000b5, WhisperMenuOk = 0x3100006b, GroupMenuOk = 0x310000ba;
         public static byte[] Id(int id) { if (id <= 0) throw new ArgumentOutOfRangeException(nameof(id)); var p = new byte[4]; Protocol0104.Write32(p, 0, id); return p; }
         public static byte[] Identity(int id, long uid)
         { if (uid <= 0) throw new ArgumentOutOfRangeException(nameof(uid)); var p = new byte[12]; Array.Copy(Id(id), p, 4); Protocol0104.Write64(p, 4, uid); return p; }
@@ -88,7 +89,8 @@ namespace FFOne.Network
                     {
                         int o = h + i * 112; int id = I(p, o); if (id <= 0 || !ids.Add(id)) throw new ProtocolException("Invalid/repeated group player.");
                         members.Add(new GroupMember { Id = id, Uid = Protocol0104.Read64(p, o + 4), Name = (Protocol0104.ReadUtf16(p, o + 14, 9) + " " + Protocol0104.ReadUtf16(p, o + 32, 17)).Trim(),
-                            Level = Protocol0104.Read16(p, o + 68), Hp = I(p, o + 72), MaxHp = I(p, o + 76), Map = I(p, o + 84), X = I(p, o + 88), Y = I(p, o + 92), Z = I(p, o + 96) });
+                            Level = Protocol0104.Read16(p, o + 68), Hp = I(p, o + 72), MaxHp = I(p, o + 76), Map = I(p, o + 84), X = I(p, o + 88), Y = I(p, o + 92), Z = I(p, o + 96),
+                            NanoId = I(p,o+100)==0 ? 0 : Protocol0104.Read16(p,o+104), NanoSkill = Protocol0104.Read16(p,o+106), NanoStamina = Protocol0104.Read16(p,o+108) });
                     }
                     var companions = new List<GroupNpc>(); ids.Clear();
                     for (int i = 0; i < npcs; i++)
@@ -98,9 +100,9 @@ namespace FFOne.Network
                         companions.Add(new GroupNpc { Id = id, Type = I(p, o + 4), Hp = I(p, o + 8), Map = I(p, o + 16), X = I(p, o + 20), Y = I(p, o + 24), Z = I(p, o + 28) });
                     }
                     u.Members = members.AsReadOnly(); u.Npcs = companions.AsReadOnly(); u.NpcCount = npcs; break;
-                case WhisperOk:
+                case WhisperOk: case WhisperMenuOk:
                     Size(p, 276); u.Uid = Protocol0104.Read64(p, 0); u.ToUid = Protocol0104.Read64(p, 8); u.Text = Protocol0104.ReadUtf16(p, 16, 128); break;
-                case GroupChatOk:
+                case GroupChatOk: case GroupMenuOk:
                     Size(p, 264); u.Id = I(p, 0); u.Text = Protocol0104.ReadUtf16(p, 4, 128); break;
                 case 0x83000065: Size(p, 16); u.Id = I(p, 4); u.Uid = Protocol0104.Read64(p, 8); break;
                 case 0x31000064: case 0x31000070: case 0x31000087: case 0x310000f0: case 0x310000f2: Size(p, 4); u.Failed = true; u.Error = I(p, 0); break;

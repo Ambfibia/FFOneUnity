@@ -2836,7 +2836,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6256513214226409615}
-  - component: {fileID: 3687164656642753274}
+  - component: {fileID: 1985392082915684656}
+  - component: {fileID: 7580727012687727361}
   m_Layer: 0
   m_Name: model
   m_TagString: Untagged
@@ -2860,39 +2861,78 @@ Transform:
   - {fileID: 6264894962815221296}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!111 &3687164656642753274
-Animation:
+--- !u!95 &1985392082915684656
+Animator:
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8561057583454910105}
   m_Enabled: 1
-  serializedVersion: 4
-  m_Animation: {fileID: 7400000, guid: 1be7ef63292d00a4dab9a7dfbbe6fa3b, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: 3148ae757b19ba64f84c9faf4ba611c2, type: 2}
-  - {fileID: 7400000, guid: c2ebd27d99d918f4a8e93b2b5353b94c, type: 2}
-  - {fileID: 7400000, guid: b046e68da7cddf945bde8c6d5a0f49e2, type: 2}
-  - {fileID: 7400000, guid: 555a57da072b7d54db52958b757bcb92, type: 2}
-  - {fileID: 7400000, guid: 1c4cebc6dc6f3674181c1e13e9673da0, type: 2}
-  - {fileID: 7400000, guid: 0b70e74c5b29f664387a77995a4cf805, type: 2}
-  - {fileID: 7400000, guid: f9a247ef5b27cff42b5723c19ed1ea3d, type: 2}
-  - {fileID: 7400000, guid: 55debdd2a1f50c940a80a3aa2232dfb5, type: 2}
-  - {fileID: 7400000, guid: 9a3c25cdf39d45b4a933c6fbf5b719a7, type: 2}
-  - {fileID: 7400000, guid: 1be7ef63292d00a4dab9a7dfbbe6fa3b, type: 2}
-  - {fileID: 7400000, guid: 3fd49ea18b32b1a479fbd3f81ce07d0b, type: 2}
-  - {fileID: 7400000, guid: a05e2bafb466fa3499197e432b624421, type: 2}
-  - {fileID: 7400000, guid: d8c0d333a401b0d44bf1b79c5eaf4bc4, type: 2}
-  - {fileID: 7400000, guid: 83fbfe57c265603489c51841cfb14640, type: 2}
-  - {fileID: 7400000, guid: a51cdceede0376a4282dea4b0275bedb, type: 2}
-  - {fileID: 7400000, guid: c56ad303aa7c07f4c829641dee852cac, type: 2}
-  - {fileID: 7400000, guid: 2c7f8234d2b8b6944bd820add536a2dc, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: ece2678a5e830cd4baa845d410aa2d2b, type: 2}
+  m_CullingMode: 0
   m_UpdateMode: 0
-  m_CullingType: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 1
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7580727012687727361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8561057583454910105}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b7ac68c382befc4d9fc82662c17e418, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.Content.NativeNpcAnimator
+  animator: {fileID: 1985392082915684656}
+  AnimationSounds:
+  - Cue: SamJack_AttackGrunt1.wav
+    Variants:
+    - {fileID: 8300000, guid: 02c2435882eafd643a1e4a4b122dc15c, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: SamJack_SwordSFX_1.wav
+    Variants:
+    - {fileID: 8300000, guid: 04c25cf788787ca48adaa852e7f8b35c, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: SamJack_AttackGrunt2.wav
+    Variants:
+    - {fileID: 8300000, guid: 41e453f068f4ea645b0c2c1672a38604, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: SamJack_SwordSFX_2.wav
+    Variants:
+    - {fileID: 8300000, guid: d3df5056ba2a69a4093954a9cf8718d6, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: SamJack_SwordSFX_3.wav
+    Variants:
+    - {fileID: 8300000, guid: 9ec807a7d4346ab4ba17e3bf309ae1e4, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: SamJack_AttackGrunt3.wav
+    Variants:
+    - {fileID: 8300000, guid: 37a9b1a57acb1584fbfaee2281a76738, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: windUser-04.wav
+    Variants:
+    - {fileID: 0}
+    RussianVariants:
+    - {fileID: 0}
+  Faces: []
 --- !u!1 &8628233456625867935
 GameObject:
   m_ObjectHideFlags: 0

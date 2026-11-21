@@ -1,0 +1,40 @@
+{
+  "kind": "bug",
+  "status": "done",
+  "priority": "normal",
+  "verification": "passed",
+  "area": "UI — интерфейс",
+  "notes": "Включён штатный режим парольного поля Unity. Windows-проверка выполнена на прямом TCP с одноразовым аккаунтом и изолированной БД.",
+  "evidence": "Видимый открытый текст одноразового тестового пароля на кадрах studio-84ce5414a862 после отказа соединения. Login.uxml использует имя атрибута is-password-field вместо password.\n19.11.2026. Разметка Login.uxml исправлена и импортирована Unity 6000.4.0f1 с прежним GUID. Windows Development на FFOneUnity f5b40dbc990f4dd42066d0bf9e32400bccff8ce9 с готовыми Addressables. При создании формы включается маска и для ранее собранной разметки. В работающем клиенте тестовый сценарий заполнил поле и отправил вход штатной кнопкой. RustyFusion с изолированной БД вернул Login: server error 2. До и после отказа на кадрах видны только звёздочки, значение осталось доступно для редактирования. После отказа соединения поле также замаскировано. Верный пароль открыл ростер. Проверены кадры 07-password-before-submit.png, 08-password-after-rejection.png, 04-login-while-offline.png в Logs/Studio/password-masking-20261119/Windows/Logs/FrontendRecovery/. Протокол Logs/Studio/password-masking-20261119/acceptance.json, Unity EditMode 31/31 в Logs/Studio/password-masking-20261119/editmode.xml.",
+  "source": "",
+  "historical": "",
+  "chat": "",
+  "triageChat": "",
+  "history": [
+    {
+      "time": "2026-11-19T09:24:37+00:00",
+      "changes": {
+        "area": "UI — интерфейс",
+        "evidence": "Видимый открытый текст одноразового тестового пароля на кадрах studio-84ce5414a862 после отказа соединения. Login.uxml использует имя атрибута is-password-field вместо password.",
+        "kind": "bug",
+        "notes": "Проверить маску при заполнении поля, после отказа авторизации и после ошибки соединения в Windows-клиенте.",
+        "status": "active",
+        "title": "Пароль на форме входа отображается открытым текстом",
+        "verification": "confirmed"
+      }
+    },
+    {
+      "time": "2026-11-19T09:35:05+00:00",
+      "changes": {
+        "evidence": "Видимый открытый текст одноразового тестового пароля на кадрах studio-84ce5414a862 после отказа соединения. Login.uxml использует имя атрибута is-password-field вместо password.\n19.11.2026. Разметка Login.uxml исправлена и импортирована Unity 6000.4.0f1 с прежним GUID. Windows Development на FFOneUnity f5b40dbc990f4dd42066d0bf9e32400bccff8ce9 с готовыми Addressables. При создании формы включается маска и для ранее собранной разметки. В работающем клиенте тестовый сценарий заполнил поле и отправил вход штатной кнопкой. RustyFusion с изолированной БД вернул Login: server error 2. До и после отказа на кадрах видны только звёздочки, значение осталось доступно для редактирования. После отказа соединения поле также замаскировано. Верный пароль открыл ростер. Проверены кадры 07-password-before-submit.png, 08-password-after-rejection.png, 04-login-while-offline.png в Logs/Studio/password-masking-20261119/Windows/Logs/FrontendRecovery/. Протокол Logs/Studio/password-masking-20261119/acceptance.json, Unity EditMode 31/31 в Logs/Studio/password-masking-20261119/editmode.xml.",
+        "notes": "Включён штатный режим парольного поля Unity. Windows-проверка выполнена на прямом TCP с одноразовым аккаунтом и изолированной БД.",
+        "status": "done",
+        "verification": "passed"
+      }
+    }
+  ],
+  "updated": "2026-11-19T09:35:05+00:00",
+  "id": "studio-f2e674fd3361",
+  "original": "Пароль на форме входа отображается открытым текстом",
+  "title": "Пароль на форме входа отображается открытым текстом"
+}

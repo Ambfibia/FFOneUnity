@@ -20,14 +20,11 @@ namespace FFOne.World
         {
             internal WorldTileReference Reference;
             internal GameObject Root;
-            internal WorldTileContent Content;
-            internal FFOne.Content.ContentAssets.Request Lease;
             internal AsyncOperationHandle<SceneInstance> SceneLease;
             internal bool SceneRequested, SceneUnloading;
             internal bool Ready, Retiring;
             internal bool AdmissionFinished;
             internal int Visuals, Colliders;
-            internal readonly List<Material> OwnedMaterials = new List<Material>();
         }
         public const float LoadDistance = 356, UnloadDistance = 420;
         public const int MaximumRoots = 9;
@@ -49,7 +46,7 @@ namespace FFOne.World
         public int MaximumObservedRoots { get; private set; }
         public string[] LoadedTileIds => tiles.Values.Where(t => t.Ready && !t.Retiring).Select(t => t.Reference.Id).OrderBy(id => id).ToArray();
         public string[] LoadedSceneTileIds => tiles.Values.Where(t => t.SceneRequested && t.Ready && !t.Retiring).Select(t => t.Reference.Id).OrderBy(id => id).ToArray();
-        public bool IsReady => Catalog && string.IsNullOrEmpty(LastError) && PendingTiles == 0 &&
+        public bool IsReady => initialized && Catalog && string.IsNullOrEmpty(LastError) && PendingTiles == 0 &&
             Catalog.Tiles.Any(t => Includes(t) && t.DistanceSquared(Anchor) < LoadDistance * LoadDistance) &&
             (neighborWater == null || neighborWater.Ready) &&
             Catalog.Tiles.Where(t => Includes(t) && t.DistanceSquared(Anchor) < LoadDistance * LoadDistance).All(t => tiles.ContainsKey(t.Id));
@@ -57,11 +54,11 @@ namespace FFOne.World
         public int NeighborWaterVisuals => neighborWater ? neighborWater.VisualCount : 0;
         public int PresentedVersion { get; private set; }
         public bool TilePresented(string id) => tiles.TryGetValue(id, out var tile) && tile.Ready && !tile.Retiring;
+        public bool Owns(Collider collider) => collider && tiles.Values.Any(tile => tile.Ready && !tile.Retiring && tile.Root && collider.transform.IsChildOf(tile.Root.transform));
         readonly Dictionary<string, Tile> tiles = new Dictionary<string, Tile>();
-        int loading, retired;
-        AsyncOperation unloading;
-        readonly Stopwatch budget = new Stopwatch();
+        int loading;
         Transform ambienceTarget;
+        bool initialized;
         RenderPipelineAsset previousPipeline, worldPipeline;
 
         IEnumerator Start()
@@ -84,15 +81,17 @@ namespace FFOne.World
                 foreach (var atmosphere in Catalog.Atmospheres)
                     FFOne.Runtime.World.WorldTerrainEnvironment.Register(atmosphere.Grid, atmosphere.FogDepth, atmosphere.Fog, atmosphere.Sky, atmosphere.Light);
             if (!View) View = Camera.main;
-            if (View) View.clearFlags = CameraClearFlags.SolidColor;
+            if (View) View.clearFlags = View.TryGetComponent<Skybox>(out var skybox) && skybox.material
+                ? CameraClearFlags.Skybox : CameraClearFlags.SolidColor;
             if (View && !View.GetComponent<WorldCameraProjection>()) View.gameObject.AddComponent<WorldCameraProjection>();
             ambienceTarget = new GameObject("World ambience anchor").transform; ambienceTarget.SetParent(transform, false);
             FFOne.Runtime.World.WorldTerrainEnvironment.SamplingTarget = ambienceTarget;
+            initialized = true;
         }
         void Update()
         {
             WorldSimulationClock.Advance();
-            if (!Catalog || !string.IsNullOrEmpty(LastError)) return;
+            if (!initialized || !Catalog || !string.IsNullOrEmpty(LastError)) return;
             neighborWater.Tick();
             if (!string.IsNullOrEmpty(neighborWater.Error)) { Fail(neighborWater.Error); return; }
             ambienceTarget.position = Anchor;
@@ -100,8 +99,8 @@ namespace FFOne.World
             foreach (var tile in tiles.Values.ToArray())
                 if (!tile.Retiring && (!Includes(tile.Reference) || tile.Reference.DistanceSquared(Anchor) > UnloadDistance * UnloadDistance))
                 { tile.Retiring = true; PresentedVersion++; tile.Root.SetActive(false); StartCoroutine(Retire(tile)); }
-            if (unloading != null && !unloading.isDone) return;
-            if (loading >= 1 || tiles.Values.Any(t => t.Retiring) || tiles.Count >= MaximumRoots) return;
+            // Prefetch one adjacent scene while the closest scene binds its editable content.
+            if (loading >= 2 || tiles.Values.Any(t => t.Retiring) || tiles.Count >= MaximumRoots) return;
             var candidate = Catalog.Tiles.Where(t => Includes(t) && !tiles.ContainsKey(t.Id) && t.DistanceSquared(Anchor) < LoadDistance * LoadDistance)
                 .OrderBy(t => t.DistanceSquared(Anchor)).ThenBy(t => t.Z).ThenBy(t => t.X).FirstOrDefault();
             if (candidate == null) return;
@@ -113,63 +112,14 @@ namespace FFOne.World
         }
         IEnumerator Admit(Tile tile)
         {
-            if (!string.IsNullOrEmpty(tile.Reference.SceneAddress))
+            // Physics belongs to the authored Unity scene. Reconstructing an
+            // absent cell from legacy meshes silently restores broken winding.
+            if (string.IsNullOrEmpty(tile.Reference.SceneAddress))
             {
-                yield return AdmitScene(tile);
-                yield break;
+                Fail("Missing authored Unity scene for world tile " + tile.Reference.Id);
+                tile.AdmissionFinished = true; loading--; yield break;
             }
-            var request = FFOne.Content.ContentAssets.AcquireAsync<WorldTileContent>(tile.Reference.Resource);
-            tile.Lease = request;
-            yield return request;
-            tile.Content = request.asset as WorldTileContent;
-            if (!tile.Content) { Fail("Missing world tile " + tile.Reference.Id); tile.AdmissionFinished = true; loading--; yield break; }
-            var legacy = new Dictionary<string, List<Transform>>();
-            var nodes = new Dictionary<string, List<Transform>>();
-            if (tile.Content.Terrain && !tile.Retiring) Instantiate(tile.Content.Terrain, tile.Root.transform, false);
-            yield return null;
-            budget.Restart(); int count = 0;
-            foreach (var placement in tile.Content.Visuals)
-            {
-                if (tile.Retiring) break;
-                var instance = Instantiate(FFOne.Content.NativeModelAssets.Resolve(placement.Model), tile.Root.transform, false);
-                WorldMaterialState.Prepare(instance);
-                WorldModelBasis.ApplySource(instance);
-                instance.name = placement.Name;
-                Pose(instance.transform, placement.Position, placement.Rotation, placement.Scale);
-                WorldObjectRange.Attach(instance, placement.CpuPresentationEnd);
-                Register(legacy, placement.LegacyId, instance.transform); Register(nodes, placement.SourceNode, instance.transform);
-                if (!Optimized)
-                    foreach (var renderer in instance.GetComponentsInChildren<Renderer>(true))
-                    { var materials = renderer.materials; foreach (var material in materials) { material.enableInstancing = false; tile.OwnedMaterials.Add(material); } }
-                VisualCount++; tile.Visuals++; count++;
-                if (budget.Elapsed.TotalMilliseconds > 2 || count >= 64) { yield return null; budget.Restart(); count = 0; }
-            }
-            foreach (var definition in tile.Content.Colliders)
-            {
-                if (tile.Retiring) break;
-                var instance = new GameObject(definition.Name); instance.transform.SetParent(tile.Root.transform, false);
-                Pose(instance.transform, definition.Position, definition.Rotation, definition.Scale);
-                var collider = instance.AddComponent<MeshCollider>(); collider.sharedMesh = definition.Mesh;
-                // Keep exact trigger mesh geometry, outside Unity nonconvex trigger physics constraints.
-                collider.enabled = !definition.Trigger;
-                Register(legacy, definition.LegacyId, instance.transform); Register(nodes, definition.SourceNode, instance.transform);
-                ColliderCount++; tile.Colliders++; count++;
-                if (budget.Elapsed.TotalMilliseconds > 2 || count >= 64) { yield return null; budget.Restart(); count = 0; }
-            }
-            if (!tile.Retiring)
-            {
-                WorldBehaviour behaviour = null;
-                yield return WorldBehaviour.AttachAsync(tile.Root, FFOne.Content.NativeData.Read("map/tiles/" + tile.Reference.Id + "/behaviour"), legacy, nodes, View, value => behaviour = value);
-                if (behaviour)
-                {
-                    if (behaviour.Errors.Count > 0) Fail(tile.Reference.Id + ": " + string.Join("; ", behaviour.Errors.Take(10)));
-                    tile.Ready = behaviour.Ready;
-                    PresentedVersion++;
-                    WorldObjectRange.FinalizeTile(tile.Root);
-                }
-            }
-            tile.AdmissionFinished = true;
-            loading--;
+            yield return AdmitScene(tile);
         }
         IEnumerator AdmitScene(Tile tile)
         {
@@ -196,8 +146,8 @@ namespace FFOne.World
             {
                 yield return cell.Initialize();
                 TraceScene("initialized " + tile.Reference.Id);
-                if (!cell.Runtime || !cell.Runtime.Ready || cell.Runtime.Errors.Count > 0)
-                    Fail("Authored cell behaviour failed: " + tile.Reference.Id + ": " + (cell.Runtime ? string.Join("; ",cell.Runtime.Errors.Take(10)) : "missing behaviour"));
+                if (!string.IsNullOrEmpty(cell.LastError) || !cell.Runtime || !cell.Runtime.Ready || cell.Runtime.Errors.Count > 0)
+                    Fail("Authored cell behaviour failed: " + tile.Reference.Id + ": " + (cell.LastError ?? (cell.Runtime ? string.Join("; ",cell.Runtime.Errors.Take(10)) : "missing behaviour")));
                 tile.Visuals = cell.Bindings.Count(b => b.Visual && b.Target);
                 tile.Colliders = tile.Root.GetComponentsInChildren<Collider>(true).Length;
                 VisualCount += tile.Visuals; ColliderCount += tile.Colliders;
@@ -222,20 +172,8 @@ namespace FFOne.World
                 tiles.Remove(tile.Reference.Id);
                 yield break;
             }
-            var descendants = tile.Root.GetComponentsInChildren<Transform>(true);
-            budget.Restart(); int count = 0;
-            for (int i = descendants.Length - 1; i >= 0; i--)
-            {
-                if (descendants[i] && descendants[i] != tile.Root.transform) Destroy(descendants[i].gameObject);
-                if (++count >= 256 || budget.Elapsed.TotalMilliseconds > 1) { yield return null; budget.Restart(); count = 0; }
-            }
-            VisualCount -= tile.Visuals; ColliderCount -= tile.Colliders;
-            foreach (var material in tile.OwnedMaterials) if (material) Destroy(material);
-            Destroy(tile.Root); tile.Content = null;
-            yield return null;
-            tile.Lease?.Dispose(); tile.Lease = null;
-            tiles.Remove(tile.Reference.Id); retired++;
-            if (retired >= 4 && loading == 0) { retired = 0; unloading = Resources.UnloadUnusedAssets(); }
+            if (tile.Root) Destroy(tile.Root);
+            tiles.Remove(tile.Reference.Id);
         }
         void Fail(string error) { LastError = error; Debug.LogError(error); }
         [Conditional("DEVELOPMENT_BUILD")]
@@ -243,13 +181,6 @@ namespace FFOne.World
         {
             if(Environment.GetCommandLineArgs().Contains("--world-district-smoke"))Debug.Log("WORLD CELL " + message);
         }
-        static void Register(Dictionary<string, List<Transform>> index, string key, Transform value)
-        {
-            if (string.IsNullOrEmpty(key)) return;
-            if (!index.TryGetValue(key, out var matches)) index[key] = matches = new List<Transform>(); matches.Add(value);
-        }
-        static void Pose(Transform target, Vector3 position, Quaternion rotation, Vector3 scale)
-        { target.localPosition = position; target.localRotation = rotation; target.localScale = scale; }
         bool quitting;
         void OnApplicationQuit() => quitting = true;
         static void ReleaseScene(AsyncOperationHandle<SceneInstance> handle)
@@ -266,8 +197,6 @@ namespace FFOne.World
             StopAllCoroutines();
             if (neighborWater) Destroy(neighborWater);
             foreach (var tile in tiles.Values) if (tile.SceneRequested && !tile.SceneUnloading && !quitting) ReleaseScene(tile.SceneLease);
-            foreach (var tile in tiles.Values) tile.Lease?.Dispose();
-            foreach (var tile in tiles.Values) foreach (var material in tile.OwnedMaterials) if (material) Destroy(material);
             if (FFOne.Runtime.World.WorldTerrainEnvironment.SamplingTarget == ambienceTarget) FFOne.Runtime.World.WorldTerrainEnvironment.SamplingTarget = null;
         }
     }

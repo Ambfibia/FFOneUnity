@@ -94,6 +94,7 @@ namespace FFOne.Editor
                 definition.TileId=tile;definition.Grid=new Vector2Int(reference.X,reference.Z);definition.Minimum=reference.Minimum;definition.Maximum=reference.Maximum;
                 definition.ImportedContentGuid=AssetDatabase.AssetPathToGUID(sourcePath);definition.ImportedContentSha256=Hash(sourcePath);
                 definition.AuthoringNotes="Saved scene owns placements and prefab overrides. Reimport never replaces it. Review changed source in a staging project.";
+                WorldCellPublication.Prepare(definition);
                 AssetDatabase.CreateAsset(definition,DefinitionPath(tile));cell.Definition=definition;
                 if(!EditorSceneManager.SaveScene(scene,path))throw new IOException("Failed saving "+path);
                 definition.SceneAddress="ffone/"+AssetDatabase.AssetPathToGUID(path);EditorUtility.SetDirty(definition);AssetDatabase.SaveAssetIfDirty(definition);
@@ -124,6 +125,8 @@ namespace FFOne.Editor
             if(!definition || !File.Exists(ScenePath(tile)))throw new InvalidOperationException("Create and validate a runtime cell first: "+tile);
             var open=SceneManager.GetSceneByPath(ScenePath(tile));
             if(open.IsValid() && open.isDirty)throw new InvalidOperationException("Save cell scene before publishing: "+tile);
+            WorldCellPublication.Prepare(definition);
+            AssetDatabase.SaveAssetIfDirty(definition);
             var catalog=AssetDatabase.LoadAssetAtPath<WorldCatalog>(WorldPath);
             catalog.Tiles.Single(t=>t.Id==tile).SceneAddress=definition.SceneAddress;
             EditorUtility.SetDirty(catalog);AssetDatabase.SaveAssetIfDirty(catalog);

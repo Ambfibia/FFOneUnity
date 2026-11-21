@@ -12,14 +12,14 @@ namespace FFOne.Editor
         public static readonly string[] Categories = {
             "Vegetation/Trees", "Vegetation/Shrubs", "Vegetation/Grass", "Vegetation/Flowers", "Vegetation/Vines", "Vegetation/Cacti", "Vegetation/Deadwood",
             "Geology/Rocks", "Geology/Cliffs", "Geology/Islands", "Geology/Ground",
-            "Buildings/Residential", "Buildings/Shops", "Buildings/Civic", "Buildings/Industrial", "Buildings/Landmarks",
-            "Architecture/Walls", "Architecture/Roofs", "Architecture/Doors", "Architecture/Windows", "Architecture/Floors", "Architecture/Stairs", "Architecture/Columns",
-            "Infrastructure/Roads", "Infrastructure/Bridges", "Infrastructure/Fences", "Infrastructure/Railways", "Infrastructure/Pipes", "Infrastructure/Power", "Infrastructure/Platforms",
+            "Buildings/Residential", "Buildings/Shops", "Buildings/Civic", "Buildings/Industrial", "Buildings/Landmarks", "Buildings/TemporaryStructures",
+            "Architecture/Walls", "Architecture/Roofs", "Architecture/Doors", "Architecture/Windows", "Architecture/Floors", "Architecture/Stairs", "Architecture/Columns", "Architecture/BuildingParts",
+            "Infrastructure/Roads", "Infrastructure/Bridges", "Infrastructure/Fences", "Infrastructure/Railways", "Infrastructure/Pipes", "Infrastructure/Power", "Infrastructure/Platforms", "Infrastructure/Ziplines",
             "StreetFurniture/Benches", "StreetFurniture/Seating", "StreetFurniture/Tables", "StreetFurniture/Lights", "StreetFurniture/BusStops", "StreetFurniture/Bins", "StreetFurniture/Hydrants", "StreetFurniture/Signs", "StreetFurniture/Planters",
-            "Props/Containers", "Props/Industrial", "Props/Household", "Props/Decoration", "Props/Statues", "Props/Graves", "Props/Sports",
-            "Vehicles/Cars", "Vehicles/Trucks", "Vehicles/Boats", "Vehicles/Aircraft", "Vehicles/Trains", "Vehicles/Construction",
-            "Attractions/Rides", "Attractions/Stages", "Water/Surfaces", "Water/Fountains", "Water/Waterfalls",
-            "Special/Interactive", "Special/Animated", "Technical/Collision", "Technical/Effects", "Review/Unclassified"
+            "Props/Containers", "Props/Industrial", "Props/Household", "Props/Decoration", "Props/Statues", "Props/Graves", "Props/Sports", "Props/Equipment", "Props/Fossils", "Props/Quest", "Props/Specimens", "Props/WaterSafety",
+            "Vehicles/Cars", "Vehicles/Trucks", "Vehicles/Boats", "Vehicles/Aircraft", "Vehicles/Trains", "Vehicles/Construction", "Vehicles/Personal", "Vehicles/Spacecraft",
+            "Attractions/Rides", "Attractions/Stages", "Attractions/CourseMarkers", "Attractions/ObstacleCourses", "Water/Surfaces", "Water/Fountains", "Water/Waterfalls",
+            "Special/Interactive", "Special/Animated", "Technical/Collision", "Technical/Effects", "Technical/Skydomes", "Review/Unclassified"
         };
         sealed class Rule
         {

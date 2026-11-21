@@ -7,6 +7,9 @@ using FFOne.UI;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
+using InputKey = UnityEngine.InputSystem.Key;
 using UnityEngine.Rendering;
 using UnityEngine.TestTools;
 using UnityEngine.UIElements;
@@ -19,6 +22,8 @@ namespace FFOne.Tests
         PanelSettings panelSettings;
         RenderTexture target;
         SettingsWindow settings;
+        Keyboard keyboard;
+        Gamepad gamepad;
         int worldClicks;
 
         [UnityTest]
@@ -57,6 +62,7 @@ namespace FFOne.Tests
             root.Add(worldButton);
             var preferences = new SettingsPreferences(); // Intentionally no path: never touch user preferences.
             settings = new SettingsWindow(root, preferences);
+            preferences.Changed += ApplyBindings;
             yield return null; yield return null;
             Assert.That(root.panel, Is.Not.Null);
             Assert.That(settings.Visible, Is.False);
@@ -68,6 +74,8 @@ namespace FFOne.Tests
             Assert.That(root.Q("settings-window").resolvedStyle.width, Is.EqualTo(1020).Within(.1f));
             Assert.That(root.Q("page-graphics").resolvedStyle.display, Is.EqualTo(DisplayStyle.Flex));
             Assert.That(root.panel.Pick(new Vector2(4,4)), Is.SameAs(overlay), "The visible modal must absorb world clicks outside its window.");
+            Assert.That(root.Q<Button>("settings-close").resolvedStyle.unitySliceLeft, Is.Zero,
+                "A circular close icon must render as a single image.");
             var frameImage = root.Q("settings-frame").resolvedStyle.backgroundImage;
             var frameTexture = FFOne.Content.ContentAssets.Load<Texture2D>("ui/en/option/outer-frame");
             Assert.That(frameTexture, Is.Not.Null, "Option textures must import as Texture2D, never auto-detected cubemaps.");
@@ -77,6 +85,8 @@ namespace FFOne.Tests
             Submit(root.Q<Button>("detail")); yield return null;
             var choices = root.Query<Button>(className:"option-choice").ToList();
             Assert.That(choices.Count, Is.EqualTo(5));
+            Assert.That(root.panel.Pick(choices[4].worldBound.center), Is.SameAs(choices[4]),
+                "The dropdown must receive clicks above the settings page.");
             Submit(choices[4]); yield return null;
             Assert.That(preferences.Get<int>("graphics.detail"), Is.EqualTo(4));
             Assert.That(preferences.Get<bool>("graphics.glow"), Is.False);
@@ -86,6 +96,8 @@ namespace FFOne.Tests
 
             Submit(root.Q<Button>("tab-social")); yield return null;
             Assert.That(root.Q("page-social").resolvedStyle.display, Is.EqualTo(DisplayStyle.Flex));
+            Assert.That(root.Q<Button>("text-locale").resolvedStyle.unitySliceRight, Is.EqualTo(27),
+                "Narrow dropdowns must preserve the native arrow cap.");
             WritePreview("settings-en-social.png");
             Submit(root.Q<Button>("text-locale")); yield return null;
             choices = root.Query<Button>(className:"option-choice").ToList();
@@ -112,35 +124,66 @@ namespace FFOne.Tests
             Assert.That(root.Query<Button>(className:"option-choice").ToList(), Is.Empty);
 
             Submit(root.Q<Button>("tab-controls")); yield return null;
+            var controls = root.Q("page-controls");
+            var sensitivityLabels = controls.Query<Label>(className:"option-slider-range-start").ToList();
+            var sensitivitySliders = controls.Query<Slider>(className:"option-slider").ToList();
+            Assert.That(sensitivityLabels.Count, Is.EqualTo(2));
+            Assert.That(sensitivityLabels.Zip(sensitivitySliders, (label, slider) => slider.worldBound.xMin - label.worldBound.xMax),
+                Is.All.GreaterThanOrEqualTo(6f), "Sensitivity captions must clear their tracks.");
+            WritePreview("settings-ru-controls.png");
             var forwardPrimary = root.Q<Button>("binding-Up-primary");
+            keyboard = InputSystem.AddDevice<Keyboard>();
+            gamepad = InputSystem.AddDevice<Gamepad>();
             Assert.That(forwardPrimary, Is.Not.Null);
             Submit(forwardPrimary); yield return null;
             var prompt = root.Q<Label>("capture-prompt");
             Assert.That(prompt.text, Does.Not.Contain("{action}"));
             Assert.That(prompt.text, Does.Not.Contain("{seconds}"));
-            Key(overlay, KeyCode.Delete); yield return null;
+            yield return Press(InputKey.Delete);
             Assert.That(preferences.Get<string>("input.bindings.Up.primary"), Is.Empty);
             Assert.That(prompt.text, Is.Empty);
-            Submit(forwardPrimary); Key(overlay, KeyCode.T); yield return null;
-            Assert.That(preferences.Get<string>("input.bindings.Up.primary"), Is.EqualTo("T"));
-            Submit(root.Q<Button>("binding-Down-primary")); Key(overlay, KeyCode.T); yield return null;
-            Assert.That(preferences.Get<string>("input.bindings.Down.primary"), Is.EqualTo("S"));
+            Submit(forwardPrimary); yield return Press(InputKey.T);
+            Assert.That(preferences.Get<string>("input.bindings.Up.primary"), Is.EqualTo("<Keyboard>/t"));
+            var forward = GameplayInput.Map.FindAction("Up", true);
+            Assert.That(forward.bindings[0].effectivePath, Is.EqualTo("<Keyboard>/w"), "A draft must not change the live action.");
+            Submit(root.Q<Button>("binding-Down-primary")); yield return Press(InputKey.T);
+            Assert.That(preferences.Get<string>("input.bindings.Down.primary"), Is.EqualTo("<Keyboard>/s"));
             Assert.That(root.Q("settings-popup-layer").childCount, Is.EqualTo(1), "Duplicate input must open a blocking message.");
             WritePreview("settings-ru-duplicate-binding.png");
             Key(overlay,KeyCode.Escape); Key(overlay,KeyCode.Escape); yield return null;
             Assert.That(settings.Visible, Is.False);
-            Assert.That((string)preferences.Committed["input"]["bindings"]["Up"]["primary"], Is.EqualTo("W"), "Closing discards uncommitted mapping edits.");
+            Assert.That((string)preferences.Committed["input"]["bindings"]["Up"]["primary"], Is.EqualTo("<Keyboard>/w"), "Closing discards uncommitted mapping edits.");
             Assert.That(root.panel.Pick(new Vector2(4,4)), Is.SameAs(worldButton), "Closing restores the world hit-test surface.");
             Submit(worldButton); Assert.That(worldClicks, Is.EqualTo(1));
             settings.Open(); yield return null;
             Assert.That(root.Q("page-graphics").resolvedStyle.display, Is.EqualTo(DisplayStyle.Flex));
+            var rangeLabels = root.Q("page-graphics").Query<Label>(className:"option-slider-range-start").ToList();
+            Assert.That(rangeLabels.Count, Is.EqualTo(7));
+            var sliders = root.Q("page-graphics").Query<Slider>(className:"option-slider").ToList();
+            Assert.That(rangeLabels.Zip(sliders, (label, slider) => slider.worldBound.xMin - label.worldBound.xMax),
+                Is.All.GreaterThanOrEqualTo(6f), "The Russian range captions must clear the slider track.");
             WritePreview("settings-ru-graphics.png");
+
+            Submit(root.Q<Button>("tab-controls"));
+            Submit(forwardPrimary); yield return Press(InputKey.T);
+            Submit(root.Q<Button>("binding-Up-pad"));
+            InputSystem.QueueStateEvent(gamepad, new GamepadState().WithButton(GamepadButton.LeftShoulder));
+            yield return null;
+            InputSystem.QueueStateEvent(gamepad, new GamepadState());
+            yield return null;
+            Assert.That(preferences.Get<string>("input.bindings.Up.pad"), Is.EqualTo("<Gamepad>/leftShoulder"));
+            Submit(root.Q<Button>("settings-apply"));
+            Assert.That(forward.bindings[0].effectivePath, Is.EqualTo("<Keyboard>/t"));
+            Assert.That(forward.bindings[2].effectivePath, Is.EqualTo("<Gamepad>/leftShoulder"));
         }
 
         [UnityTearDown]
         public IEnumerator Cleanup()
         {
             settings?.Dispose(); settings = null;
+            if (keyboard != null && keyboard.added) InputSystem.RemoveDevice(keyboard);
+            if (gamepad != null && gamepad.added) InputSystem.RemoveDevice(gamepad);
+            if (Application.isPlaying) GameplayInput.Apply(SettingsPreferences.Defaults());
             if (owner) Object.DestroyImmediate(owner);
             if (panelSettings) Object.DestroyImmediate(panelSettings);
             if (target) { target.Release(); Object.DestroyImmediate(target); }
@@ -156,6 +199,14 @@ namespace FFOne.Tests
         {
             using (var evt = KeyDownEvent.GetPooled(new Event { type = EventType.KeyDown, keyCode = key })) { evt.target = element; element.SendEvent(evt); }
         }
+        IEnumerator Press(InputKey key)
+        {
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState(key));
+            yield return null;
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+            yield return null;
+        }
+        void ApplyBindings() => GameplayInput.Apply(settings.Preferences.Committed);
         void WritePreview(string name)
         {
             var previous = RenderTexture.active;

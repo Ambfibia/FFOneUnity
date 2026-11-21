@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using FFOne.Content;
 using FFOne.Network;
 using FFOne.World;
 using UnityEngine;
@@ -40,10 +41,13 @@ namespace FFOne.UI
                     "native Recall Point model route loads and creates the original marker presentation");
                 Check(actor.Definition.Model == WorldNpcCatalog.RecallPointModel && world.Replicas.ContentFailures.Count == failures,
                     "Recall Point resolves its exact published prefab without a missing-content fallback");
-                var body = actor.GetComponentInChildren<Animation>(true);
-                Check(body && body.GetClip("stand1") && body.GetClip("nif-default") &&
-                    body.GetComponentsInChildren<Transform>(true).Length == 4 && !body.GetComponentsInChildren<Renderer>(true).Any(),
-                    "loaded RXcom preserves its four source nodes and both clips with no fabricated body Renderer");
+                var body = actor.GetComponentInChildren<NativeNpcAnimator>(true);
+                Check(body && body.Animator.runtimeAnimatorController, "loaded RXcom uses its authored Animator Controller");
+                // The RXcom source body is inactive. Its separate effect supplies the visible marker.
+                Check(!body.gameObject.activeInHierarchy && body.GetClip("stand1", true) && body.GetClip("nif-default", true),
+                    "the inactive RXcom body retains both authored native clip bindings");
+                Check(body.GetComponentsInChildren<Transform>(true).Length == 4 && !body.GetComponentsInChildren<Renderer>(true).Any(),
+                    "loaded RXcom preserves its four source nodes with no fabricated body Renderer");
                 var box = body.transform.Find("Box01/Box01 NonAccum/Box").GetComponent<MeshFilter>().sharedMesh;
                 Check(box && box.vertexCount == 24 && box.triangles.Length == 36,
                     "native RXcom retains the original unrendered Box geometry");
@@ -51,7 +55,13 @@ namespace FFOne.UI
                     Mathf.Abs(presentation.EffectRoot.localPosition.y - 1.08f) < .00001f &&
                     Quaternion.Angle(presentation.EffectRoot.localRotation, Quaternion.Euler(90, 0, 0)) < .001f,
                     "unselected Recall Point uses authored ES446 at its proven root attachment");
-                await Wait(() => RecallParticlesReady(presentation), "authored ES446 emits both native particle surfaces in the player");
+                var particleMesh = new Mesh();
+                try
+                {
+                    await Wait(() => RecallParticlesReady(presentation, world.View, particleMesh),
+                        "authored ES446 emits both native particle surfaces in the player");
+                }
+                finally { Destroy(particleMesh); }
                 var viewport = world.View.WorldToViewportPoint(presentation.EffectRoot.position);
                 Check(viewport.z > 0 && viewport.x > 0 && viewport.x < 1 && viewport.y > 0 && viewport.y < 1,
                     "the real Recall Point marker is inside the unchanged gameplay camera view");
@@ -60,9 +70,15 @@ namespace FFOne.UI
                 Check(frontend.LiveUi.OpenNpcTravel(actor.Entity, actor.Definition), "native Recall Point interaction opens its registration action");
                 received.Remove(ProtocolRecall.Success);
                 Submit(frontend.LiveUi.Windows.View.Q<Button>("recall-register"));
-                await Wait(() => received.Contains(ProtocolRecall.Success) && !frontend.LiveUi.TravelBusy &&
-                    world.Replicas.SelectedRecallPointId == actor.Entity.Id && presentation.EffectId == 811 && RecallParticlesReady(presentation),
-                    "RustyFusion accepts the real Recall registration and its decoded NPC identity selects authored ES811");
+                var selectedMesh = new Mesh();
+                try
+                {
+                    await Wait(() => received.Contains(ProtocolRecall.Success) && !frontend.LiveUi.TravelBusy &&
+                        world.Replicas.SelectedRecallPointId == actor.Entity.Id && presentation.EffectId == 811 &&
+                        RecallParticlesReady(presentation, world.View, selectedMesh),
+                        "RustyFusion accepts the real Recall registration and its decoded NPC identity selects authored ES811");
+                }
+                finally { Destroy(selectedMesh); }
                 Check(!frontend.LiveUi.Windows.View.Q<Button>("recall-register").enabledInHierarchy,
                     "acknowledged Recall registration disables the native Register action");
                 await Frames(12); Capture(worldTexture, "recall-point-811-registered"); Capture(uiTexture, "recall-registration");
@@ -103,14 +119,21 @@ namespace FFOne.UI
             }
         }
 
-        static bool RecallParticlesReady(RecallPointPresentation presentation)
+        static bool RecallParticlesReady(RecallPointPresentation presentation, Camera camera, Mesh baked)
         {
-            if (!presentation || !presentation.EffectRoot) return false;
-            var root = presentation.EffectRoot;
-            var filters = root.GetComponentsInChildren<MeshFilter>();
-            var renderers = root.GetComponentsInChildren<MeshRenderer>();
-            return filters.Length == 2 && filters.All(f => f.sharedMesh && f.sharedMesh.vertexCount > 0) &&
-                renderers.Length == 2 && renderers.All(r => r.enabled && r.sharedMaterial && r.sharedMaterial.shader && r.sharedMaterial.shader.isSupported);
+            if (!presentation || !presentation.EffectRoot || !camera) return false;
+            var systems = presentation.EffectRoot.GetComponentsInChildren<ParticleSystem>();
+            if (systems.Length != 2) return false;
+            foreach (var system in systems)
+            {
+                if (system.particleCount == 0 || !system.TryGetComponent<ParticleSystemRenderer>(out var renderer) ||
+                    !renderer.enabled || !renderer.sharedMaterial || !renderer.sharedMaterial.shader.isSupported)
+                    return false;
+                baked.Clear();
+                renderer.BakeMesh(baked, camera, ParticleSystemBakeMeshOptions.Default);
+                if (baked.vertexCount == 0) return false;
+            }
+            return true;
         }
     }
 }

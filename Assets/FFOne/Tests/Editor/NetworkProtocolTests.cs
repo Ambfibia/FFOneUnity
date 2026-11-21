@@ -83,11 +83,13 @@ namespace FFOne.Tests
         {
             byte[] payload = new byte[2700];
             Protocol0104.Write32(payload, 0, 42); Protocol0104.Write64(payload, 8, 1234);
+            Protocol0104.Write16(payload, 4, 50);
             Protocol0104.Write32(payload, 124, -100); Protocol0104.Write32(payload, 128, 200); Protocol0104.Write32(payload, 132, 300);
             Protocol0104.Write32(payload, 112, 987); Protocol0104.Write64(payload, 2692, 0x0102030405060708);
             var entry = Protocol0104.DecodeWorldEntry(payload, 1234);
             Assert.AreEqual(42, entry.PlayerId); Assert.AreEqual(-100, entry.X); Assert.AreEqual(200, entry.Y); Assert.AreEqual(300, entry.Z);
             Assert.AreEqual(987, entry.FusionMatter); Assert.AreEqual(2688, entry.RawLoadData.Length);
+            Assert.AreEqual(50, entry.UserLevel);
             Assert.Throws<ProtocolException>(() => Protocol0104.DecodeWorldEntry(payload, 5678));
             Assert.Throws<ProtocolException>(() => Protocol0104.DecodeWorldEntry(new byte[2699], 1234));
         }

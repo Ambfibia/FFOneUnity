@@ -2,14 +2,16 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
   <Style src="/Assets/FFOne/Content/UI/Styles/FFTheme.uss" />
   <Style src="/Assets/FFOne/Content/UI/Styles/Settings.uss" />
-  <ui:VisualElement name="settings-overlay" class="option-overlay">
-    <ui:VisualElement name="settings-window" style="position: absolute; left: 0px; top: 0px; width: 1020px; height: 638px;" picking-mode="Ignore">
-      <ui:Button name="tab-graphics" style="position: absolute; left: 8px; top: 19px; width: 275px; height: 44px;" text="GRAPHICS &amp; SOUND" class="ff-button option-tab tab-graphics" />
-      <ui:Button name="tab-game-ui" style="position: absolute; left: 330px; top: 21px; width: 188px; height: 32px;" text="GAME UI" class="ff-button option-tab tab-game-ui" />
-      <ui:Button name="tab-social" style="position: absolute; left: 560px; top: 21px; width: 189px; height: 33px;" text="SOCIAL" class="ff-button option-tab tab-social" />
-      <ui:Button name="tab-controls" style="position: absolute; left: 798px; top: 19px; width: 196px; height: 45px;" text="CONTROLS" class="ff-button option-tab tab-controls" />
+  <ui:Template name="MappingRow" src="SettingsBindingRow.uxml" />
+  <ui:Template name="ColorSwatch" src="SettingsSwatch.uxml" />
+  <ui:VisualElement name="settings-overlay" class="option-overlay" focusable="true">
+    <ui:VisualElement name="settings-window" class="option-window" picking-mode="Ignore">
+      <ui:Button name="tab-graphics" text="GRAPHICS &amp; SOUND" class="ff-button option-tab tab-graphics" />
+      <ui:Button name="tab-game-ui" text="GAME UI" class="ff-button option-tab tab-game-ui" />
+      <ui:Button name="tab-social" text="SOCIAL" class="ff-button option-tab tab-social" />
+      <ui:Button name="tab-controls" text="CONTROLS" class="ff-button option-tab tab-controls" />
       <ui:VisualElement name="settings-frame" style="position: absolute; left: 10px; top: 50px; width: 980px; height: 540px;" class="option-frame" picking-mode="Ignore" />
-      <ui:VisualElement name="page-graphics" style="position: absolute; left: 20px; top: 60px; width: 960px; height: 520px;" class="option-page" picking-mode="Ignore">
+      <ui:VisualElement name="page-graphics" style="position: absolute; left: 20px; top: 60px; width: 960px; height: 520px;" class="option-page option-page-graphics" picking-mode="Ignore">
         <ui:VisualElement style="position: absolute; left: 10px; top: 20px; width: 450px; height: 45px;" class="option-sky" picking-mode="Ignore" />
         <ui:VisualElement style="position: absolute; left: 10px; top: 50px; width: 240px; height: 460px;" class="option-flat" picking-mode="Ignore" />
         <ui:VisualElement style="position: absolute; left: 220px; top: 64px; width: 240px; height: 446px;" class="option-flat" picking-mode="Ignore" />
@@ -24,21 +26,21 @@
         <ui:VisualElement style="position: absolute; left: 500px; top: 171px; width: 435px; height: 329px;" class="option-side" picking-mode="Ignore" />
         <ui:Label style="position: absolute; left: 20px; top: 28px; width: 100px; height: 24px;" text="GRAPHICS" class="option-title" picking-mode="Ignore" />
         <ui:Label style="position: absolute; left: 500px; top: 28px; width: 100px; height: 24px;" text="SOUND" class="option-title" picking-mode="Ignore" />
-        <ui:Button name="default-graphics" style="position: absolute; left: 275px; top: 30px; width: 180px; height: 25px;" text="DEFAULT GRAPHICS" class="ff-button option-button" />
-        <ui:Button name="default-sound" style="position: absolute; left: 755px; top: 30px; width: 180px; height: 25px;" text="DEFAULT SOUND" class="ff-button option-button" />
-        <ui:Label style="position: absolute; left: 9px; top: 80px; width: 150px; height: 25px;" text="SCREEN MODE:" class="option-label" picking-mode="Ignore" />
-        <ui:Label style="position: absolute; left: 0px; top: 113px; width: 150px; height: 25px;" text="DETAIL LEVEL:" class="option-label" picking-mode="Ignore" />
+        <ui:Button name="default-graphics" style="position: absolute; left: 275px; top: 30px; width: 180px; height: 25px;" text="DEFAULT GRAPHICS" class="option-role-default-graphics ff-button option-button" />
+        <ui:Button name="default-sound" style="position: absolute; left: 755px; top: 30px; width: 180px; height: 25px;" text="DEFAULT SOUND" class="option-role-default-sound ff-button option-button" />
+        <ui:Label style="position: absolute; left: 24px; top: 80px; width: 156px; height: 25px;" text="SCREEN MODE:" class="option-label" picking-mode="Ignore" />
+        <ui:Label style="position: absolute; left: 24px; top: 113px; width: 156px; height: 25px;" text="DETAIL LEVEL:" class="option-label" picking-mode="Ignore" />
         <ui:Label style="position: absolute; left: 30px; top: 200px; width: 150px; height: 25px;" text="VISIBILITY:" class="option-label" picking-mode="Ignore" />
         <ui:Label style="position: absolute; left: 30px; top: 235px; width: 150px; height: 25px;" text="PARTICLE EFFECT DENSITY:" class="option-label" picking-mode="Ignore" />
         <ui:Label style="position: absolute; left: 30px; top: 437px; width: 150px; height: 25px;" text="SHADOWS:" class="option-label" picking-mode="Ignore" />
         <ui:Label style="position: absolute; left: 30px; top: 468px; width: 150px; height: 25px;" text="TEXTURE QUALITY:" class="option-label" picking-mode="Ignore" />
         <ui:Label style="position: absolute; left: 40px; top: 170px; width: 200px; height: 25px;" text="CUSTOM DETAIL LEVEL" class="option-cyan" picking-mode="Ignore" />
-        <ui:Button name="resolution" style="position: absolute; left: 200px; top: 82px; width: 223px; height: 21px;" text="" class="ff-button option-dropdown" />
-        <ui:Button name="detail" style="position: absolute; left: 200px; top: 115px; width: 223px; height: 21px;" text="" class="ff-button option-dropdown" />
-        <ui:Button name="shadow" style="position: absolute; left: 200px; top: 437px; width: 223px; height: 21px;" text="" class="ff-button option-dropdown" />
-        <ui:Button name="texture" style="position: absolute; left: 200px; top: 468px; width: 223px; height: 21px;" text="" class="ff-button option-dropdown" />
-        <ui:Slider low-value="0" high-value="10" name="graphics.visibility" style="position: absolute; left: 230px; top: 197px; width: 170px; height: 27px;" class="option-slider" />
-        <ui:Slider low-value="0" high-value="3" name="graphics.particles" style="position: absolute; left: 230px; top: 237px; width: 170px; height: 27px;" class="option-slider" />
+        <ui:Button name="resolution" style="position: absolute; left: 200px; top: 82px; width: 223px; height: 21px;" text="" class="option-role-resolution ff-button option-dropdown" />
+        <ui:Button name="detail" style="position: absolute; left: 200px; top: 115px; width: 223px; height: 21px;" text="" class="option-role-detail ff-button option-dropdown" />
+        <ui:Button name="shadow" style="position: absolute; left: 200px; top: 437px; width: 223px; height: 21px;" text="" class="option-role-shadow ff-button option-dropdown" />
+        <ui:Button name="texture" style="position: absolute; left: 200px; top: 468px; width: 223px; height: 21px;" text="" class="option-role-texture ff-button option-dropdown" />
+        <ui:Slider low-value="0" high-value="10" name="graphics.visibility" style="position: absolute; left: 238px; top: 197px; width: 160px; height: 27px;" class="option-slider" />
+        <ui:Slider low-value="0" high-value="3" name="graphics.particles" style="position: absolute; left: 238px; top: 237px; width: 160px; height: 27px;" class="option-slider" />
         <ui:Label style="position: absolute; left: 30px; top: 277px; width: 150px; height: 25px;" text="TOON OUTLINE:" class="option-label" picking-mode="Ignore" />
         <ui:Button name="graphics.toon-on" style="position: absolute; left: 200px; top: 277px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
         <ui:Label style="position: absolute; left: 222px; top: 277px; width: 38px; height: 21px;" text="On" class="option-small" picking-mode="Ignore" />
@@ -49,7 +51,7 @@
         <ui:Label style="position: absolute; left: 222px; top: 310px; width: 38px; height: 21px;" text="On" class="option-small" picking-mode="Ignore" />
         <ui:Button name="graphics.glow-off" style="position: absolute; left: 260px; top: 310px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
         <ui:Label style="position: absolute; left: 282px; top: 310px; width: 38px; height: 21px;" text="Off" class="option-small" picking-mode="Ignore" />
-        <ui:Label style="position: absolute; left: 30px; top: 345px; width: 150px; height: 25px;" text="ANISOTROPIC FILTERING:" class="option-label" picking-mode="Ignore" />
+        <ui:Label style="position: absolute; left: 22px; top: 345px; width: 173px; height: 25px;" text="ANISOTROPIC FILTERING:" class="option-label" picking-mode="Ignore" />
         <ui:Button name="graphics.anisotropic-on" style="position: absolute; left: 200px; top: 345px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
         <ui:Label style="position: absolute; left: 222px; top: 345px; width: 38px; height: 21px;" text="On" class="option-small" picking-mode="Ignore" />
         <ui:Button name="graphics.anisotropic-off" style="position: absolute; left: 260px; top: 345px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
@@ -70,47 +72,47 @@
         <ui:Label style="position: absolute; left: 722px; top: 90px; width: 38px; height: 21px;" text="On" class="option-small" picking-mode="Ignore" />
         <ui:Button name="sound.master_enabled-off" style="position: absolute; left: 760px; top: 90px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
         <ui:Label style="position: absolute; left: 782px; top: 90px; width: 38px; height: 21px;" text="Off" class="option-small" picking-mode="Ignore" />
-        <ui:Slider low-value="0" high-value="10" name="sound.master" style="position: absolute; left: 723px; top: 117px; width: 170px; height: 27px;" class="option-slider" />
+        <ui:Slider low-value="0" high-value="10" name="sound.master" style="position: absolute; left: 733px; top: 117px; width: 160px; height: 27px;" class="option-slider" />
         <ui:Label style="position: absolute; left: 520px; top: 190px; width: 165px; height: 30px;" text="SOUND EFFECT VOLUME:" class="option-label" picking-mode="Ignore" />
         <ui:Button name="sound.effects_enabled-on" style="position: absolute; left: 700px; top: 195px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
         <ui:Label style="position: absolute; left: 722px; top: 195px; width: 38px; height: 21px;" text="On" class="option-small" picking-mode="Ignore" />
         <ui:Button name="sound.effects_enabled-off" style="position: absolute; left: 760px; top: 195px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
         <ui:Label style="position: absolute; left: 782px; top: 195px; width: 38px; height: 21px;" text="Off" class="option-small" picking-mode="Ignore" />
-        <ui:Slider low-value="0" high-value="10" name="sound.effects" style="position: absolute; left: 723px; top: 220px; width: 170px; height: 27px;" class="option-slider" />
+        <ui:Slider low-value="0" high-value="10" name="sound.effects" style="position: absolute; left: 733px; top: 220px; width: 160px; height: 27px;" class="option-slider" />
         <ui:Label style="position: absolute; left: 520px; top: 280px; width: 165px; height: 30px;" text="VOICE VOLUME:" class="option-label" picking-mode="Ignore" />
         <ui:Button name="sound.voice_enabled-on" style="position: absolute; left: 700px; top: 285px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
         <ui:Label style="position: absolute; left: 722px; top: 285px; width: 38px; height: 21px;" text="On" class="option-small" picking-mode="Ignore" />
         <ui:Button name="sound.voice_enabled-off" style="position: absolute; left: 760px; top: 285px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
         <ui:Label style="position: absolute; left: 782px; top: 285px; width: 38px; height: 21px;" text="Off" class="option-small" picking-mode="Ignore" />
-        <ui:Slider low-value="0" high-value="10" name="sound.voice" style="position: absolute; left: 723px; top: 310px; width: 170px; height: 27px;" class="option-slider" />
+        <ui:Slider low-value="0" high-value="10" name="sound.voice" style="position: absolute; left: 733px; top: 310px; width: 160px; height: 27px;" class="option-slider" />
         <ui:Label style="position: absolute; left: 520px; top: 360px; width: 165px; height: 30px;" text="AMBIENT VOLUME:" class="option-label" picking-mode="Ignore" />
         <ui:Button name="sound.ambient_enabled-on" style="position: absolute; left: 700px; top: 365px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
         <ui:Label style="position: absolute; left: 722px; top: 365px; width: 38px; height: 21px;" text="On" class="option-small" picking-mode="Ignore" />
         <ui:Button name="sound.ambient_enabled-off" style="position: absolute; left: 760px; top: 365px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
         <ui:Label style="position: absolute; left: 782px; top: 365px; width: 38px; height: 21px;" text="Off" class="option-small" picking-mode="Ignore" />
-        <ui:Slider low-value="0" high-value="10" name="sound.ambient" style="position: absolute; left: 723px; top: 390px; width: 170px; height: 27px;" class="option-slider" />
+        <ui:Slider low-value="0" high-value="10" name="sound.ambient" style="position: absolute; left: 733px; top: 390px; width: 160px; height: 27px;" class="option-slider" />
         <ui:Label style="position: absolute; left: 520px; top: 430px; width: 165px; height: 30px;" text="MUSIC VOLUME:" class="option-label" picking-mode="Ignore" />
         <ui:Button name="sound.music_enabled-on" style="position: absolute; left: 700px; top: 435px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
         <ui:Label style="position: absolute; left: 722px; top: 435px; width: 38px; height: 21px;" text="On" class="option-small" picking-mode="Ignore" />
         <ui:Button name="sound.music_enabled-off" style="position: absolute; left: 760px; top: 435px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
         <ui:Label style="position: absolute; left: 782px; top: 435px; width: 38px; height: 21px;" text="Off" class="option-small" picking-mode="Ignore" />
-        <ui:Slider low-value="0" high-value="10" name="sound.music" style="position: absolute; left: 723px; top: 460px; width: 170px; height: 27px;" class="option-slider" />
-        <ui:Label style="position: absolute; left: 200px; top: 196px; width: 30px; height: 24px;" text="Near" class="option-small" picking-mode="Ignore" />
-        <ui:Label style="position: absolute; left: 405px; top: 196px; width: 35px; height: 24px;" text="Far" class="option-small" picking-mode="Ignore" />
-        <ui:Label style="position: absolute; left: 200px; top: 236px; width: 30px; height: 24px;" text="Low" class="option-small" picking-mode="Ignore" />
-        <ui:Label style="position: absolute; left: 405px; top: 236px; width: 35px; height: 24px;" text="High" class="option-small" picking-mode="Ignore" />
-        <ui:Label style="position: absolute; left: 693px; top: 116px; width: 30px; height: 24px;" text="Low" class="option-small" picking-mode="Ignore" />
-        <ui:Label style="position: absolute; left: 898px; top: 116px; width: 35px; height: 24px;" text="High" class="option-small" picking-mode="Ignore" />
-        <ui:Label style="position: absolute; left: 693px; top: 219px; width: 30px; height: 24px;" text="Low" class="option-small" picking-mode="Ignore" />
-        <ui:Label style="position: absolute; left: 898px; top: 219px; width: 35px; height: 24px;" text="High" class="option-small" picking-mode="Ignore" />
-        <ui:Label style="position: absolute; left: 693px; top: 309px; width: 30px; height: 24px;" text="Low" class="option-small" picking-mode="Ignore" />
-        <ui:Label style="position: absolute; left: 898px; top: 309px; width: 35px; height: 24px;" text="High" class="option-small" picking-mode="Ignore" />
-        <ui:Label style="position: absolute; left: 693px; top: 389px; width: 30px; height: 24px;" text="Low" class="option-small" picking-mode="Ignore" />
-        <ui:Label style="position: absolute; left: 898px; top: 389px; width: 35px; height: 24px;" text="High" class="option-small" picking-mode="Ignore" />
-        <ui:Label style="position: absolute; left: 693px; top: 459px; width: 30px; height: 24px;" text="Low" class="option-small" picking-mode="Ignore" />
-        <ui:Label style="position: absolute; left: 898px; top: 459px; width: 35px; height: 24px;" text="High" class="option-small" picking-mode="Ignore" />
+        <ui:Slider low-value="0" high-value="10" name="sound.music" style="position: absolute; left: 733px; top: 460px; width: 160px; height: 27px;" class="option-slider" />
+        <ui:Label style="position: absolute; left: 190px; top: 196px; width: 41px; height: 24px;" text="Near" class="option-small option-slider-range-start" picking-mode="Ignore" />
+        <ui:Label style="position: absolute; left: 405px; top: 196px; width: 42px; height: 24px;" text="Far" class="option-small" picking-mode="Ignore" />
+        <ui:Label style="position: absolute; left: 190px; top: 236px; width: 41px; height: 24px;" text="Low" class="option-small option-slider-range-start" picking-mode="Ignore" />
+        <ui:Label style="position: absolute; left: 405px; top: 236px; width: 42px; height: 24px;" text="High" class="option-small" picking-mode="Ignore" />
+        <ui:Label style="position: absolute; left: 683px; top: 116px; width: 43px; height: 24px;" text="Low" class="option-small option-slider-range-start" picking-mode="Ignore" />
+        <ui:Label style="position: absolute; left: 898px; top: 116px; width: 42px; height: 24px;" text="High" class="option-small" picking-mode="Ignore" />
+        <ui:Label style="position: absolute; left: 683px; top: 219px; width: 43px; height: 24px;" text="Low" class="option-small option-slider-range-start" picking-mode="Ignore" />
+        <ui:Label style="position: absolute; left: 898px; top: 219px; width: 42px; height: 24px;" text="High" class="option-small" picking-mode="Ignore" />
+        <ui:Label style="position: absolute; left: 683px; top: 309px; width: 43px; height: 24px;" text="Low" class="option-small option-slider-range-start" picking-mode="Ignore" />
+        <ui:Label style="position: absolute; left: 898px; top: 309px; width: 42px; height: 24px;" text="High" class="option-small" picking-mode="Ignore" />
+        <ui:Label style="position: absolute; left: 683px; top: 389px; width: 43px; height: 24px;" text="Low" class="option-small option-slider-range-start" picking-mode="Ignore" />
+        <ui:Label style="position: absolute; left: 898px; top: 389px; width: 42px; height: 24px;" text="High" class="option-small" picking-mode="Ignore" />
+        <ui:Label style="position: absolute; left: 683px; top: 459px; width: 43px; height: 24px;" text="Low" class="option-small option-slider-range-start" picking-mode="Ignore" />
+        <ui:Label style="position: absolute; left: 898px; top: 459px; width: 42px; height: 24px;" text="High" class="option-small" picking-mode="Ignore" />
       </ui:VisualElement>
-      <ui:VisualElement name="page-game-ui" style="position: absolute; left: 20px; top: 60px; width: 960px; height: 520px;" class="option-page" picking-mode="Ignore">
+      <ui:VisualElement name="page-game-ui" style="position: absolute; left: 20px; top: 60px; width: 960px; height: 520px;" class="option-page option-page-game-ui" picking-mode="Ignore">
         <ui:VisualElement style="position: absolute; left: 10px; top: 20px; width: 935px; height: 45px;" class="option-sky" picking-mode="Ignore" />
         <ui:VisualElement style="position: absolute; left: 10px; top: 50px; width: 650px; height: 230px;" class="option-flat" picking-mode="Ignore" />
         <ui:VisualElement style="position: absolute; left: 560px; top: 64px; width: 385px; height: 216px;" class="option-flat" picking-mode="Ignore" />
@@ -123,8 +125,8 @@
         <ui:VisualElement style="position: absolute; left: 70px; top: 81px; width: 370px; height: 179px;" class="option-side" picking-mode="Ignore" />
         <ui:Label style="position: absolute; left: 20px; top: 28px; width: 200px; height: 24px;" text="DISPLAY ELEMENTS" class="option-title" picking-mode="Ignore" />
         <ui:Label style="position: absolute; left: 20px; top: 308px; width: 200px; height: 24px;" text="CHAT TEXT COLORS" class="option-title" picking-mode="Ignore" />
-        <ui:Button name="default-display" style="position: absolute; left: 690px; top: 30px; width: 250px; height: 25px;" text="DEFAULT DISPLAY ELEMENTS" class="ff-button option-button" />
-        <ui:Button name="default-colors" style="position: absolute; left: 690px; top: 310px; width: 250px; height: 25px;" text="DEFAULT TEXT COLORS" class="ff-button option-button" />
+        <ui:Button name="default-display" style="position: absolute; left: 690px; top: 30px; width: 250px; height: 25px;" text="DEFAULT DISPLAY ELEMENTS" class="option-role-default-display ff-button option-button" />
+        <ui:Button name="default-colors" style="position: absolute; left: 690px; top: 310px; width: 250px; height: 25px;" text="DEFAULT TEXT COLORS" class="option-role-default-colors ff-button option-button" />
         <ui:Label style="position: absolute; left: 100px; top: 70px; width: 150px; height: 25px;" text="FLOATING DISPLAY" class="option-cyan" picking-mode="Ignore" />
         <ui:Label style="position: absolute; left: 0px; top: 95px; width: 300px; height: 21px;" text="MY NAME:" class="option-label" picking-mode="Ignore" />
         <ui:Button name="display.my_name-on" style="position: absolute; left: 310px; top: 95px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
@@ -166,42 +168,112 @@
         <ui:Label style="position: absolute; left: 782px; top: 111px; width: 38px; height: 21px;" text="On" class="option-small" picking-mode="Ignore" />
         <ui:Button name="display.scale_ui-off" style="position: absolute; left: 820px; top: 111px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
         <ui:Label style="position: absolute; left: 842px; top: 111px; width: 38px; height: 21px;" text="Off" class="option-small" picking-mode="Ignore" />
-        <ui:Label style="position: absolute; left: 450px; top: 137px; width: 300px; height: 21px;" text="OLD CHAT:" class="option-label" picking-mode="Ignore" />
-        <ui:Button name="display.new_chat-on" style="position: absolute; left: 760px; top: 137px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
+        <ui:Label style="position: absolute; left: 450px; top: 137px; width: 300px; height: 21px;" text="COMPUTRESS HINTS:" class="option-label" picking-mode="Ignore" />
+        <ui:Button name="display.game_hint-on" style="position: absolute; left: 760px; top: 137px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
         <ui:Label style="position: absolute; left: 782px; top: 137px; width: 38px; height: 21px;" text="On" class="option-small" picking-mode="Ignore" />
-        <ui:Button name="display.new_chat-off" style="position: absolute; left: 820px; top: 137px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
+        <ui:Button name="display.game_hint-off" style="position: absolute; left: 820px; top: 137px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
         <ui:Label style="position: absolute; left: 842px; top: 137px; width: 38px; height: 21px;" text="Off" class="option-small" picking-mode="Ignore" />
-        <ui:Label style="position: absolute; left: 450px; top: 163px; width: 300px; height: 21px;" text="COMPUTRESS HINTS:" class="option-label" picking-mode="Ignore" />
-        <ui:Button name="display.game_hint-on" style="position: absolute; left: 760px; top: 163px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
+        <ui:Label style="position: absolute; left: 450px; top: 163px; width: 300px; height: 21px;" text="NPC MESSAGES IN CHAT WINDOW:" class="option-label" picking-mode="Ignore" />
+        <ui:Button name="display.npc_messages_in_chat-on" style="position: absolute; left: 760px; top: 163px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
         <ui:Label style="position: absolute; left: 782px; top: 163px; width: 38px; height: 21px;" text="On" class="option-small" picking-mode="Ignore" />
-        <ui:Button name="display.game_hint-off" style="position: absolute; left: 820px; top: 163px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
+        <ui:Button name="display.npc_messages_in_chat-off" style="position: absolute; left: 820px; top: 163px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
         <ui:Label style="position: absolute; left: 842px; top: 163px; width: 38px; height: 21px;" text="Off" class="option-small" picking-mode="Ignore" />
-        <ui:Label style="position: absolute; left: 450px; top: 189px; width: 300px; height: 21px;" text="NPC MESSAGES IN CHAT WINDOW:" class="option-label" picking-mode="Ignore" />
-        <ui:Button name="display.npc_messages_in_chat-on" style="position: absolute; left: 760px; top: 189px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
+        <ui:Label style="position: absolute; left: 450px; top: 189px; width: 300px; height: 21px;" text="COMBAT IN CHAT WINDOW:" class="option-label" picking-mode="Ignore" />
+        <ui:Button name="display.combat_in_chat-on" style="position: absolute; left: 760px; top: 189px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
         <ui:Label style="position: absolute; left: 782px; top: 189px; width: 38px; height: 21px;" text="On" class="option-small" picking-mode="Ignore" />
-        <ui:Button name="display.npc_messages_in_chat-off" style="position: absolute; left: 820px; top: 189px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
+        <ui:Button name="display.combat_in_chat-off" style="position: absolute; left: 820px; top: 189px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
         <ui:Label style="position: absolute; left: 842px; top: 189px; width: 38px; height: 21px;" text="Off" class="option-small" picking-mode="Ignore" />
-        <ui:Label style="position: absolute; left: 450px; top: 215px; width: 300px; height: 21px;" text="COMBAT IN CHAT WINDOW:" class="option-label" picking-mode="Ignore" />
-        <ui:Button name="display.combat_in_chat-on" style="position: absolute; left: 760px; top: 215px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
+        <ui:Label style="position: absolute; left: 450px; top: 215px; width: 300px; height: 21px;" text="ANIMATED NANOCOM:" class="option-label" picking-mode="Ignore" />
+        <ui:Button name="display.animated_nanos-on" style="position: absolute; left: 760px; top: 215px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
         <ui:Label style="position: absolute; left: 782px; top: 215px; width: 38px; height: 21px;" text="On" class="option-small" picking-mode="Ignore" />
-        <ui:Button name="display.combat_in_chat-off" style="position: absolute; left: 820px; top: 215px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
+        <ui:Button name="display.animated_nanos-off" style="position: absolute; left: 820px; top: 215px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
         <ui:Label style="position: absolute; left: 842px; top: 215px; width: 38px; height: 21px;" text="Off" class="option-small" picking-mode="Ignore" />
-        <ui:Label style="position: absolute; left: 450px; top: 241px; width: 300px; height: 21px;" text="ANIMATED NANOCOM:" class="option-label" picking-mode="Ignore" />
-        <ui:Button name="display.animated_nanos-on" style="position: absolute; left: 760px; top: 241px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
-        <ui:Label style="position: absolute; left: 782px; top: 241px; width: 38px; height: 21px;" text="On" class="option-small" picking-mode="Ignore" />
-        <ui:Button name="display.animated_nanos-off" style="position: absolute; left: 820px; top: 241px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
-        <ui:Label style="position: absolute; left: 842px; top: 241px; width: 38px; height: 21px;" text="Off" class="option-small" picking-mode="Ignore" />
         <ui:VisualElement style="position: absolute; left: 90px; top: 360px; width: 194px; height: 120px;" class="option-sky" picking-mode="Ignore" />
         <ui:Label style="position: absolute; left: 100px; top: 365px; width: 150px; height: 25px;" text="GENERAL CHAT" class="option-cyan" picking-mode="Ignore" />
-        <ui:VisualElement name="palette-general" style="position: absolute; left: 100px; top: 390px; width: 180px; height: 90px;" picking-mode="Ignore" />
+        <ui:VisualElement class="option-role-palette-general" name="palette-general" style="position: absolute; left: 100px; top: 390px; width: 180px; height: 90px;" picking-mode="Ignore">
+          <ui:VisualElement class="option-swatch-row" picking-mode="Ignore">
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+          </ui:VisualElement>
+          <ui:VisualElement class="option-swatch-row" picking-mode="Ignore">
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+          </ui:VisualElement>
+          <ui:VisualElement class="option-swatch-row" picking-mode="Ignore">
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+          </ui:VisualElement>
+        </ui:VisualElement>
         <ui:VisualElement style="position: absolute; left: 380px; top: 360px; width: 194px; height: 120px;" class="option-sky" picking-mode="Ignore" />
         <ui:Label style="position: absolute; left: 390px; top: 365px; width: 150px; height: 25px;" text="BUDDY CHAT" class="option-cyan" picking-mode="Ignore" />
-        <ui:VisualElement name="palette-buddy" style="position: absolute; left: 390px; top: 390px; width: 180px; height: 90px;" picking-mode="Ignore" />
+        <ui:VisualElement class="option-role-palette-buddy" name="palette-buddy" style="position: absolute; left: 390px; top: 390px; width: 180px; height: 90px;" picking-mode="Ignore">
+          <ui:VisualElement class="option-swatch-row" picking-mode="Ignore">
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+          </ui:VisualElement>
+          <ui:VisualElement class="option-swatch-row" picking-mode="Ignore">
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+          </ui:VisualElement>
+          <ui:VisualElement class="option-swatch-row" picking-mode="Ignore">
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+          </ui:VisualElement>
+        </ui:VisualElement>
         <ui:VisualElement style="position: absolute; left: 670px; top: 360px; width: 194px; height: 120px;" class="option-sky" picking-mode="Ignore" />
         <ui:Label style="position: absolute; left: 680px; top: 365px; width: 150px; height: 25px;" text="GROUP CHAT" class="option-cyan" picking-mode="Ignore" />
-        <ui:VisualElement name="palette-group" style="position: absolute; left: 680px; top: 390px; width: 180px; height: 90px;" picking-mode="Ignore" />
+        <ui:VisualElement class="option-role-palette-group" name="palette-group" style="position: absolute; left: 680px; top: 390px; width: 180px; height: 90px;" picking-mode="Ignore">
+          <ui:VisualElement class="option-swatch-row" picking-mode="Ignore">
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+          </ui:VisualElement>
+          <ui:VisualElement class="option-swatch-row" picking-mode="Ignore">
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+          </ui:VisualElement>
+          <ui:VisualElement class="option-swatch-row" picking-mode="Ignore">
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+            <ui:Instance template="ColorSwatch" class="option-swatch-slot" />
+          </ui:VisualElement>
+        </ui:VisualElement>
       </ui:VisualElement>
-      <ui:VisualElement name="page-social" style="position: absolute; left: 20px; top: 60px; width: 960px; height: 520px;" class="option-page" picking-mode="Ignore">
+      <ui:VisualElement name="page-social" style="position: absolute; left: 20px; top: 60px; width: 960px; height: 520px;" class="option-page option-page-social" picking-mode="Ignore">
         <ui:VisualElement style="position: absolute; left: 10px; top: 20px; width: 450px; height: 45px;" class="option-sky" picking-mode="Ignore" />
         <ui:VisualElement style="position: absolute; left: 10px; top: 220px; width: 450px; height: 45px;" class="option-sky" picking-mode="Ignore" />
         <ui:VisualElement style="position: absolute; left: 490px; top: 20px; width: 450px; height: 45px;" class="option-sky" picking-mode="Ignore" />
@@ -215,9 +287,9 @@
         <ui:Label style="position: absolute; left: 500px; top: 28px; width: 200px; height: 24px;" text="BLOCKED PLAYERS" class="option-title" picking-mode="Ignore" />
         <ui:Label style="position: absolute; left: 35px; top: 79px; width: 185px; height: 25px;" text="TEXT LANGUAGE:" class="option-label" picking-mode="Ignore" />
         <ui:Label style="position: absolute; left: 35px; top: 127px; width: 185px; height: 25px;" text="VOICE LANGUAGE:" class="option-label" picking-mode="Ignore" />
-        <ui:Button name="text-locale" style="position: absolute; left: 238px; top: 79px; width: 175px; height: 25px;" text="" class="ff-button option-dropdown" />
-        <ui:Button name="voice-locale" style="position: absolute; left: 238px; top: 127px; width: 175px; height: 25px;" text="" class="ff-button option-dropdown" />
-        <ui:Button name="default-social" style="position: absolute; left: 275px; top: 230px; width: 180px; height: 25px;" text="DEFAULT REQUESTS" class="ff-button option-button" />
+        <ui:Button name="text-locale" style="position: absolute; left: 238px; top: 79px; width: 175px; height: 25px;" text="" class="option-role-text-locale ff-button option-dropdown" />
+        <ui:Button name="voice-locale" style="position: absolute; left: 238px; top: 127px; width: 175px; height: 25px;" text="" class="option-role-voice-locale ff-button option-dropdown" />
+        <ui:Button name="default-social" style="position: absolute; left: 275px; top: 230px; width: 180px; height: 25px;" text="DEFAULT REQUESTS" class="option-role-default-social ff-button option-button" />
         <ui:VisualElement style="position: absolute; left: 80px; top: 280px; width: 300px; height: 60px;" class="option-small" picking-mode="Ignore" />
         <ui:Label style="position: absolute; left: 90px; top: 300px; width: 150px; height: 21px;" text="GROUP REQUESTS:" class="option-label" picking-mode="Ignore" />
         <ui:Button name="social.group-on" style="position: absolute; left: 260px; top: 300px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
@@ -237,10 +309,10 @@
         <ui:Button name="social.trade-off" style="position: absolute; left: 320px; top: 454px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
         <ui:Label style="position: absolute; left: 342px; top: 454px; width: 38px; height: 21px;" text="No" class="option-small" picking-mode="Ignore" />
         <ui:Label style="position: absolute; left: 510px; top: 60px; width: 368px; height: 40px;" text="Select a name below to remove it from your Blocked Players list. Reminder: Unblocked players can send you requests and chat messages." class="option-description" picking-mode="Ignore" />
-        <ui:ScrollView name="blocked-players" style="position: absolute; left: 565px; top: 100px; width: 300px; height: 300px;" class="option-list" />
-        <ui:Button name="unignore" style="position: absolute; left: 570px; top: 415px; width: 290px; height: 25px;" text="UNIGNORE" class="ff-button option-button" />
+        <ui:ScrollView name="blocked-players" style="position: absolute; left: 565px; top: 100px; width: 300px; height: 300px;" class="option-role-blocked-players option-list" />
+        <ui:Button name="unignore" style="position: absolute; left: 570px; top: 415px; width: 290px; height: 25px;" text="UNIGNORE" class="option-role-unignore ff-button option-button" />
       </ui:VisualElement>
-      <ui:VisualElement name="page-controls" style="position: absolute; left: 20px; top: 60px; width: 960px; height: 520px;" class="option-page" picking-mode="Ignore">
+      <ui:VisualElement name="page-controls" style="position: absolute; left: 20px; top: 60px; width: 960px; height: 520px;" class="option-page option-page-controls" picking-mode="Ignore">
         <ui:VisualElement style="position: absolute; left: 10px; top: 20px; width: 935px; height: 45px;" class="option-sky" picking-mode="Ignore" />
         <ui:VisualElement style="position: absolute; left: 10px; top: 160px; width: 935px; height: 45px;" class="option-sky" picking-mode="Ignore" />
         <ui:VisualElement style="position: absolute; left: 10px; top: 50px; width: 650px; height: 90px;" class="option-flat" picking-mode="Ignore" />
@@ -249,8 +321,8 @@
         <ui:VisualElement style="position: absolute; left: 460px; top: 204px; width: 485px; height: 306px;" class="option-flat" picking-mode="Ignore" />
         <ui:Label style="position: absolute; left: 20px; top: 28px; width: 200px; height: 24px;" text="INPUT CONTROLS" class="option-title" picking-mode="Ignore" />
         <ui:Label style="position: absolute; left: 20px; top: 168px; width: 200px; height: 24px;" text="KEY MAPPING" class="option-title" picking-mode="Ignore" />
-        <ui:Button name="default-input" style="position: absolute; left: 690px; top: 30px; width: 250px; height: 25px;" text="DEFAULT INPUT CONTROLS" class="ff-button option-button" />
-        <ui:Button name="default-bindings" style="position: absolute; left: 690px; top: 170px; width: 250px; height: 25px;" text="DEFAULT KEY MAPPING" class="ff-button option-button" />
+        <ui:Button name="default-input" style="position: absolute; left: 690px; top: 30px; width: 250px; height: 25px;" text="DEFAULT INPUT CONTROLS" class="option-role-default-input ff-button option-button" />
+        <ui:Button name="default-bindings" style="position: absolute; left: 690px; top: 170px; width: 250px; height: 25px;" text="DEFAULT KEY MAPPING" class="option-role-default-bindings ff-button option-button" />
         <ui:Label style="position: absolute; left: 30px; top: 88px; width: 200px; height: 25px;" text="INVERT CAMERA Y-AXIS:" class="option-label" picking-mode="Ignore" />
         <ui:Button name="input.invert_y-on" style="position: absolute; left: 250px; top: 88px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
         <ui:Label style="position: absolute; left: 272px; top: 88px; width: 38px; height: 21px;" text="Yes" class="option-small" picking-mode="Ignore" />
@@ -262,22 +334,99 @@
         <ui:Button name="input.pad_invert_y-off" style="position: absolute; left: 310px; top: 128px; width: 22px; height: 21px;" text="" class="ff-button option-radio" />
         <ui:Label style="position: absolute; left: 332px; top: 128px; width: 38px; height: 21px;" text="No" class="option-small" picking-mode="Ignore" />
         <ui:Label style="position: absolute; left: 450px; top: 88px; width: 200px; height: 25px;" text="CAMERA SENSITIVITY:" class="option-label" picking-mode="Ignore" />
-        <ui:Slider low-value="1" high-value="10" name="input.sensitivity" style="position: absolute; left: 680px; top: 85px; width: 170px; height: 27px;" class="option-slider" />
-        <ui:Label style="position: absolute; left: 655px; top: 84px; width: 30px; height: 24px;" text="Low" class="option-small" picking-mode="Ignore" />
+        <ui:Slider low-value="1" high-value="10" name="input.sensitivity" style="position: absolute; left: 702px; top: 85px; width: 148px; height: 27px;" class="option-slider" />
+        <ui:Label style="position: absolute; left: 655px; top: 84px; width: 40px; height: 24px;" text="Low" class="option-small option-slider-range-start" picking-mode="Ignore" />
         <ui:Label style="position: absolute; left: 855px; top: 84px; width: 40px; height: 24px;" text="High" class="option-small" picking-mode="Ignore" />
         <ui:Label style="position: absolute; left: 450px; top: 128px; width: 200px; height: 25px;" text="PAD SENSITIVITY:" class="option-label" picking-mode="Ignore" />
-        <ui:Slider low-value="1" high-value="10" name="input.pad_sensitivity" style="position: absolute; left: 680px; top: 125px; width: 170px; height: 27px;" class="option-slider" />
-        <ui:Label style="position: absolute; left: 655px; top: 124px; width: 30px; height: 24px;" text="Low" class="option-small" picking-mode="Ignore" />
+        <ui:Slider low-value="1" high-value="10" name="input.pad_sensitivity" style="position: absolute; left: 702px; top: 125px; width: 148px; height: 27px;" class="option-slider" />
+        <ui:Label style="position: absolute; left: 655px; top: 124px; width: 40px; height: 24px;" text="Low" class="option-small option-slider-range-start" picking-mode="Ignore" />
         <ui:Label style="position: absolute; left: 855px; top: 124px; width: 40px; height: 24px;" text="High" class="option-small" picking-mode="Ignore" />
         <ui:Label style="position: absolute; left: 20px; top: 188px; width: 210px; height: 25px;" text="Selected Gamepad :" class="option-label" picking-mode="Ignore" />
-        <ui:Button name="pad-profile" style="position: absolute; left: 250px; top: 190px; width: 223px; height: 21px;" text="" class="ff-button option-dropdown" />
-        <ui:Label name="capture-prompt" style="position: absolute; left: 30px; top: 210px; width: 800px; height: 20px;" text="" class="option-small" picking-mode="Ignore" />
-        <ui:ScrollView name="key-mappings" style="position: absolute; left: 25px; top: 230px; width: 900px; height: 260px;" class="option-list" />
+        <ui:Button name="pad-profile" style="position: absolute; left: 250px; top: 190px; width: 223px; height: 21px;" text="" class="option-role-pad-profile ff-button option-dropdown" />
+        <ui:Label name="capture-prompt" style="position: absolute; left: 30px; top: 210px; width: 800px; height: 20px;" text="" class="option-role-capture-prompt option-small" picking-mode="Ignore" />
+        <ui:ScrollView name="key-mappings" style="position: absolute; left: 25px; top: 230px; width: 900px; height: 260px;" class="option-role-key-mappings option-list">
+          <ui:VisualElement class="option-mappings" picking-mode="Ignore">
+            <ui:VisualElement class="option-mapping-group option-mapping-movement" style="position:absolute; left:0; top:0px; right:0; height:300px;">
+              <ui:VisualElement class="option-side" style="position:absolute; left:10px; top:35px; width:900px; height:280px;" picking-mode="Ignore" />
+              <ui:VisualElement class="option-connector" style="position:absolute; left:10px; top:12px; width:169px; height:36px;" picking-mode="Ignore" />
+              <ui:Label class="option-title" style="position:absolute; left:20px; top:20px; width:160px; height:24px;" text="MOVEMENT" picking-mode="Ignore" />
+              <ui:Label class="option-small" style="position:absolute; left:180px; top:20px; width:180px; height:24px;" text="SETTING 1" picking-mode="Ignore" />
+              <ui:Label class="option-small" style="position:absolute; left:400px; top:20px; width:180px; height:24px;" text="SETTING 2" picking-mode="Ignore" />
+              <ui:Label class="option-small" style="position:absolute; left:620px; top:20px; width:180px; height:24px;" text="SETTING 3" picking-mode="Ignore" />
+              <ui:VisualElement class="option-mapping-rows" style="top:60px;" picking-mode="Ignore">
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+              </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="option-mapping-group option-mapping-interface" style="position:absolute; left:0; top:330px; right:0; height:210px;">
+              <ui:VisualElement class="option-side" style="position:absolute; left:10px; top:33px; width:900px; height:180px;" picking-mode="Ignore" />
+              <ui:VisualElement class="option-connector" style="position:absolute; left:10px; top:10px; width:169px; height:36px;" picking-mode="Ignore" />
+              <ui:Label class="option-title" style="position:absolute; left:20px; top:19px; width:160px; height:24px;" text="INTERFACE" picking-mode="Ignore" />
+              <ui:Label class="option-small" style="position:absolute; left:180px; top:19px; width:180px; height:24px;" text="SETTING 1" picking-mode="Ignore" />
+              <ui:Label class="option-small" style="position:absolute; left:400px; top:19px; width:180px; height:24px;" text="SETTING 2" picking-mode="Ignore" />
+              <ui:Label class="option-small" style="position:absolute; left:620px; top:19px; width:180px; height:24px;" text="SETTING 3" picking-mode="Ignore" />
+              <ui:VisualElement class="option-mapping-rows" style="top:60px;" picking-mode="Ignore">
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+              </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="option-mapping-group option-mapping-camera" style="position:absolute; left:0; top:565px; right:0; height:240px;">
+              <ui:VisualElement class="option-side" style="position:absolute; left:10px; top:30px; width:870px; height:220px;" picking-mode="Ignore" />
+              <ui:VisualElement class="option-connector" style="position:absolute; left:10px; top:10px; width:139px; height:36px;" picking-mode="Ignore" />
+              <ui:Label class="option-title" style="position:absolute; left:20px; top:19px; width:160px; height:24px;" text="CAMERA" picking-mode="Ignore" />
+              <ui:Label class="option-small" style="position:absolute; left:180px; top:19px; width:180px; height:24px;" text="SETTING 1" picking-mode="Ignore" />
+              <ui:Label class="option-small" style="position:absolute; left:400px; top:19px; width:180px; height:24px;" text="SETTING 2" picking-mode="Ignore" />
+              <ui:Label class="option-small" style="position:absolute; left:620px; top:19px; width:180px; height:24px;" text="SETTING 3" picking-mode="Ignore" />
+              <ui:VisualElement class="option-mapping-rows" style="top:60px;" picking-mode="Ignore">
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+              </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="option-mapping-group option-mapping-combat" style="position:absolute; left:0; top:825px; right:0; height:300px;">
+              <ui:VisualElement class="option-side" style="position:absolute; left:10px; top:30px; width:870px; height:280px;" picking-mode="Ignore" />
+              <ui:VisualElement class="option-connector" style="position:absolute; left:10px; top:10px; width:139px; height:36px;" picking-mode="Ignore" />
+              <ui:Label class="option-title" style="position:absolute; left:20px; top:19px; width:160px; height:24px;" text="COMBAT" picking-mode="Ignore" />
+              <ui:Label class="option-small" style="position:absolute; left:180px; top:19px; width:180px; height:24px;" text="SETTING 1" picking-mode="Ignore" />
+              <ui:Label class="option-small" style="position:absolute; left:400px; top:19px; width:180px; height:24px;" text="SETTING 2" picking-mode="Ignore" />
+              <ui:Label class="option-small" style="position:absolute; left:620px; top:19px; width:180px; height:24px;" text="SETTING 3" picking-mode="Ignore" />
+              <ui:VisualElement class="option-mapping-rows" style="top:60px;" picking-mode="Ignore">
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+                <ui:Instance template="MappingRow" class="option-mapping-row-instance" />
+              </ui:VisualElement>
+            </ui:VisualElement>
+          </ui:VisualElement>
+        </ui:ScrollView>
       </ui:VisualElement>
-      <ui:Button name="settings-close" style="position: absolute; left: 987px; top: 0px; width: 30px; height: 30px;" text="" class="ff-button option-close" />
-      <ui:Button name="settings-apply" style="position: absolute; left: 500px; top: 600px; width: 180px; height: 25px;" text="APPLY CHANGE" class="ff-button option-button" />
-      <ui:Button name="settings-save" style="position: absolute; left: 695px; top: 600px; width: 180px; height: 25px;" text="SAVE AND EXIT" class="ff-button option-button" />
-      <ui:VisualElement name="settings-popup-layer" style="position: absolute; left: 0px; top: 0px; width: 1020px; height: 638px;" picking-mode="Ignore" />
+      <ui:Button name="settings-close" style="position: absolute; left: 987px; top: 0px; width: 30px; height: 30px;" text="" class="option-role-settings-close ff-button option-close" />
+      <ui:Button name="settings-apply" style="position: absolute; left: 500px; top: 600px; width: 180px; height: 25px;" text="APPLY CHANGE" class="option-role-settings-apply ff-button option-button" />
+      <ui:Button name="settings-save" style="position: absolute; left: 695px; top: 600px; width: 180px; height: 25px;" text="SAVE AND EXIT" class="option-role-settings-save ff-button option-button" />
+      <ui:VisualElement name="settings-popup-layer" class="option-popup-layer" picking-mode="Ignore">
+        <ui:VisualElement class="option-popup-message option-modal-shield">
+          <ui:VisualElement class="option-small option-message-box">
+            <ui:Label class="option-description option-message-text" enable-rich-text="false" picking-mode="Ignore" />
+            <ui:Button class="ff-button option-button option-message-ok" text="OK" />
+          </ui:VisualElement>
+        </ui:VisualElement>
+      </ui:VisualElement>
     </ui:VisualElement>
   </ui:VisualElement>
 </ui:UXML>

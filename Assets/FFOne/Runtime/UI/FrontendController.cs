@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using FFOne.Content;
@@ -16,12 +18,15 @@ namespace FFOne.UI
     [RequireComponent(typeof(UIDocument))]
     public sealed partial class FrontendController : MonoBehaviour
     {
+        [SerializeField] UIDocument document;
+
         [Header("Frontend preferences")]
         [SerializeField] string language = "ru";
         [SerializeField] bool playMusic = true;
 
         public FusionClient Session { get; private set; }
         public string Language => language;
+        public string VoiceLanguage => (string)preferences?.Committed["voice_locale"] ?? language;
         public CharacterInfo SelectedCharacter { get; private set; }
         public VisualElement Root { get; private set; }
         public Image PreviewImage { get; private set; }
@@ -34,25 +39,28 @@ namespace FFOne.UI
         public event Action<int> CreateCharacterRequested;
 
         CancellationTokenSource lifetime;
-        AudioSource music;
+        RetrobutionAudioController audio;
         PanelSettings ownedPanel;
         VisualElement loginRoot, selectionRoot, selectionGroup, avatarGroup, loginPanel, modal;
-        Image loginBackground, chrome;
+        VisualElement loginBackground;
+        VisualElement chrome;
         readonly Image[] backgrounds = new Image[10];
         readonly Button[] slotButtons = new Button[4];
+        readonly VisualElement[] slotRows = new VisualElement[4];
         readonly Label[] slotNames = new Label[4], slotLevels = new Label[4], slotLocations = new Label[4], emptyLabels = new Label[4];
-        readonly Image[] disksBack = new Image[4], disksFront = new Image[4];
         TextField username, password;
         Button submit, create, delete, enter, musicButton, fullscreen, quit;
-        Label avatarName, status;
+        Label avatarName, avatarStatus, status;
         bool busy, showingSelection;
         float selectionTime;
         float viewportWidth, uiScale = 1, characterScale = 1;
         string statusText = "";
+        string connectionErrorServerKey;
         string currentBackground = "future/CSFutureBG_";
 
         void Awake()
         {
+            GameplayInput.TrackGamepads();
             lifetime = new CancellationTokenSource();
             Session = new FusionClient();
             InitializeProfiles();
@@ -60,11 +68,14 @@ namespace FFOne.UI
 
         // Addressables may need the scene's asynchronous activation to finish.
         // Start runs after every Awake; dependent frontend components start later.
-        void Start()
+        async void Start()
         {
             language = PlayerPrefs.GetString("ffone.text-language", language);
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            language = UiSmokeLaunch.Locale ?? language;
+#endif
             playMusic = PlayerPrefs.GetInt("ffone.music", playMusic ? 1 : 0) == 1;
-            var document = GetComponent<UIDocument>();
+            if (!document) TryGetComponent(out document);
             if (document.panelSettings == null)
             {
                 ownedPanel = ScriptableObject.CreateInstance<PanelSettings>();
@@ -78,30 +89,21 @@ namespace FFOne.UI
             Root.Clear();
             Root.name = "ffone-frontend";
             Root.AddToClassList("frontend-root");
-            Root.styleSheets.Add(FFOne.Content.ContentAssets.Load<StyleSheet>("ui/styles/FFTheme"));
-            var styles = FFOne.Content.ContentAssets.Load<StyleSheet>("ui/styles/Frontend");
-            if (styles != null) Root.styleSheets.Add(styles);
-            FFWidgets.Font(Root);
-            Root.RegisterCallback<GeometryChangedEvent>(_ => Layout());
-            BuildLogin();
-            BuildSelection();
-            status = FFWidgets.Label(Root, "connection-status", "", 0, 0, 580, 60, true, 14);
-            status.AddToClassList("frontend-status");
-            status.style.display = DisplayStyle.None;
-            Root.RegisterCallback<KeyDownEvent>(OnKey, TrickleDown.TrickleDown);
-            music = gameObject.AddComponent<AudioSource>();
-            music.clip = FFOne.Content.ContentAssets.Load<AudioClip>("audio/music/00_main_theme");
-            music.loop = true;
-            music.volume = 0.5f;
-            if (playMusic && music.clip != null) music.Play();
-            InitializeOptions();
-            ShowLogin();
+            try { await InitializeFrontendAsync(lifetime.Token); }
+            catch (OperationCanceledException) { }
+            catch (Exception error)
+            {
+                frontendInitialized = false;
+                Debug.LogException(error, this);
+                if (this) ShowError(error.Message);
+            }
         }
 
         void Update()
         {
+            if (!frontendInitialized) return;
             if (UnityEngine.InputSystem.Keyboard.current?.f10Key.wasPressedThisFrame == true && !networkWorld) OpenSettings();
-            if (!showingSelection && profiles != null && Time.unscaledTime >= nextServerProbe) RefreshServerHealth();
+            TickServerHealth();
             while (Session != null && Session.TryDequeueEvent(out var networkEvent))
             {
                 if (DeferGameplayEvent(networkEvent)) continue;
@@ -113,24 +115,29 @@ namespace FFOne.UI
                     catch (ProtocolException failure) { ShowError(failure.Message); }
                 }
                 HandleWorldDisconnect(networkEvent);
-                if (networkEvent.Kind == NetworkEventKind.Disconnected && !busy)
+                if (networkEvent.Kind == NetworkEventKind.Disconnected)
                 {
-                    Session.Dispose();
-                    Session = new FusionClient();
-                    ShowLogin();
-                    SetBusy(false);
-                    ShowError(networkEvent.Message);
+                    bool loginDisconnected = !networkEvent.IsShard || !Session.IsLoggedIn;
+                    if (loginDisconnected) MarkServerOffline(profiles.Current);
+                    if (!busy || selectionPreparing)
+                    {
+                        ReturnToLoginAfterDisconnect(networkEvent.Message, loginDisconnected ? profiles.Current.Key : null);
+                        if (!loginDisconnected) ProbeServer(profiles.Current);
+                    }
                 }
             }
             TickWorldFlow();
             TickGameplayUi();
+            TickGamepadNavigation();
             if (!showingSelection) return;
+            if (selectionRoot.style.display != DisplayStyle.None) RefreshSelectionPreviewStatus();
             selectionTime += Time.unscaledDeltaTime;
             for (int i = 0; i < backgrounds.Length; i++) backgrounds[i].style.left = viewportWidth / 2 + (FrontendLayout.BackgroundX(i, selectionTime) - viewportWidth / 2) * characterScale;
         }
 
         void OnDestroy()
         {
+            selectionLoading?.Cancel(); selectionLoading?.Dispose(); selectionLoading = null;
             if (preferences != null) preferences.Changed -= ApplyOptions;
             settings?.Dispose();
             DisposeWorldFlow();
@@ -142,27 +149,29 @@ namespace FFOne.UI
 
         public void ShowLogin()
         {
+            audio?.SetMode(RetrobutionAudioController.Mode.Lobby);
+            selectionPresentationVersion++; selectionPreparing = false;
+            selectionLoading?.Cancel(); selectionLoading?.Dispose(); selectionLoading = null;
+            HideLoading();
             showingSelection = false;
             loginRoot.style.display = DisplayStyle.Flex;
             selectionRoot.style.display = DisplayStyle.None;
             SelectedCharacter = null;
             CharacterSelected?.Invoke(null);
+            RosterChanged?.Invoke(Array.Empty<CharacterInfo>());
             CloseModal();
             SetStatus("");
             Layout();
-            username.Focus();
             BuildAccountControls();
+            if (savedAccount == null) username.Focus();
+            else submit.Focus();
         }
 
-        public void ShowSelection()
+        public async void ShowSelection()
         {
-            showingSelection = true;
-            loginRoot.style.display = DisplayStyle.None;
-            selectionRoot.style.display = DisplayStyle.Flex;
-            CloseModal();
-            SetStatus("");
-            RefreshRoster();
-            Layout();
+            try { await ShowSelectionAsync(); }
+            catch (OperationCanceledException) { }
+            catch (Exception error) { if (this) ShowError(error.Message); }
         }
 
         public void SetSelectionVisible(bool visible) => selectionRoot.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
@@ -173,27 +182,25 @@ namespace FFOne.UI
         {
             var characters = Session.Characters;
             long selectedUid = SelectedCharacter?.Uid ?? 0;
-            SelectedCharacter = characters.FirstOrDefault(c => c.Uid == selectedUid) ?? characters.FirstOrDefault();
+            SelectedCharacter = characters.FirstOrDefault(c => selectedUid != 0 && c.Uid == selectedUid)
+                ?? characters.FirstOrDefault(c => c.Slot == Session.SelectedSlot)
+                ?? characters.FirstOrDefault();
             for (int slot = 0; slot < 4; slot++)
             {
                 var character = characters.FirstOrDefault(c => c.Slot == slot + 1);
                 bool occupied = character != null;
                 bool selected = character == SelectedCharacter && occupied;
-                string image = occupied ? (selected ? "CSCharButtonOver" : "CSCharButtonNormal") : "CSCharButtonEmpty";
-                FFStyle.Button(slotButtons[slot], FFWidgets.Controls + image, FFWidgets.Controls + (occupied ? "CSCharButtonOver" : "CSCharButtonEmpty"));
+                slotRows[slot].EnableInClassList("selection-slot-occupied", occupied);
+                slotRows[slot].EnableInClassList("selection-slot-selected", selected);
+                slotRows[slot].EnableInClassList("selection-slot-highlight", selected);
                 slotButtons[slot].pickingMode = occupied ? PickingMode.Position : PickingMode.Ignore;
                 slotButtons[slot].focusable = occupied;
                 slotNames[slot].text = occupied ? character.DisplayName : "";
-                slotNames[slot].style.color = selected ? new Color(0, .179f, .558f) : new Color(.898f, .898f, .898f);
                 slotLevels[slot].text = occupied ? T("ui.character_select.level", "LEVEL {level}").Replace("{level}", character.Level.ToString()) : "";
                 slotLocations[slot].text = occupied ? CharacterLocations.Describe(character, language, selected) : "";
-                slotLevels[slot].style.color = slotLocations[slot].style.color = selected ? new Color(0, .179f, .558f) : new Color(0, .8f, 1);
-                emptyLabels[slot].style.display = occupied ? DisplayStyle.None : DisplayStyle.Flex;
-                disksBack[slot].style.display = disksFront[slot].style.display = DisplayStyle.Flex;
-                SlotPreviewImages[slot].style.display = occupied ? DisplayStyle.Flex : DisplayStyle.None;
             }
             avatarName.text = SelectedCharacter?.DisplayName ?? "";
-            string background = SelectedCharacter == null ? "future/CSFutureBG_" : CharacterLocations.Resolve(SelectedCharacter.X, SelectedCharacter.Y)?.Background ?? "future/CSFutureBG_";
+            string background = SelectedCharacter == null ? "future/CSFutureBG_" : CharacterLocations.RosterLocation(SelectedCharacter)?.Background ?? "future/CSFutureBG_";
             if (background != currentBackground)
             {
                 currentBackground = background;
@@ -209,8 +216,7 @@ namespace FFOne.UI
             var character = Session.Characters.FirstOrDefault(c => c.Slot == slot + 1);
             if (character == null) return;
             bool selected = hover || SelectedCharacter == character;
-            slotNames[slot].style.color = selected ? new Color(0, .179f, .558f) : new Color(.898f, .898f, .898f);
-            slotLevels[slot].style.color = slotLocations[slot].style.color = selected ? new Color(0, .179f, .558f) : new Color(0, .8f, 1);
+            slotRows[slot].EnableInClassList("selection-slot-highlight", selected);
             slotLocations[slot].text = CharacterLocations.Describe(character, language, selected);
         }
 
@@ -218,9 +224,11 @@ namespace FFOne.UI
         {
             if (busy) return;
             var character = Session.Characters.FirstOrDefault(c => c.Slot == slot);
-            if (character == null) return;
+            if (character == null || character == SelectedCharacter) return;
+            PlayUiSound("button");
             SelectedCharacter = character;
             RefreshRoster();
+            SetStatus("");
         }
 
         void RequestCreate(int slot = 0)
@@ -242,12 +250,24 @@ namespace FFOne.UI
             bool saved = savedAccount != null, remember = rememberAccount;
             await RunOperation(async () => {
                 if (saved) secret = profiles.ReadSecret(user);
-                if (server.Api != null)
+                try
                 {
-                    var accepted = await Session.LoginWithLauncherCredentialAsync(server.Api, user, secret, saved, lifetime.Token);
-                    user = accepted.Username; secret = accepted.RefreshToken;
+                    if (server.Api != null)
+                    {
+                        var accepted = await Session.LoginWithLauncherCredentialAsync(server.Api, user, secret, saved, lifetime.Token);
+                        user = accepted.Username; secret = accepted.RefreshToken;
+                    }
+                    else await Session.LoginAsync(server.Endpoint.Host, server.Endpoint.Port, user, secret, lifetime.Token);
                 }
-                else await Session.LoginAsync(server.Endpoint.Host, server.Endpoint.Port, user, secret, lifetime.Token);
+                catch (Exception error) when (IsLoginTransportFailure(error))
+                {
+                    if (this)
+                    {
+                        MarkServerOffline(server);
+                        SetStatus(error.Message, server.Key);
+                    }
+                    return;
+                }
                 if (this == null || lifetime.IsCancellationRequested) return;
                 if (remember)
                 {
@@ -256,7 +276,8 @@ namespace FFOne.UI
                 }
                 password.value = "";
                 BuildAccountControls();
-                ShowSelection();
+                UpdateServerBrowserMessage();
+                await ShowSelectionAsync();
             }, T("ui.login.connecting", "CONNECTING..."));
         }
 
@@ -273,23 +294,58 @@ namespace FFOne.UI
 
         async Task RunOperation(Func<Task> operation, string progress)
         {
+            var session = Session;
+            bool needsAuthenticatedSession = session.IsLoggedIn || showingSelection;
+            Exception failure = null;
             SetBusy(true);
             SetStatus(progress);
             try { await operation(); }
             catch (OperationCanceledException) { }
-            catch (Exception error) { if (this != null) ShowError(error.Message); }
-            finally { if (this != null) SetBusy(false); }
+            catch (Exception error) { failure = error; }
+            finally
+            {
+                if (this != null && Session == session)
+                {
+                    // A failed transaction can close the socket before the reader reports it.
+                    if (needsAuthenticatedSession && !session.IsLoggedIn && !session.IsInWorld)
+                    {
+                        var server = profiles.Current;
+                        bool connectionLost = failure == null || IsLoginTransportFailure(failure);
+                        if (connectionLost) MarkServerOffline(server);
+                        ReturnToLoginAfterDisconnect(failure?.Message ?? (language == "ru" ? "Сервер закрыл соединение." : "Server closed the connection."),
+                            connectionLost ? server.Key : null);
+                    }
+                    else
+                    {
+                        if (failure != null) ShowError(failure.Message);
+                        SetBusy(false);
+                    }
+                }
+            }
+        }
+
+        static bool IsLoginTransportFailure(Exception error) => error is SocketException or EndOfStreamException or TimeoutException
+            or IOException { InnerException: SocketException };
+
+        void ReturnToLoginAfterDisconnect(string message, string serverKey)
+        {
+            Session.Dispose();
+            Session = new FusionClient();
+            ShowLogin();
+            SetBusy(false);
+            SetStatus(message, serverKey);
         }
 
         void SetBusy(bool value)
         {
+            value |= selectionPreparing;
             busy = value;
             submit?.SetEnabled(!value);
             username?.SetEnabled(!value);
             password?.SetEnabled(!value);
             browserPanel?.SetEnabled(!value);
             accountControls?.SetEnabled(!value);
-            loginRoot?.Q<Button>("login-language")?.SetEnabled(!value);
+            loginLanguage?.SetEnabled(!value);
             for (int i = 0; i < 4; i++) slotButtons[i]?.SetEnabled(!value);
             create?.SetEnabled(!value && Session.Characters.Count < 4 && !Session.IsInWorld);
             delete?.SetEnabled(!value && SelectedCharacter != null && !Session.IsInWorld);
@@ -297,12 +353,14 @@ namespace FFOne.UI
             if (create != null) create.style.display = Session.Characters.Count < 4 ? DisplayStyle.Flex : DisplayStyle.None;
             if (delete != null) delete.style.display = SelectedCharacter != null ? DisplayStyle.Flex : DisplayStyle.None;
             if (enter != null) enter.style.display = SelectedCharacter != null ? DisplayStyle.Flex : DisplayStyle.None;
+            ApplyWorldInputGate();
         }
 
         public void ShowError(string message) => SetStatus(message);
-        void SetStatus(string message)
+        void SetStatus(string message, string serverKey = null)
         {
             statusText = message ?? "";
+            connectionErrorServerKey = serverKey;
             if (status == null) return;
             status.text = statusText;
             status.style.display = statusText.Length == 0 ? DisplayStyle.None : DisplayStyle.Flex;
@@ -333,14 +391,13 @@ namespace FFOne.UI
             loginRoot.style.display = showingSelection || worldLifetime != null ? DisplayStyle.None : DisplayStyle.Flex;
             username.value = user;
             password.value = secret;
-            selectionGroup.Q<Label>("selection-title").text = FFStyle.Caption(T("ui.character_select.title", "SELECT A CHARACTER"));
+            selectionTitle.text = FFStyle.Caption(T("ui.character_select.title", "SELECT A CHARACTER"));
             for (int i = 0; i < 4; i++) emptyLabels[i].text = FFStyle.Caption(T("ui.character_select.empty", "EMPTY"));
             create.text = FFStyle.Caption(T("ui.character_select.create", "CREATE CHARACTER"));
             delete.text = FFStyle.Caption(T("ui.character_select.delete", "DELETE CHARACTER"));
             enter.text = FFStyle.Caption(T("ui.character_select.enter", "ENTER THE GAME"));
             quit.text = FFStyle.Caption(T("ui.common.quit", "QUIT"));
-            FFStyle.Button(musicButton, MusicTexture(), MusicTexture());
-            status.BringToFront();
+            RefreshSelectionControls();
             if (showingSelection) RefreshRoster();
             Layout();
         }
@@ -348,13 +405,49 @@ namespace FFOne.UI
         void OnKey(KeyDownEvent evt)
         {
             if (settings?.Visible == true || worldMenu != null) return;
-            if (evt.keyCode == KeyCode.Escape && modal != null) { CloseModal(); evt.StopPropagation(); }
-            else if (evt.keyCode == KeyCode.Return && modal == null && loginRoot.style.display != DisplayStyle.None && !addingServer) { Login(); evt.StopPropagation(); }
+            if (modal != null)
+            {
+                if (evt.keyCode == KeyCode.Escape) { CloseModal(); evt.StopPropagation(); }
+                return;
+            }
+            if (busy) return;
+            bool submitKey = evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter;
+            var target = evt.target as VisualElement;
+            var targetButton = target as Button ?? target?.GetFirstAncestorOfType<Button>();
+            if (loginRoot.style.display != DisplayStyle.None)
+            {
+                if (!submitKey || addingServer || targetButton != null) return;
+                Login();
+                evt.StopPropagation();
+            }
+            else if (selectionRoot.style.display != DisplayStyle.None && !Session.IsInWorld)
+            {
+                int slot = (int)evt.keyCode - (int)KeyCode.Alpha1 + 1;
+                if (slot >= 1 && slot <= slotButtons.Length) SelectSlot(slot);
+                else if (evt.keyCode == KeyCode.UpArrow || evt.keyCode == KeyCode.DownArrow)
+                {
+                    var roster = Session.Characters;
+                    int count = roster.Count;
+                    if (count == 0) return;
+                    int current = SelectedCharacter?.Slot ?? 0;
+                    var next = evt.keyCode == KeyCode.UpArrow
+                        ? roster.LastOrDefault(character => character.Slot < current) ?? roster[count - 1]
+                        : roster.FirstOrDefault(character => character.Slot > current) ?? roster[0];
+                    SelectSlot(next.Slot);
+                }
+                else if (submitKey && (targetButton == null || slotButtons.Contains(targetButton)))
+                {
+                    if (SelectedCharacter != null) PlayUiSound("button");
+                    EnterWorld();
+                }
+                else return;
+                evt.StopPropagation();
+            }
         }
 
         void Layout()
         {
-            if (Root == null) return;
+            if (!frontendInitialized || Root == null) return;
             float width = Root.resolvedStyle.width, height = Root.resolvedStyle.height;
             if (float.IsNaN(width) || width <= 0) width = Screen.width;
             if (float.IsNaN(height) || height <= 0) height = Screen.height;
@@ -366,7 +459,6 @@ namespace FFOne.UI
                 float left = width / 2 + 185 * uiScale + 16, panelHeight = BrowserHeight();
                 float fit = Mathf.Max(.1f, Mathf.Min(uiScale, (width - left - 16) / 280, (height - 24) / panelHeight));
                 FFWidgets.Rect(browserPanel, left, (height - 299 * uiScale) / 2, 280, panelHeight);
-                browserPanel.style.transformOrigin = new TransformOrigin(0, 0);
                 browserPanel.style.scale = new Scale(new Vector3(fit, fit, 1));
             }
             float backgroundScale = Mathf.Max(width / 1920, height / 1080);
@@ -381,43 +473,9 @@ namespace FFOne.UI
             FFWidgets.ScaledRect(quit, new Rect(20, height - 38, 90, 23), characterScale, new Vector2(0, height));
             FFWidgets.ScaledRect(fullscreen, new Rect(width - 45, height - 35, 35, 31), characterScale, new Vector2(width, height));
             if (status != null) FFWidgets.Rect(status, (width - 580) / 2, height - 68, 580, 58);
-            if (modal?.Q("modal-panel") is VisualElement dialog) LayoutModal(dialog, width, height);
+            LayoutFrontendDialog(width, height);
             FrontendLayoutOverrides.Apply(Root);
             FFWidgets.FitTree(Root);
-        }
-
-        void CloseModal() { modal?.RemoveFromHierarchy(); modal = null; }
-        VisualElement ModalPanel(float width, float height, string texture = null)
-        {
-            CloseModal();
-            modal = new VisualElement { name = "frontend-modal" };
-            modal.AddToClassList("frontend-modal");
-            Root.Add(modal);
-            var panel = new VisualElement { name = "modal-panel" };
-            panel.style.position = Position.Absolute;
-            panel.style.left = Length.Percent(50);
-            panel.style.top = Length.Percent(50);
-            panel.style.marginLeft = -width / 2;
-            panel.style.marginTop = -height / 2;
-            panel.style.width = width;
-            panel.style.height = height;
-            if (texture != null) FFStyle.Background(panel, texture);
-            else panel.style.backgroundColor = new Color(.03f, .10f, .17f, .98f);
-            modal.Add(panel);
-            LayoutModal(panel, Root.resolvedStyle.width, Root.resolvedStyle.height);
-            return panel;
-        }
-
-        static void LayoutModal(VisualElement panel, float width, float height)
-        {
-            if (!(width > 0 && height > 0)) return;
-            float scale = Mathf.Min(FrontendLayout.CharacterScale(width, height),
-                (width - 24) / panel.style.width.value.value, (height - 24) / panel.style.height.value.value);
-            panel.style.marginLeft = panel.style.marginTop = 0;
-            FFWidgets.Rect(panel, FrontendLayout.Centered(width, height,
-                new Vector2(panel.style.width.value.value, panel.style.height.value.value), scale));
-            panel.style.transformOrigin = new TransformOrigin(0, 0);
-            panel.style.scale = new Scale(new Vector3(scale, scale, 1));
         }
     }
 }

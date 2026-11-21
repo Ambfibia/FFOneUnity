@@ -436,7 +436,7 @@ SkinnedMeshRenderer:
   m_Quality: 0
   m_UpdateWhenOffscreen: 1
   m_SkinnedMotionVectors: 1
-  m_Mesh: {fileID: 4300000, guid: 71785624ff14ff04396d6927cc85c934, type: 2}
+  m_Mesh: {fileID: 4300000, guid: 1ddd522e3c57d8d4abbf0709de3c13c5, type: 2}
   m_Bones:
   - {fileID: 205602911521074249}
   - {fileID: 3776206446232660128}
@@ -587,7 +587,7 @@ SkinnedMeshRenderer:
   m_Quality: 0
   m_UpdateWhenOffscreen: 1
   m_SkinnedMotionVectors: 1
-  m_Mesh: {fileID: 4300000, guid: 6821b977fff72a34fa5cc48ad53c1718, type: 2}
+  m_Mesh: {fileID: 4300000, guid: a50b79c93e539114aaf138a1e5a7bbb5, type: 2}
   m_Bones:
   - {fileID: 205602911521074249}
   - {fileID: 3776206446232660128}
@@ -1974,7 +1974,7 @@ SkinnedMeshRenderer:
   m_Quality: 0
   m_UpdateWhenOffscreen: 1
   m_SkinnedMotionVectors: 1
-  m_Mesh: {fileID: 4300000, guid: 6a4a723df9bbeff438aa7826a5f495d8, type: 2}
+  m_Mesh: {fileID: 4300000, guid: a50b79c93e539114aaf138a1e5a7bbb5, type: 2}
   m_Bones:
   - {fileID: 205602911521074249}
   - {fileID: 3776206446232660128}
@@ -2432,7 +2432,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4807687004001389319}
-  - component: {fileID: 1806169296954338528}
+  - component: {fileID: 4852596123918041209}
+  - component: {fileID: 616370953415185531}
   m_Layer: 0
   m_Name: model
   m_TagString: Untagged
@@ -2456,31 +2457,43 @@ Transform:
   - {fileID: 6086993892101863410}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!111 &1806169296954338528
-Animation:
+--- !u!95 &4852596123918041209
+Animator:
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7686087656934381717}
   m_Enabled: 1
-  serializedVersion: 4
-  m_Animation: {fileID: 7400000, guid: 495bebfea7691dd4cb56589c39c8ab30, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: c939688674c6f4f4c986929de2502cb2, type: 2}
-  - {fileID: 7400000, guid: 722e739394f4ad544b68adaec2afa187, type: 2}
-  - {fileID: 7400000, guid: 25c9e8276bf75874f9bec2bc85db5466, type: 2}
-  - {fileID: 7400000, guid: 1612db4e0bb29cd49aa84ddcbb58b11a, type: 2}
-  - {fileID: 7400000, guid: 53253fdb8d167f340837b2240eede36d, type: 2}
-  - {fileID: 7400000, guid: bf7d14dd36147b5469a78044da27455b, type: 2}
-  - {fileID: 7400000, guid: 495bebfea7691dd4cb56589c39c8ab30, type: 2}
-  - {fileID: 7400000, guid: 71991af21691805479aa57095421cc0c, type: 2}
-  - {fileID: 7400000, guid: fbc91bd8eb9ec9340a49517b6bea18bf, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: f436d8592da50484ab0ab02ebaa5887f, type: 2}
+  m_CullingMode: 0
   m_UpdateMode: 0
-  m_CullingType: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 1
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &616370953415185531
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7686087656934381717}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b7ac68c382befc4d9fc82662c17e418, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.Content.NativeNpcAnimator
+  animator: {fileID: 4852596123918041209}
+  AnimationSounds: []
+  Faces: []
 --- !u!1 &7803047858415155743
 GameObject:
   m_ObjectHideFlags: 0
@@ -2605,7 +2618,7 @@ SkinnedMeshRenderer:
   m_Quality: 0
   m_UpdateWhenOffscreen: 1
   m_SkinnedMotionVectors: 1
-  m_Mesh: {fileID: 4300000, guid: f8b654ffb9e37154489751a97c8a6fe8, type: 2}
+  m_Mesh: {fileID: 4300000, guid: 4d48d9a2b188d124183e45964725b380, type: 2}
   m_Bones:
   - {fileID: 205602911521074249}
   - {fileID: 3776206446232660128}
@@ -2947,7 +2960,7 @@ SkinnedMeshRenderer:
   m_Quality: 0
   m_UpdateWhenOffscreen: 1
   m_SkinnedMotionVectors: 1
-  m_Mesh: {fileID: 4300000, guid: ed98b3436a8f1384c935783754527cef, type: 2}
+  m_Mesh: {fileID: 4300000, guid: a50b79c93e539114aaf138a1e5a7bbb5, type: 2}
   m_Bones:
   - {fileID: 205602911521074249}
   - {fileID: 3776206446232660128}

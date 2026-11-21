@@ -126,6 +126,7 @@ namespace FFOne.Tests
             owner.SetActive(false);
             var stage = owner.AddComponent<PreviewStage>();
             object view = PreviewView();
+            typeof(PreviewStage).GetField("main", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(stage, view);
             var camera = (Camera)view.GetType().GetField("Camera").GetValue(view);
             try
             {

@@ -20,6 +20,9 @@ namespace FFOne.Network
     public static class ProtocolChat
     {
         public const uint Request = 0x13000007, Success = 0x31000012, Failure = 0x31000013;
+        public const uint MenuRequest = 0x13000008, MenuSuccess = 0x31000018, MenuFailure = 0x31000019;
+        public const uint EmoteRequest = 0x13000050, EmoteReply = 0x31000092;
+        public const uint ServerMessage = 0x310000d1;
         public const int MaximumTextUnits = 127; // 128 UTF-16 units including the required NUL.
 
         public static byte[] FreeChatPayload(string text)
@@ -35,14 +38,24 @@ namespace FFOne.Network
         public static bool TryDecode(ProtocolFrame frame, out ChatMessage message)
         {
             message = null;
-            if (frame == null || (frame.PacketType != Success && frame.PacketType != Failure)) return false;
+            if (frame == null || (frame.PacketType != Success && frame.PacketType != Failure && frame.PacketType != MenuSuccess && frame.PacketType != MenuFailure)) return false;
             Protocol0104.RequireSize(frame.Payload, 264);
             // Reply: sender/error int32, char16[128], emote int32, pack(4).
             int value = Protocol0104.Read32(frame.Payload, 0);
             string text = ReadText(frame.Payload, 4, 128);
-            bool rejected = frame.PacketType == Failure;
+            bool rejected = frame.PacketType == Failure || frame.PacketType == MenuFailure;
             message = new ChatMessage(rejected ? ChatMessageKind.Rejected : ChatMessageKind.Message,
                 rejected ? 0 : value, text, Protocol0104.Read32(frame.Payload, 260), rejected ? value : 0);
+            return true;
+        }
+
+        public static bool TryDecodeServerMessage(ProtocolFrame frame, out string text)
+        {
+            text = null;
+            if (frame?.PacketType != ServerMessage) return false;
+            // ServerMessage0104: one type byte, alignment, and char16_t[512].
+            Protocol0104.RequireSize(frame.Payload, 1026);
+            text = ReadText(frame.Payload, 2, 512);
             return true;
         }
 

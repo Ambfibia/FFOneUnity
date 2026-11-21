@@ -61,11 +61,24 @@ namespace FFOne.Network
         private static async Task<string> ApiRequest(HttpClient http, HttpRequestMessage request, CancellationToken cancellation)
         {
             using (request)
-            using (var response = await http.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellation).ConfigureAwait(false))
             {
-                // Do not echo response bodies or URLs: servers may include submitted credentials.
-                if (!response.IsSuccessStatusCode) throw new IOException($"Launcher authentication failed (HTTP {(int)response.StatusCode}).");
-                return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                try
+                {
+                    using var response = await http.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellation).ConfigureAwait(false);
+                    // Do not echo response bodies or URLs: servers may include submitted credentials.
+                    if (!response.IsSuccessStatusCode) throw new IOException($"Launcher authentication failed (HTTP {(int)response.StatusCode}).");
+                    return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) when (!cancellation.IsCancellationRequested)
+                {
+                    throw new TimeoutException("Launcher authentication timed out.");
+                }
+                catch (HttpRequestException error) when (error.InnerException is WebException { Status: WebExceptionStatus.Timeout })
+                {
+                    // Unity's Mono HTTP handler wraps an expired request as a WebException.
+                    cancellation.ThrowIfCancellationRequested();
+                    throw new TimeoutException("Launcher authentication timed out.", error);
+                }
             }
         }
         private static T ReadJson<T>(string text)

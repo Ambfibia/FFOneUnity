@@ -1,0 +1,76 @@
+{
+  "schema": "ffone.studio.orchestration.v1",
+  "integration_owner": "production_integrator",
+  "concurrency": "Minimum useful team; host cap applies; three children plus orchestrator configured.",
+  "role_directory": ".codex/agents",
+  "mode_inference": "Historical fact required: RECONSTRUCT. New behavior/source-only change: DEVELOP. Both: HYBRID.",
+  "exclusive_write_resources": [
+    "Unity scene",
+    "prefab",
+    "meta/GUID",
+    "Addressables catalog",
+    "wire contract"
+  ],
+  "handoff_fields": [
+    "outcome",
+    "evidence",
+    "unknowns",
+    "write_scope",
+    "preservation_ids",
+    "acceptance",
+    "integrator"
+  ],
+  "modes": {
+    "RECONSTRUCT": {
+      "roles": [
+        "reconstruction_lead",
+        "legacy_unity_analyst",
+        "code_reverse_engineer",
+        "asset_recovery_engineer",
+        "behavior_analyst",
+        "parity_qa"
+      ],
+      "skills": [
+        "legacy-unity-research",
+        "asset-provenance",
+        "production-validation"
+      ]
+    },
+    "DEVELOP": {
+      "roles": [
+        "bug_triage_analyst",
+        "technical_director",
+        "unity_gameplay_engineer",
+        "unity_content_engineer",
+        "network_rustyfusion_engineer",
+        "ui_ux_engineer",
+        "build_qa_engineer",
+        "production_integrator"
+      ],
+      "skills": [
+        "unity6-production",
+        "rustyfusion-integration",
+        "production-validation"
+      ]
+    },
+    "HYBRID": {
+      "roles": [
+        "reconstruction_lead",
+        "technical_director",
+        "unity_gameplay_engineer",
+        "unity_content_engineer",
+        "network_rustyfusion_engineer",
+        "parity_qa",
+        "production_integrator"
+      ],
+      "skills": [
+        "reconstruction-studio",
+        "legacy-unity-research",
+        "asset-provenance",
+        "unity6-production",
+        "rustyfusion-integration",
+        "production-validation"
+      ]
+    }
+  }
+}

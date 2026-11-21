@@ -9,12 +9,20 @@ namespace FFOne.UI
     public sealed partial class GameplayUiState
     {
         public int Guide { get; private set; }
+        public int GuideCount { get; private set; }
         public IReadOnlyList<int> CompletedMissions { get; private set; } = Array.Empty<int>();
         internal GameplayUiState WithMissionFlags(byte[] load)
         {
             var next = (GameplayUiState)MemberwiseClone(); var completed = new List<int>();
             for (int i = 0; i < 2048; i++) if ((load[1712 + i / 8] & (1 << (i % 8))) != 0) completed.Add(i + 1);
-            next.CompletedMissions = completed.AsReadOnly(); next.Guide = Protocol0104.Read16(load, 86); return next;
+            next.CompletedMissions = completed.AsReadOnly(); next.Guide = Protocol0104.Read16(load, 86);
+            next.GuideCount = Protocol0104.Read16(load, 88); return next;
+        }
+        internal GameplayUiState WithMentor(int mentor, int count, int fusionMatter)
+        {
+            var next = (GameplayUiState)MemberwiseClone();
+            next.Guide = mentor; next.GuideCount = count; next.FusionMatter = fusionMatter;
+            return next;
         }
         internal GameplayUiState WithQuests(IEnumerable<GameplayQuestState> quests, int? tracked = null, int? completed = null)
         {
@@ -52,6 +60,7 @@ namespace FFOne.UI
 
     public sealed partial class GameplayUiSession
     {
+        internal void ConfirmMentor(int mentor, int count, int fusionMatter) => Publish(Snapshot.WithMentor(mentor, count, fusionMatter));
         readonly Dictionary<int, int> completionBranches = new();
         readonly HashSet<int> automaticMissionRequests = new();
         public Func<int, WorldMissionDefinition> MissionDefinition { get; set; } = id => WorldMissionCatalog.Load().Find(id);

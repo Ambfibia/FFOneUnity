@@ -1,0 +1,63 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+  <ui:Template name="TutorialDialogue" src="TutorialDialogue.uxml" />
+  <ui:VisualElement name="tutorial-overlay" class="tutorial-overlay cinematic-fill ui-suppressed" picking-mode="Ignore">
+    <ui:VisualElement name="tutorial-presentation" class="tutorial-presentation cinematic-fill" picking-mode="Ignore">
+      <ui:VisualElement class="tutorial-instructions cinematic-fill" picking-mode="Ignore">
+        <ui:Image class="tutorial-hint-image cinematic-placed" scale-mode="StretchToFill" picking-mode="Ignore" />
+        <ui:Image class="tutorial-hint-arrow cinematic-placed" scale-mode="StretchToFill" picking-mode="Ignore" />
+        <ui:VisualElement class="tutorial-localized-jump-key ui-suppressed" picking-mode="Ignore">
+          <ui:Image class="tutorial-jump-strip-0 tutorial-jump-strip" scale-mode="StretchToFill" picking-mode="Ignore" />
+          <ui:Image class="tutorial-jump-strip-1 tutorial-jump-strip" scale-mode="StretchToFill" picking-mode="Ignore" />
+          <ui:Image class="tutorial-jump-strip-2 tutorial-jump-strip" scale-mode="StretchToFill" picking-mode="Ignore" />
+          <ui:Image class="tutorial-jump-strip-3 tutorial-jump-strip" scale-mode="StretchToFill" picking-mode="Ignore" />
+          <ui:Image class="tutorial-jump-strip-4 tutorial-jump-strip" scale-mode="StretchToFill" picking-mode="Ignore" />
+          <ui:Label class="tutorial-jump-label cinematic-copy cinematic-chalet" text="Пробел" enable-rich-text="false" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:Label class="tutorial-instruction-shadow cinematic-copy cinematic-placed cinematic-shadow ui-suppressed" enable-rich-text="false" picking-mode="Ignore" />
+        <ui:Label class="tutorial-instruction cinematic-copy cinematic-placed ui-suppressed" enable-rich-text="false" picking-mode="Ignore" />
+      </ui:VisualElement>
+      <ui:VisualElement class="tutorial-top-bar cinematic-bar cinematic-bar--top ui-suppressed" picking-mode="Ignore" />
+      <ui:VisualElement class="tutorial-bottom-bar cinematic-bar cinematic-bar--bottom ui-suppressed" picking-mode="Ignore" />
+      <ui:VisualElement class="tutorial-pan-host cinematic-fill" picking-mode="Ignore" />
+      <ui:Image class="tutorial-scene-picture cinematic-placed" scale-mode="StretchToFill" picking-mode="Ignore" />
+      <ui:Image class="tutorial-auxiliary-picture cinematic-placed" scale-mode="StretchToFill" picking-mode="Ignore" />
+      <ui:Image class="tutorial-auxiliary-pointer cinematic-placed" scale-mode="StretchToFill" picking-mode="Ignore" />
+      <ui:Label class="tutorial-secondary-instruction-shadow cinematic-copy cinematic-placed cinematic-shadow ui-suppressed" enable-rich-text="false" picking-mode="Ignore" />
+      <ui:Label class="tutorial-secondary-instruction cinematic-copy cinematic-placed ui-suppressed" enable-rich-text="false" picking-mode="Ignore" />
+      <ui:Label class="tutorial-location-shadow tutorial-location-copy cinematic-copy cinematic-placed cinematic-shadow ui-suppressed" enable-rich-text="false" picking-mode="Ignore" />
+      <ui:Label class="tutorial-location tutorial-location-copy cinematic-copy cinematic-placed ui-suppressed" enable-rich-text="false" picking-mode="Ignore" />
+      <ui:Instance template="TutorialDialogue" class="tutorial-scripted cinematic-placed cinematic-clip ui-suppressed" picking-mode="Ignore" />
+      <ui:Instance template="TutorialDialogue" class="tutorial-voice cinematic-placed cinematic-clip ui-suppressed" picking-mode="Ignore" />
+      <ui:VisualElement class="tutorial-fade cinematic-fill ui-suppressed" picking-mode="Ignore" />
+      <ui:Button name="tutorial-cinematic-skip" class="tutorial-cinematic-skip cinematic-chalet cinematic-placed ff-button ui-suppressed" />
+    </ui:VisualElement>
+    <ui:VisualElement name="tutorial-pause" class="tutorial-pause ui-suppressed" picking-mode="Ignore">
+      <ui:Label class="tutorial-pause-title cinematic-copy cinematic-chalet" enable-rich-text="false" picking-mode="Ignore" />
+      <ui:Button name="tutorial-resume" class="tutorial-pause-button tutorial-resume cinematic-chalet" />
+      <ui:Button name="tutorial-exit" class="tutorial-pause-button tutorial-exit cinematic-chalet" />
+    </ui:VisualElement>
+  </ui:VisualElement>
+  <ui:VisualElement name="dexter-ship-cutscene" class="dexter-ship-cutscene cinematic-fill" focusable="true">
+    <ui:VisualElement class="dexter-ship-scene-canvas cinematic-fill" picking-mode="Ignore">
+      <ui:VisualElement class="dexter-ship-background" picking-mode="Ignore" />
+      <ui:VisualElement class="dexter-ship-blackout dexter-ship-blackout--before cinematic-fill ui-suppressed" picking-mode="Ignore" />
+      <ui:Image class="dexter-ship-hologram" scale-mode="ScaleToFit" picking-mode="Ignore" />
+      <ui:VisualElement class="dexter-ship-blackout dexter-ship-blackout--after cinematic-fill ui-suppressed" picking-mode="Ignore" />
+      <ui:Label class="dexter-ship-error cinematic-copy cinematic-fill ui-suppressed" enable-rich-text="false" picking-mode="Ignore" />
+    </ui:VisualElement>
+    <ui:VisualElement class="cinematic-bar cinematic-bar--top" picking-mode="Ignore" />
+    <ui:VisualElement class="cinematic-bar cinematic-bar--bottom" picking-mode="Ignore" />
+    <ui:VisualElement class="dexter-ship-title-canvas cinematic-fill ui-suppressed" picking-mode="Ignore">
+      <ui:Label class="dexter-ship-title-shadow dexter-ship-location-title cinematic-copy cinematic-shadow" enable-rich-text="false" picking-mode="Ignore" />
+      <ui:Label class="dexter-ship-title dexter-ship-location-title cinematic-copy" enable-rich-text="false" picking-mode="Ignore" />
+    </ui:VisualElement>
+    <ui:VisualElement name="dexter-ship-subtitle-area" class="dexter-ship-subtitle-area cinematic-placed cinematic-clip" picking-mode="Ignore">
+      <ui:Label name="dexter-ship-subtitle-speaker" class="dexter-ship-subtitle-speaker cinematic-copy cinematic-clip" enable-rich-text="false" picking-mode="Ignore" />
+      <ui:Label name="dexter-ship-subtitle-dialogue" class="dexter-ship-subtitle-dialogue cinematic-copy cinematic-chalet" enable-rich-text="false" picking-mode="Ignore" />
+    </ui:VisualElement>
+    <ui:VisualElement class="dexter-ship-skip-canvas cinematic-fill" picking-mode="Ignore">
+      <ui:Label class="dexter-ship-skip-label cinematic-copy cinematic-chalet cinematic-clip" enable-rich-text="false" picking-mode="Ignore" />
+    </ui:VisualElement>
+    <ui:Label class="dexter-ship-loading" enable-rich-text="false" picking-mode="Ignore" />
+  </ui:VisualElement>
+</ui:UXML>

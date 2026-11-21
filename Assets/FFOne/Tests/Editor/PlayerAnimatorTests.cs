@@ -6,6 +6,8 @@ using System.Reflection;
 using FFOne.Content;
 using FFOne.Creation;
 using FFOne.Network;
+using FFOne.Tutorial;
+using FFOne.World;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using UnityEditor;
@@ -26,14 +28,16 @@ namespace FFOne.Tests
         {
             var rig = Rig(gender);
             var vehicle = NativeData.Object("characters/player/shared/vehicle_animations")["genders"].Single(g => (string)g["gender"] == gender);
-            var accepted = rig["clips"].Concat(vehicle["clips"]).OrderBy(c => (int)c["gltfAnimationIndex"]).ToArray();
+            var locomotion = NativeData.Object("characters/player/shared/locomotion_animations")["genders"].Single(g => (string)g["gender"] == gender);
+            var damage = NativeData.Object("characters/player/shared/damage_animations")["genders"].Single(g => (string)g["gender"] == gender);
+            var accepted = rig["clips"].Concat(vehicle["clips"]).Concat(locomotion["clips"]).Concat(damage["clips"]).OrderBy(c => (int)c["gltfAnimationIndex"]).ToArray();
             var profile = Profile(gender);
             var controller = profile.Controller as AnimatorController;
             Assert.That(controller, Is.Not.Null);
             Assert.That(profile.Avatar.isValid, Is.True);
-            Assert.That(accepted.Length, Is.EqualTo(141));
-            Assert.That(accepted.Count(c => (string)c["playback"] == "loop"), Is.EqualTo(57));
-            Assert.That(accepted.Count(c => (string)c["playback"] == "clamp"), Is.EqualTo(84));
+            Assert.That(accepted.Length, Is.EqualTo(143));
+            Assert.That(accepted.Count(c => (string)c["playback"] == "loop"), Is.EqualTo(58));
+            Assert.That(accepted.Count(c => (string)c["playback"] == "clamp"), Is.EqualTo(85));
             Assert.That(profile.ClipNames, Is.EqualTo(accepted.Select(c => (string)c["name"]).ToArray()));
             var clips = controller.animationClips.GroupBy(c => c.name).ToDictionary(g => g.Key, g => g.First());
             var legacy = Prefab(gender).GetComponent<Animation>();
@@ -50,9 +54,18 @@ namespace FFOne.Tests
                 Assert.That(AnimationUtility.GetAnimationClipSettings(clip).loopTime, Is.EqualTo(loop), name);
                 Assert.That(clip.wrapMode, Is.EqualTo(loop ? WrapMode.Loop : WrapMode.ClampForever), name);
                 var layer = controller.layers.Single(l => l.name == (ShapeClips.Contains(name) ? name
+                    : name.EndsWith("turnleft", StringComparison.Ordinal) ? NativePlayerAnimator.LeftTurnLayer
+                    : name.EndsWith("turnright", StringComparison.Ordinal) ? NativePlayerAnimator.RightTurnLayer
                     : name.EndsWith("upper", StringComparison.Ordinal) ? NativePlayerAnimator.UpperLayer : NativePlayerAnimator.BaseLayer));
                 var state = layer.stateMachine.states.Single(s => s.state.name == name).state;
                 Assert.That(state.motion, Is.SameAs(clip), name);
+                if (name is "staying" or "standup")
+                {
+                    var resume = state.transitions.Single();
+                    Assert.That(resume.destinationState.name, Is.EqualTo("stand1"), name);
+                    Assert.That(resume.exitTime * clip.length, Is.EqualTo(name == "standup" ? 2.0833335f : clip.length).Within(.00001f), name);
+                    Assert.That(resume.duration, Is.EqualTo(.3f).Within(.00001f), name);
+                }
                 float vehicleEnd = NativeVehicleAnimation.EndSeconds(name);
                 if (vehicleEnd > 0)
                 {
@@ -68,7 +81,12 @@ namespace FFOne.Tests
                         Assert.That(transition.duration, Is.EqualTo(.3f), name + " EndAnimation return blend");
                     }
                 }
-                if (ShapeClips.Contains(name)) continue;
+                if (ShapeClips.Contains(name) || NativePlayerAnimator.IsDirectionalPose(name))
+                {
+                    Assert.That(layer.blendingMode, Is.EqualTo(AnimatorLayerBlendingMode.Additive), name);
+                    Assert.That(state.timeParameterActive, Is.True, name);
+                    continue;
+                }
                 Assert.That(layer.stateMachine.anyStateTransitions.Any(t => t.destinationState == state), Is.True, name);
                 if (loop) continue;
                 Assert.That(state.transitions.Any(t => t.hasExitTime && t.destinationState != null), Is.True,
@@ -93,9 +111,9 @@ namespace FFOne.Tests
             foreach (string name in Profile(gender).ClipNames)
             {
                 Assert.That(rig.Motion.Supports(name), Is.True, name);
-                if (ShapeClips.Contains(name))
+                if (ShapeClips.Contains(name) || NativePlayerAnimator.IsDirectionalPose(name))
                 {
-                    Assert.That(rig.Motion.Play(name), Is.False, name + " is a static body customization pose.");
+                    Assert.That(rig.Motion.Play(name), Is.False, name + " is an additive pose, not a full-body motion.");
                     continue;
                 }
                 int layer = name.EndsWith("upper", StringComparison.Ordinal) ? 1 : 0;
@@ -106,6 +124,69 @@ namespace FFOne.Tests
                 Assert.That(rig.Animator.GetCurrentAnimatorClipInfo(layer).Any(c => c.clip.name == name), Is.True, name);
                 AssertFinite(rig.Pose(), name);
             }
+        }
+
+        [TestCase("male", false)]
+        [TestCase("male", true)]
+        [TestCase("female", false)]
+        [TestCase("female", true)]
+        public void DirectionalPosesTurnRunningBodyWithoutReplacingOrAccumulatingItsMotion(string gender, bool armed)
+        {
+            using var turning = new AnimatedRig(gender, false);
+            using var straight = new AnimatedRig(gender, false);
+            string clip = armed ? "riflerun" : "run";
+            foreach (var rig in new[] { turning, straight })
+            {
+                rig.Motion.Play(clip, true);
+                rig.Animator.Play(NativePlayerAnimator.BaseLayer + "." + clip, 0, .23f);
+                rig.Animator.Update(0);
+            }
+            turning.Animator.SetLayerWeight(turning.Animator.GetLayerIndex(NativePlayerAnimator.LeftTurnLayer), 1);
+            turning.Animator.SetLayerWeight(turning.Animator.GetLayerIndex(NativePlayerAnimator.RightTurnLayer), 1);
+            turning.Animator.Update(Frame);
+            straight.Animator.Update(Frame);
+            AssertPoseEqual(straight.Pose(), turning.Pose(), .1f, 1e-4f, "Zero turn must be an identity delta");
+            turning.Motion.SetMovementDirection(-1, 0, .5f);
+            turning.Animator.Update(0);
+            var initial = turning.Pose();
+            Assert.That(MaxAngle(straight.Pose(), initial), Is.GreaterThan(15), "Strafing must sample the authored turn pose.");
+            Assert.That(turning.Animator.GetFloat("LeftTurn"), Is.EqualTo(1));
+            Assert.That(turning.Animator.GetFloat("RightTurn"), Is.EqualTo(0));
+            for (int loop = 0; loop < 5; loop++) turning.Advance(turning.Motion.Duration(clip));
+            AssertPoseEqual(initial, turning.Pose(), .2f, .002f, "Turn deltas must not accumulate over run loops");
+            turning.Motion.SetMovementDirection(0, 0, .25f);
+            Assert.That(turning.Animator.GetFloat("LeftTurn"), Is.EqualTo(.5f).Within(1e-5));
+            turning.Motion.SetMovementDirection(0, 0, .25f);
+            turning.Animator.Update(0);
+            Assert.That(turning.Animator.GetFloat("LeftTurn"), Is.EqualTo(0));
+            Assert.That(turning.Animator.GetCurrentAnimatorStateInfo(0).IsName(NativePlayerAnimator.BaseLayer + "." + clip), Is.True);
+        }
+
+        [TestCase("male", false)]
+        [TestCase("male", true)]
+        [TestCase("female", false)]
+        [TestCase("female", true)]
+        public void LocomotionKeepsBackwardJumpAndLandingStatesUntilTheyComplete(string gender, bool armed)
+        {
+            using var rig = new AnimatedRig(gender, false);
+            string prefix = armed ? "rifle" : "";
+            void Tick(float forward, bool grounded, bool launched = false)
+            {
+                rig.Motion.UpdateLocomotion(0, forward, grounded, launched, armed, Frame);
+                rig.Step(Frame);
+            }
+            Tick(-1, true);
+            for (int i = 0; i < 30; i++) Tick(-1, true);
+            Assert.That(rig.Animator.GetCurrentAnimatorStateInfo(0).IsName(NativePlayerAnimator.BaseLayer + "." + prefix + "runback"), Is.True);
+            Tick(-1, false, true);
+            for (int i = 0; i < 180; i++) Tick(-1, false);
+            Assert.That(rig.Animator.GetCurrentAnimatorStateInfo(0).IsName(NativePlayerAnimator.BaseLayer + "." + prefix + "jump"), Is.True);
+            Tick(-1, true);
+            for (int i = 0; i < 24; i++) Tick(-1, true);
+            Assert.That(rig.Animator.GetCurrentAnimatorStateInfo(0).IsName(NativePlayerAnimator.BaseLayer + "." + prefix + "jumplandrun"), Is.True);
+            for (int i = 0; i < 180; i++) Tick(-1, true);
+            Assert.That(rig.Animator.GetCurrentAnimatorStateInfo(0).IsName(NativePlayerAnimator.BaseLayer + "." + prefix + "runback"), Is.True);
+            AssertFinite(rig.Pose(), "backward jump and landing");
         }
 
         [TestCase("male", "stand1")]
@@ -265,6 +346,63 @@ namespace FFOne.Tests
             Assert.That(rig.Animator.IsInTransition(0), Is.False, "Repeated idle requests must not start self-transitions.");
             Assert.That(rig.Animator.GetCurrentAnimatorStateInfo(0).normalizedTime,
                 Is.EqualTo(normalized + Frame * 12 / rig.Motion.Duration("stand1")).Within(.001f));
+        }
+
+        [TestCase("male")]
+        [TestCase("female")]
+        public void SameFrameIdleCancelsQueuedRunWithoutDroppingTheUpperAttack(string gender)
+        {
+            using var rig = new AnimatedRig(gender, false);
+            Assert.That(rig.Motion.Play("run"), Is.True);
+            Assert.That(rig.Motion.Play("rifleattack1upper"), Is.True);
+            Assert.That(rig.Motion.Play("stand1"), Is.True);
+            rig.Advance(.2f);
+            Assert.That(rig.Animator.GetCurrentAnimatorStateInfo(0).IsName(NativePlayerAnimator.BaseLayer + ".stand1"), Is.True);
+            Assert.That(rig.Animator.GetCurrentAnimatorStateInfo(1).IsName(NativePlayerAnimator.UpperLayer + ".rifleattack1upper"), Is.True);
+        }
+
+        [TestCase("male", 3, "pistol")]
+        [TestCase("female", 10, "bomb")]
+        public void EquippedLocomotionSelectsMatchingReadyPoseAndDelaysFallMotionOnShallowEdges(string gender, int equipType, string prefix)
+        {
+            using var rig = new AnimatedRig(gender, false);
+            Assert.That(WorldWeaponCatalog.AnimationPrefix(equipType), Is.EqualTo(prefix));
+            void Tick(float forward, bool grounded, float vertical)
+            {
+                rig.Motion.UpdateLocomotion(0, forward, grounded, false, prefix, true, Frame, vertical);
+                rig.Advance(.2f);
+            }
+            Tick(0, true, 0);
+            Assert.That(rig.Animator.GetCurrentAnimatorStateInfo(0).IsName(NativePlayerAnimator.BaseLayer + "." + prefix + "ready"), Is.True);
+            Tick(-1, false, -2);
+            Assert.That(rig.Animator.GetCurrentAnimatorStateInfo(0).IsName(NativePlayerAnimator.BaseLayer + "." + prefix + "runback"), Is.True);
+            Tick(-1, false, -6);
+            Assert.That(rig.Animator.GetCurrentAnimatorStateInfo(0).IsName(NativePlayerAnimator.BaseLayer + "." + prefix + "jumpstart"), Is.True);
+        }
+
+        [Test]
+        public void TutorialRenderGateFreezesTheIndependentPlayerRoot()
+        {
+            using var rig = new AnimatedRig("male", false);
+            var root = new GameObject("Tutorial render gate test");
+            try
+            {
+                var owner = root.AddComponent<TutorialController>();
+                typeof(TutorialController).GetProperty(nameof(TutorialController.Player)).SetValue(owner, rig.Root.transform);
+                typeof(TutorialController).GetProperty(nameof(TutorialController.ViewCamera)).SetValue(owner, root.AddComponent<Camera>());
+                typeof(TutorialController).GetField("worldStream", BindingFlags.Instance | BindingFlags.NonPublic)
+                    .SetValue(owner, root.AddComponent<WorldStreamer>());
+                var gateType = typeof(TutorialCinematics).GetNestedType("PresentationGate", BindingFlags.NonPublic);
+                rig.Motion.Play("staying", true);
+                using (var gate = (IDisposable)Activator.CreateInstance(gateType, new object[] { owner }))
+                {
+                    Assert.That(rig.Animator.speed, Is.Zero);
+                    rig.Advance(2f);
+                    Assert.That(rig.Animator.GetCurrentAnimatorStateInfo(0).IsName(NativePlayerAnimator.BaseLayer + ".staying"), Is.True);
+                }
+                Assert.That(rig.Animator.speed, Is.EqualTo(1));
+            }
+            finally { UnityEngine.Object.DestroyImmediate(root); }
         }
 
         [TestCase("male", "jumpstart", "jump")]

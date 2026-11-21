@@ -11,6 +11,7 @@ namespace FFOne.Network
     public static class ProtocolShiny
     {
         public const uint Enter = 0x310000ad, Leave = 0x310000ae, New = 0x310000af, Around = 0x310000b0, RemoveAround = 0x310000b1;
+        internal const uint PickupFail = 0x310000b2, PickupOk = 0x310000b3;
         public static bool TryDecode(ProtocolFrame frame, out IReadOnlyList<ShinyInterest> values)
         {
             values = null; if (frame == null) return false; var p = frame.Payload; var result = new List<ShinyInterest>();
@@ -37,5 +38,10 @@ namespace FFOne.Network
             }
             values = result.AsReadOnly(); return true;
         }
+    }
+    public sealed partial class FusionClient
+    {
+        internal System.Threading.Tasks.Task PickupShinyAsync(int id, System.Threading.CancellationToken token)
+            => SendGameplayAsync(0x13000060, ProtocolTravel.Words(id), token);
     }
 }

@@ -124,12 +124,12 @@ namespace FFOne.Tests
                 Assert.AreSame(unselected, presentation.EffectRoot, "Repeated server state must not restart the authored particles.");
                 Assert.That(presentation.EffectRoot.localPosition.y, Is.EqualTo(1.08f).Within(.00001f));
                 Assert.That(Quaternion.Angle(Quaternion.Euler(90, 0, 0), presentation.EffectRoot.localRotation), Is.LessThan(.001f));
-                Assert.AreEqual(2, presentation.EffectRoot.GetComponentsInChildren<MeshRenderer>().Length);
+                Assert.AreEqual(2, presentation.EffectRoot.GetComponentsInChildren<ParticleSystemRenderer>().Length);
                 presentation.SetSelected(true);
                 Assert.AreEqual(811, presentation.EffectId);
                 Assert.IsFalse(unselected, "Replacing a marker must release the old particle owner.");
                 Assert.AreEqual(1, actor.transform.childCount);
-                Assert.AreEqual(2, presentation.EffectRoot.GetComponentsInChildren<MeshRenderer>().Length);
+                Assert.AreEqual(2, presentation.EffectRoot.GetComponentsInChildren<ParticleSystemRenderer>().Length);
                 presentation.SetSelected(false);
                 Assert.AreEqual(446, presentation.EffectId);
             }

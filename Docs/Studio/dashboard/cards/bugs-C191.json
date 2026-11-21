@@ -1,0 +1,47 @@
+{
+  "status": "done",
+  "verification": "passed",
+  "notes": "Координаты, номер карты и iAngle показаны в HUD. Угол обновился при повороте персонажа. Обычный аккаунт получил сообщение в чате.",
+  "evidence": "Реальные входы GM 50 и обычного игрока, /viewloc, поворот, смена EN/RU, скрытие через /viweloc, местный отказ обычному аккаунту. Кадры: Logs/Studio/DashboardFive-20261119/validation-harness/live/viewloc/ и Logs/Studio/DashboardFive-20261119/validation-harness/live/viewloc-normal/. 19.11.2026. Unity 6000.4.0f1, свежая Windows-сборка со свежим каталогом, реальный изолированный RustyFusion. Протокол: Logs/Studio/DashboardFive-20261119/verification-20261119.json; сборка: Logs/Studio/DashboardFive-20261119/rebuild/unity-build.log; SHA-256: Logs/Studio/DashboardFive-20261119/rebuild/artifact-sha256.json.",
+  "history": [
+    {
+      "time": "2026-11-18T14:14:50+00:00",
+      "changes": {
+        "evidence": "18.11.2026. /viewloc отсутствует в реестре init_commands текущего RustyFusion (src/server/shard/chat.rs); локальный обработчик команды не найден в Assets/FFOne/Runtime. Вывод угла через игровой чат требует реализации или проверки другой точки обработки.",
+        "status": "ready",
+        "verification": "analyzed"
+      }
+    },
+    {
+      "time": "2026-11-19T10:13:48+00:00",
+      "changes": {
+        "status": "active"
+      }
+    },
+    {
+      "time": "2026-11-19T10:46:31+00:00",
+      "changes": {
+        "evidence": "WorldSnapshotUses2700ByteLayoutAndChecksSelectedUid подтвердил iUserLevel на существующем смещении 0104. Порог GM и углы сверены с FFOneClient и RustyFusion. Итоговая обработка локального отказа скомпилирована через Roslyn. 19.11.2026. Unity 6000.4.0f1, EditMode 40/40: Logs/Studio/DashboardFive-20261119/tests.xml. Компиляция Runtime Editor и Player через Roslyn: Logs/Studio/DashboardFive-20261119/roslyn-runtime.log, Logs/Studio/DashboardFive-20261119/roslyn-player.log. Сборка Windows прервана при Generate Bundle Packing: Logs/Studio/DashboardFive-20261119/unity-build.log.",
+        "notes": "Команда переключает карту, XYZ и iAngle персонажа. Проверить в свежем клиенте GM 50, обычный аккаунт, поворот, повторное переключение, RU/EN и отправку из разных каналов.",
+        "status": "review",
+        "verification": "tested"
+      }
+    },
+    {
+      "time": "2026-11-19T11:10:54+00:00",
+      "changes": {
+        "status": "active"
+      }
+    },
+    {
+      "time": "2026-11-19T11:44:03+00:00",
+      "changes": {
+        "evidence": "Реальные входы GM 50 и обычного игрока, /viewloc, поворот, смена EN/RU, скрытие через /viweloc, местный отказ обычному аккаунту. Кадры: Logs/Studio/DashboardFive-20261119/validation-harness/live/viewloc/ и Logs/Studio/DashboardFive-20261119/validation-harness/live/viewloc-normal/. 19.11.2026. Unity 6000.4.0f1, свежая Windows-сборка со свежим каталогом, реальный изолированный RustyFusion. Протокол: Logs/Studio/DashboardFive-20261119/verification-20261119.json; сборка: Logs/Studio/DashboardFive-20261119/rebuild/unity-build.log; SHA-256: Logs/Studio/DashboardFive-20261119/rebuild/artifact-sha256.json.",
+        "notes": "Координаты, номер карты и iAngle показаны в HUD. Угол обновился при повороте персонажа. Обычный аккаунт получил сообщение в чате.",
+        "status": "done",
+        "verification": "passed"
+      }
+    }
+  ],
+  "updated": "2026-11-19T11:44:03+00:00"
+}

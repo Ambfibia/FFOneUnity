@@ -1736,7 +1736,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2145574404220572716}
-  - component: {fileID: 1543752669044765784}
+  - component: {fileID: 3126352766494103718}
+  - component: {fileID: 5345301880434921243}
+  - component: {fileID: 4598356682785329584}
   m_Layer: 0
   m_Name: model
   m_TagString: Untagged
@@ -1760,38 +1762,43 @@ Transform:
   - {fileID: 2848549843302580192}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!111 &1543752669044765784
-Animation:
+--- !u!95 &3126352766494103718
+Animator:
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7534214504174657501}
   m_Enabled: 1
-  serializedVersion: 4
-  m_Animation: {fileID: 7400000, guid: 17cf5aa094b991b4b81e88fec8341998, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: c5e19c7272957e741b93e736c8d00284, type: 2}
-  - {fileID: 7400000, guid: 9864e7357415c344f9f705f8938f9b30, type: 2}
-  - {fileID: 7400000, guid: fbd842c7f8b77ca4ab45d95ac5df2517, type: 2}
-  - {fileID: 7400000, guid: d01a82b213130dc4c80d342db082877c, type: 2}
-  - {fileID: 7400000, guid: 4720e302af09d014ebf05a2a37eadb79, type: 2}
-  - {fileID: 7400000, guid: 207e336703e343a4b9eb6a7cca69b7a4, type: 2}
-  - {fileID: 7400000, guid: c9f7c50d03be0b44e9aaca7f8b3f5cde, type: 2}
-  - {fileID: 7400000, guid: 5f37bc77fa82c124b9c0076a1820050d, type: 2}
-  - {fileID: 7400000, guid: 11ff74cfb885a324ba2265e667222efb, type: 2}
-  - {fileID: 7400000, guid: 1f2e652487193504a810463be0df173d, type: 2}
-  - {fileID: 7400000, guid: 17cf5aa094b991b4b81e88fec8341998, type: 2}
-  - {fileID: 7400000, guid: 83ba959af2c970f42981bc9bd2b02e65, type: 2}
-  - {fileID: 7400000, guid: b246f3d186095a74abe754ba13d2e83e, type: 2}
-  - {fileID: 7400000, guid: baa5de569645a9a4fa70aa477f017690, type: 2}
-  - {fileID: 7400000, guid: af14cf26d42247e4ca4a46c0e22e8b2a, type: 2}
-  - {fileID: 7400000, guid: ae4df32e969d41746868730dd2ccf346, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 4379f5ab3aa48b84d8fb04cf87553382, type: 2}
+  m_CullingMode: 0
   m_UpdateMode: 0
-  m_CullingType: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 1
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &5345301880434921243
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7534214504174657501}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b7ac68c382befc4d9fc82662c17e418, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.Content.NativeNpcAnimator
+  animator: {fileID: 3126352766494103718}
+  AnimationSounds: []
+  Faces: []
 --- !u!1 &7700971380904497934
 GameObject:
   m_ObjectHideFlags: 0
@@ -2309,3 +2316,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2996541778083739485}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4598356682785329584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7534214504174657501}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ee3989daf214b8c805f250337cb2f41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.World.WorldNpcSkins
+  surfaces:
+  - Renderer: {fileID: 7724494943043503177}
+    Slot: 0
+    Default: {fileID: 2100000, guid: 299fd41db1d6d96438712764d855aca5, type: 2}
+    Choices:
+    - Types: e1000000a3010000
+      Material: {fileID: 2100000, guid: cd9071e5f8d658d2b5fb581d5bb3e670, type: 2}
+    - Types: c2010000e0010000650200007b040000e8040000
+      Material: {fileID: 2100000, guid: 5076049493ef5afabdbf922e551f0fa9, type: 2}

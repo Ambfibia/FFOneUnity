@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -11,11 +12,9 @@ namespace FFOne.UI
         static readonly float[] Zoom = { 1f, .5f, .25f, 950f / 8192f };
         public static readonly Rect Viewport = new Rect(20, 14, 950, 624);
 
-        public static int Zone(int mapNumber, Vector3 position)
+        public static int Zone(int mapNumber, Vector3 position, bool episode = false)
         {
-            // Runtime only establishes overworld map 0. Retrobution uses bInsMap+iEp_ID
-            // for its no-map gate; an arbitrary server map number is not a source zone ID.
-            if (mapNumber != 0 || !float.IsFinite(position.x) || !float.IsFinite(position.z)) return Unavailable;
+            if ((mapNumber != 0 && !episode) || !float.IsFinite(position.x) || !float.IsFinite(position.z)) return Unavailable;
             var point = new Vector2(position.x, position.z);
             if (new Rect(5632, 512, 2048, 2048).Contains(point)) return Future;
             if (new Rect(1024, 5120, 2560, 2048).Contains(point)) return Dark;
@@ -76,49 +75,77 @@ namespace FFOne.UI
 
     public sealed partial class GameplayUiController
     {
+        const string MapRolePrefix = "ff-world-map-";
+        const string MapHiddenClass = MapRolePrefix + "hidden";
+        static readonly string[] MapPanRoles = { "pan-left", "pan-right", "pan-up", "pan-down" };
         VisualElement mapRoot;
         Image mapImage, mapPlayer;
+        Label mapLocation;
+        VisualElement mapZoomBar;
+        readonly Dictionary<string, Button> mapButtons = new();
+        readonly Dictionary<string, Image> mapArtwork = new();
+        readonly VisualElement[] mapZoomHighlights = new VisualElement[3];
         Rect mapTarget, mapUv;
         int mapZone = RetrobutionMapLayout.Unavailable, mapStep;
         Vector2 mapPan;
         float mapHeading;
 
+        int CurrentMapZone()
+        {
+            var state = session.Snapshot;
+            return RetrobutionMapLayout.Zone(state.MapNumber, state.WorldPosition, travelCatalog?.EpisodeMaps.Contains(state.MapNumber) == true);
+        }
+
         void BindMap(VisualElement root)
         {
             mapRoot = root;
             RetrobutionImage.BindAll(root);
-            mapImage = FFView.Require<Image>(root, "map-image");
-            mapPlayer = FFView.Require<Image>(root, "map-player");
+            mapImage = MapElement<Image>(root, "image");
+            mapPlayer = MapElement<Image>(root, "player");
+            mapLocation = MapElement<Label>(root, "location");
+            mapZoomBar = MapElement<VisualElement>(root, "zoom-bar");
+            mapArtwork.Clear();
+            foreach (var family in new[] { "payzone", "freezone", "darkzone" })
+            {
+                int count = family == "payzone" ? 4 : 2;
+                for (int i = 0; i < count; i++)
+                {
+                    string role = family + "-" + i;
+                    mapArtwork.Add(role, MapElement<Image>(root, role));
+                }
+            }
+            mapArtwork.Add("unavailable", MapElement<Image>(root, "unavailable"));
+            mapButtons.Clear();
             mapPan = Vector2.zero;
-            mapZone = RetrobutionMapLayout.Zone(session.Snapshot.MapNumber, session.Snapshot.WorldPosition);
+            mapZone = CurrentMapZone();
             mapStep = RetrobutionMapLayout.InitialStep(mapZone);
             mapTarget = mapUv = RetrobutionMapLayout.Camera(mapZone, mapStep, MapPosition());
-            ActionButton(root, "close", () => Windows.Close());
-            FFView.Require<Button>(root, "help").SetEnabled(false);
-            FFView.Require<Button>(root, "show-filters").SetEnabled(false);
-            ActionButton(root, "zoom-in", () => SetMapStep(Mathf.Min(mapStep + 1, 2), mapTarget.center));
-            ActionButton(root, "zoom-out", () => SetMapStep(Mathf.Max(mapStep - 1, 0), mapTarget.center));
+            BindMapButton("close", () => Windows.Close(), true);
+            BindMapButton("help", () => OpenGuide(15), true);
+            BindMapInteractions(root);
+            BindMapButton("zoom-in", () => SetMapStep(Mathf.Min(mapStep + 1, 2), mapTarget.center));
+            BindMapButton("zoom-out", () => SetMapStep(Mathf.Max(mapStep - 1, 0), mapTarget.center));
             for (int index = 0; index < 3; index++)
             {
                 int step = index;
-                ActionButton(root, "zoom-step-" + index, () => SetMapStep(step, mapTarget.center));
+                BindMapButton("zoom-step-" + index, () => SetMapStep(step, mapTarget.center));
+                mapZoomHighlights[index] = MapElement<VisualElement>(root, $"zoom-step-{index}-selected");
             }
-            ActionButton(root, "my-view", () => SetMapStep(3, MapPosition()));
-            ActionButton(root, "world-view", () => SetMapStep(mapZone == RetrobutionMapLayout.Overworld ? 0 : 2, MapPosition()));
+            BindMapButton("my-view", () => SetMapStep(3, MapPosition()));
+            BindMapButton("world-view", () => SetMapStep(mapZone == RetrobutionMapLayout.Overworld ? 0 : 2, MapPosition()));
             BindMapPan(root, "pan-left", Vector2.left); BindMapPan(root, "pan-right", Vector2.right);
             BindMapPan(root, "pan-up", Vector2.up); BindMapPan(root, "pan-down", Vector2.down);
-            root.Query<TextElement>().ForEach(text => FFWidgets.Font(text, false, 12));
             if (language == "ru")
             {
-                FFView.Require<Label>(root, "my-view-label").text = "МОЯ ПОЗИЦИЯ";
-                FFView.Require<Label>(root, "world-view-label").text = "ВЕСЬ МИР";
-                FFView.Require<Label>(root, "show-filters-label").text = "ФИЛЬТРЫ";
-                FFView.Require<Label>(root, "map-location-heading-label").text = "местоположение:";
+                MapElement<Label>(root, "my-view-label").text = "МОЯ ПОЗИЦИЯ";
+                MapElement<Label>(root, "world-view-label").text = "ВЕСЬ МИР";
+                MapElement<Label>(root, "show-filters-label").text = "ФИЛЬТРЫ";
+                MapElement<Label>(root, "location-heading").text = "местоположение:";
             }
             // UI scheduling pauses with panel detachment, so closed views do not retain an update loop.
             root.schedule.Execute(() => {
                 if (disposed || mapRoot != root || Windows.Current != GameplayWindow.Map) return;
-                if (interactionSuspended || prompt != null) { mapPan = Vector2.zero; return; }
+                if (interactionSuspended || prompt != null || gameGuide != null) { mapPan = Vector2.zero; return; }
                 if (mapPan != Vector2.zero)
                 {
                     mapTarget.position += Vector2.Scale(mapPan, mapTarget.size) * (Time.deltaTime / 8);
@@ -130,14 +157,40 @@ namespace FFOne.UI
             }).Every(16);
             root.RegisterCallback<DetachFromPanelEvent>(_ => {
                 if (mapRoot != root) return;
+                mapMarkers = mapFilterStrip = null;
+                mapMarkerTemplate = null;
+                mapMarkerPool.Clear();
+                mapButtons.Clear();
+                mapArtwork.Clear();
+                Array.Clear(mapZoomHighlights, 0, mapZoomHighlights.Length);
+                mapLocation = null;
+                mapZoomBar = null;
+                presenceTimer?.Pause(); presenceTimer = null;
                 mapPan = Vector2.zero; mapRoot = null; mapImage = null; mapPlayer = null;
             });
             RefreshMap(true);
         }
 
-        void BindMapPan(VisualElement root, string name, Vector2 direction)
+        static T MapElement<T>(VisualElement root, string role) where T : VisualElement =>
+            FFView.RequireClass<T>(root, MapRolePrefix + role);
+
+        static void SetMapVisible(VisualElement element, bool visible) =>
+            element.EnableInClassList(MapHiddenClass, !visible);
+
+        void BindMapButton(string role, Action action, bool sound = false)
         {
-            var button = FFView.Require<Button>(root, name);
+            var button = MapElement<Button>(mapRoot, role);
+            mapButtons.Add(role, button);
+            button.clicked += () => {
+                if (sound) playSound?.Invoke("button");
+                action();
+            };
+        }
+
+        void BindMapPan(VisualElement root, string role, Vector2 direction)
+        {
+            var button = MapElement<Button>(root, role);
+            mapButtons.Add(role, button);
             button.RegisterCallback<PointerDownEvent>(evt => {
                 if (evt.button != 0 || !button.enabledInHierarchy || interactionSuspended || prompt != null) return;
                 mapPan = direction; button.CapturePointer(evt.pointerId);
@@ -160,10 +213,67 @@ namespace FFOne.UI
             return float.IsFinite(position.x) && float.IsFinite(position.z) ? new Vector2(position.x, position.z) / 8192 : new Vector2(.5f, .5f);
         }
 
+        internal sealed class PadCursor : VisualElement
+        {
+            public PadCursor()
+            {
+                pickingMode = PickingMode.Ignore;
+                style.position = Position.Absolute;
+                style.width = style.height = 18;
+                generateVisualContent += context =>
+                {
+                    var pen = context.painter2D;
+                    pen.strokeColor = Color.white; pen.lineWidth = 2;
+                    pen.BeginPath(); pen.Arc(new Vector2(9, 9), 7, 0, 360); pen.ClosePath(); pen.Stroke();
+                    pen.fillColor = Color.white;
+                    pen.BeginPath(); pen.Arc(new Vector2(9, 9), 2, 0, 360); pen.ClosePath(); pen.Fill();
+                };
+            }
+        }
+
+        PadCursor padMapCursor;
+        Vector2 padMapPosition = new(485, 316);
+
+        internal void HidePadMapCursor() { if (padMapCursor != null) padMapCursor.visible = false; }
+
+        internal bool NavigateMap(UnityEngine.InputSystem.Gamepad pad, float dt)
+        {
+            if (Windows.Current != GameplayWindow.Map || mapRoot == null || interactionSuspended || gameGuide != null || prompt != null) return false;
+            if (padMapCursor?.panel == null)
+            {
+                var viewport = MapElement<VisualElement>(mapRoot, "viewport");
+                padMapPosition = new Vector2(485, 316);
+                padMapCursor = new PadCursor(); viewport.Add(padMapCursor);
+            }
+            padMapCursor.visible = true;
+            Vector2 pan = pad.rightStick.ReadValue();
+            if (pan.sqrMagnitude > 0 && mapStep > 0)
+            {
+                mapTarget.position += Vector2.Scale(pan, mapTarget.size) * (dt / 3);
+                mapTarget = RetrobutionMapLayout.Clamp(mapZone, mapTarget);
+            }
+            var cursor = pad.leftStick.ReadValue();
+            padMapPosition += new Vector2(cursor.x, -cursor.y) * (360 * dt);
+            padMapPosition = new Vector2(Mathf.Clamp(padMapPosition.x, 50, 919), Mathf.Clamp(padMapPosition.y, 46, 585));
+            padMapCursor.style.left = padMapPosition.x - 9; padMapCursor.style.top = padMapPosition.y - 9;
+            if (mapZone < 0 || !mapImage.image) return true;
+            if (pad.dpad.right.wasPressedThisFrame) SetMapStep(3, MapPosition());
+            else if (pad.dpad.left.wasPressedThisFrame && mapZone != RetrobutionMapLayout.Tutorial)
+                SetMapStep(mapZone == RetrobutionMapLayout.Overworld ? 0 : 2, MapPosition());
+            else if (pad.dpad.up.wasPressedThisFrame && mapZone == RetrobutionMapLayout.Overworld)
+                SetMapStep(Mathf.Min(2, mapStep + 1), mapTarget.center);
+            else if (pad.dpad.down.wasPressedThisFrame && mapZone == RetrobutionMapLayout.Overworld)
+                SetMapStep(Mathf.Clamp(mapStep - 1, 0, 2), mapTarget.center);
+            if (pad.buttonSouth.wasPressedThisFrame) ChangeWaypoint(padMapPosition);
+            return true;
+        }
+
         void SetMapStep(int step, Vector2 center)
         {
             if (mapZone == RetrobutionMapLayout.Unavailable || interactionSuspended || prompt != null) return;
+            playSound?.Invoke("button");
             mapStep = step; mapTarget = RetrobutionMapLayout.Camera(mapZone, step, center);
+            mapProjectionDirty = true; UpdateMapFilters();
             RefreshMap();
         }
 
@@ -176,34 +286,37 @@ namespace FFOne.UI
         void RefreshMap(bool initial = false)
         {
             if (mapRoot == null || (!initial && mapRoot.panel == null)) return;
-            int zone = RetrobutionMapLayout.Zone(session.Snapshot.MapNumber, session.Snapshot.WorldPosition);
+            int zone = CurrentMapZone();
             if (zone != mapZone)
             {
                 mapZone = zone; mapStep = RetrobutionMapLayout.InitialStep(zone);
                 mapTarget = mapUv = RetrobutionMapLayout.Camera(zone, mapStep, MapPosition());
+                mapContentsDirty = true; UpdateMapFilters();
+                _ = RequestMapPresence();
             }
             bool available = mapZone != RetrobutionMapLayout.Unavailable;
             string family = mapZone switch { RetrobutionMapLayout.Future or RetrobutionMapLayout.Tutorial => "freezone", RetrobutionMapLayout.Dark => "darkzone", _ => "payzone" };
             int texture = mapZone == RetrobutionMapLayout.Overworld ? mapStep : mapStep - 2;
-            string binding = available ? $"map-{family}-{texture}" : "map-unavailable";
-            mapImage.image = FFView.Require<Image>(mapRoot, binding).image;
-            FFView.Require<Button>(mapRoot, "my-view").SetEnabled(available && mapStep != 3);
-            FFView.Require<Button>(mapRoot, "world-view").SetEnabled(available && mapStep == 3 && mapZone != RetrobutionMapLayout.Tutorial);
+            string binding = available ? $"{family}-{texture}" : "unavailable";
+            mapImage.image = mapArtwork[binding].image;
+            mapButtons["my-view"].SetEnabled(available && mapStep != 3);
+            mapButtons["world-view"].SetEnabled(available && mapStep == 3 && mapZone != RetrobutionMapLayout.Tutorial);
             bool zoom = available && mapZone == RetrobutionMapLayout.Overworld && mapStep != 3;
-            FFView.Require<Button>(mapRoot, "zoom-in").SetEnabled(zoom && mapStep < 2);
-            FFView.Require<Button>(mapRoot, "zoom-out").SetEnabled(zoom && mapStep > 0);
-            foreach (string name in new[] { "pan-left", "pan-right", "pan-up", "pan-down" }) FFView.Require<Button>(mapRoot, name).SetEnabled(available);
+            mapButtons["zoom-in"].SetEnabled(zoom && mapStep < 2);
+            mapButtons["zoom-out"].SetEnabled(zoom && mapStep > 0);
+            foreach (string role in MapPanRoles) mapButtons[role].SetEnabled(available);
+            bool overworld = mapZone == RetrobutionMapLayout.Overworld;
             for (int i = 0; i < 3; i++)
             {
-                var button = FFView.Require<Button>(mapRoot, "zoom-step-" + i);
+                var button = mapButtons["zoom-step-" + i];
                 button.SetEnabled(zoom && mapStep != i);
-                button.style.display = mapZone == RetrobutionMapLayout.Overworld ? DisplayStyle.Flex : DisplayStyle.None;
-                FFView.Require<VisualElement>(mapRoot, $"zoom-step-{i}-selected").style.display = zoom && mapStep == i ? DisplayStyle.Flex : DisplayStyle.None;
+                SetMapVisible(button, overworld);
+                SetMapVisible(mapZoomHighlights[i], zoom && mapStep == i);
             }
-            foreach (string name in new[] { "zoom-in", "zoom-out", "zoom-bar" })
-                FFView.Require<VisualElement>(mapRoot, name).style.display = mapZone == RetrobutionMapLayout.Overworld ? DisplayStyle.Flex : DisplayStyle.None;
-            // No verified dong-name lookup exists here. Do not manufacture a district name from coordinates.
-            FFView.Require<Label>(mapRoot, "map-location-label").text = available ? "" : (language == "ru" ? "Карта недоступна" : "Map unavailable");
+            SetMapVisible(mapButtons["zoom-in"], overworld);
+            SetMapVisible(mapButtons["zoom-out"], overworld);
+            SetMapVisible(mapZoomBar, overworld);
+            mapLocation.text = available ? minimap.PlaceName.text : (language == "ru" ? "Карта недоступна" : "Map unavailable");
             DrawMap();
         }
 
@@ -214,8 +327,9 @@ namespace FFOne.UI
             mapImage.style.left = draw.x; mapImage.style.top = draw.y;
             mapImage.style.width = draw.width; mapImage.style.height = draw.height;
             mapImage.uv = mapZone == RetrobutionMapLayout.Unavailable ? new Rect(0, 0, 1, 1) : mapUv;
+            DrawMapContents(draw);
             bool visible = mapZone != RetrobutionMapLayout.Unavailable && mapTarget.Contains(MapPosition());
-            mapPlayer.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
+            SetMapVisible(mapPlayer, visible);
             if (!visible) return;
             Vector2 marker = RetrobutionMapLayout.Marker(session.Snapshot.WorldPosition, mapUv, draw);
             mapPlayer.style.left = marker.x; mapPlayer.style.top = marker.y;

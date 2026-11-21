@@ -50,7 +50,8 @@ namespace FFOne.World
                 foreach (var material in renderer.sharedMaterials)
                     if (!material || material.shader.name != "FFOne/NativeWorld") group.Unbounded = true;
             }
-            if (model.GetComponentInChildren<Animation>(true)) group.Unbounded = true;
+            if (model.GetComponentInChildren<Animation>(true) || model.GetComponentInChildren<Animator>(true))
+                group.Unbounded = true;
             var driver = tile.GetComponent<WorldObjectRange>();
             if (!driver) { driver = tile.gameObject.AddComponent<WorldObjectRange>(); driver.coordinator = true; }
         }

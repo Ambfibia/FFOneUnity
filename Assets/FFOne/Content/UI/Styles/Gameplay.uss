@@ -1,9 +1,141 @@
-.gameplay-prompt { position:absolute; left:0; top:0; right:0; bottom:0; align-items:center; justify-content:center; background-color:rgba(0,0,0,.55); }
-.gameplay-prompt-panel { width:430px; max-width:90%; padding:24px; background-color:rgb(7,25,32); border-width:1px; border-color:rgb(58,169,180); }
-.gameplay-prompt-title { color:white; font-size:20px; margin-bottom:16px; white-space:normal; }
-.gameplay-prompt-body { color:rgb(222,238,242); white-space:normal; margin-bottom:20px; }
-.gameplay-prompt-actions { flex-direction:row; justify-content:space-between; margin-top:20px; }
-.gameplay-prompt-actions > Button { width:46%; height:32px; }
+.gameplay-prompt { position:absolute; left:0; top:0; right:0; bottom:0; background-color:rgba(0,0,0,.55); }
+.gameplay-prompt-panel {
+    position:absolute; width:600px; height:164px; transform-origin:0 0;
+    background-image:url('../Artwork/en/gameplay/system/systemDialogBox.png');
+    -unity-background-scale-mode:stretch-to-fill;
+    -unity-slice-left:40; -unity-slice-right:40; -unity-slice-top:16; -unity-slice-bottom:40;
+}
+.gameplay-prompt-title, .gameplay-prompt-body {
+    position:absolute; left:140px; width:420px; -unity-text-align:upper-left; color:white; font-size:12px;
+}
+.gameplay-prompt-title { top:20px; height:23px; }
+.gameplay-prompt-body { top:48px; height:75px; -unity-font-definition:url('../Fonts/chaletbook-regular-sdf.asset'); }
+.gameplay-prompt--mission .gameplay-prompt-body { width:400px; }
+.gameplay-prompt-icon { position:absolute; left:60px; top:27px; width:62px; height:62px; }
+.gameplay-prompt-stack { position:absolute; left:60px; top:70px; width:58px; height:18px; -unity-text-align:lower-right; }
+.gameplay-prompt-value { display:none; position:absolute; left:140px; top:89px; width:148px; height:26px; font-size:12px; }
+.gameplay-prompt--input .gameplay-prompt-value { display:flex; }
+.gameplay-prompt--input .gameplay-prompt-body { height:40px; }
+.gameplay-prompt-cancel, .gameplay-prompt-confirm {
+    position:absolute; top:124px; height:25px; -unity-background-scale-mode:stretch-to-fill; font-size:12px;
+}
+.gameplay-prompt-cancel { left:44px; width:150px; background-image:url('../Artwork/en/character/selection/controls/CancelNormal.png'); -unity-slice-left:5; -unity-slice-right:5; -unity-slice-top:5; -unity-slice-bottom:5; }
+.gameplay-prompt-confirm {
+    left:454px; width:110px; background-image:url('../Artwork/en/character/selection/controls/blue_button_normal.png');
+    -unity-slice-left:5; -unity-slice-right:5; -unity-slice-top:5; -unity-slice-bottom:5;
+}
+.gameplay-prompt-confirm:hover, .gameplay-prompt-confirm:focus, .gameplay-prompt-confirm:active {
+    background-image:url('../Artwork/en/character/selection/controls/blue_button_over.png');
+}
+.gameplay-prompt--destructive .gameplay-prompt-confirm {
+    background-image:url('../Artwork/en/character/selection/controls/red_button_normal.png');
+}
+.gameplay-prompt--destructive .gameplay-prompt-confirm:hover, .gameplay-prompt--destructive .gameplay-prompt-confirm:focus,
+.gameplay-prompt--destructive .gameplay-prompt-confirm:active {
+    background-image:url('../Artwork/en/character/selection/controls/red_button_over.png');
+}
+.gameplay-prompt--mission .gameplay-prompt-confirm { left:320px; width:245px; }
+
+.nanocom-invitation-dialog {
+    position:absolute; left:0; top:0; right:0; bottom:0; background-color:rgba(0,0,0,.5);
+}
+.nanocom-invitation-panel {
+    position:absolute; width:520px; height:164px; transform-origin:0 0;
+    background-image:url('../Artwork/en/gameplay/system/systemDialogBox.png'); -unity-background-scale-mode:stretch-to-fill;
+    -unity-slice-left:40; -unity-slice-bottom:40; -unity-slice-right:40; -unity-slice-top:16;
+}
+.nanocom-invitation-area {
+    position:absolute; left:70px; top:30px; width:415px; height:87px;
+    background-image:url('../Artwork/en/gameplay/nanocom/messagearea.png'); -unity-background-scale-mode:stretch-to-fill;
+    -unity-slice-left:8; -unity-slice-bottom:4; -unity-slice-right:8; -unity-slice-top:2;
+}
+.nanocom-invitation-icon { position:absolute; left:25px; top:15px; width:62px; height:62px; }
+.nanocom-invitation-panel .nanocom-invitation-title {
+    position:absolute; left:100px; top:1px; width:376px; height:31px; color:cyan; font-size:13px; -unity-text-align:middle-left;
+}
+.nanocom-invitation-panel .nanocom-invitation-body,
+.nanocom-invitation-panel .nanocom-invitation-expiration {
+    position:absolute; left:100px; width:324px; height:28px; font-size:12px; -unity-text-align:middle-center;
+    -unity-font-definition:url('../Fonts/chaletbook-regular-sdf.asset');
+}
+.nanocom-invitation-body { top:34px; }
+.nanocom-invitation-expiration { top:66px; }
+.nanocom-invitation-panel .nanocom-invitation-decline,
+.nanocom-invitation-panel .nanocom-invitation-accept {
+    position:absolute; top:124px; width:150px; height:25px; font-size:12px;
+    -unity-background-scale-mode:stretch-to-fill;
+}
+.nanocom-invitation-decline {
+    left:44px; background-image:url('../Artwork/en/character/selection/controls/red_button_normal.png');
+    -unity-slice-left:5; -unity-slice-bottom:5; -unity-slice-right:5; -unity-slice-top:5;
+}
+.nanocom-invitation-decline:hover, .nanocom-invitation-decline:focus, .nanocom-invitation-decline:active {
+    background-image:url('../Artwork/en/character/selection/controls/red_button_over.png');
+}
+.nanocom-invitation-accept {
+    left:334px; background-image:url('../Artwork/en/character/selection/controls/blue_button_normal.png');
+    -unity-slice-left:6; -unity-slice-bottom:4; -unity-slice-right:6; -unity-slice-top:6;
+}
+.nanocom-invitation-accept:hover, .nanocom-invitation-accept:focus, .nanocom-invitation-accept:active {
+    background-image:url('../Artwork/en/character/selection/controls/blue_button_over.png');
+}
+
+.npc-service-window,
+.npc-service-action,
+.transport-right,
+.transport-left,
+.transport-left-box { -unity-background-scale-mode:stretch-to-fill; }
+
+/* The 64 px multi-win texture needs one center texel. The source's right cap is 45 px. */
+.npc-service-window {
+    background-image:url('../Artwork/en/gameplay/mission/npc/npc_multi_window.png');
+    -unity-slice-left:20; -unity-slice-right:43; -unity-slice-top:40; -unity-slice-bottom:20;
+}
+.npc-service-action {
+    background-image:url('../Artwork/en/character/selection/controls/blue_button_normal.png');
+    -unity-slice-left:6; -unity-slice-right:6; -unity-slice-top:6; -unity-slice-bottom:4;
+}
+.npc-service-action:hover,
+.npc-service-action:focus,
+.npc-service-action:active { background-image:url('../Artwork/en/character/selection/controls/blue_button_over.png'); }
+.npc-service-band { position:absolute; left:0; right:0; height:15.673982%; background-color:black; }
+.npc-service-band--top { top:0; }
+.npc-service-band--bottom { bottom:0; }
+.npc-service-window {
+    position:absolute; left:75%; top:50%; translate:-50% -50%; width:242px;
+    padding:56px 15px 10px;
+}
+.npc-service-window--compact { padding-top:53px; }
+.npc-service-root .npc-service-status {
+    position:absolute; top:88%; left:50%; translate:-50% 0; width:480px; height:30px;
+    -unity-font-definition:url("../Fonts/chaletbook-regular-sdf.asset"); -unity-text-align:middle-center;
+}
+.npc-service-name {
+    position:absolute; left:15px; top:10px; width:187px; height:40px; -unity-text-align:middle-left;
+}
+.npc-service-root .npc-service-action {
+    width:212px; height:48px; margin-bottom:6px; padding-left:50px; -unity-text-align:middle-left;
+}
+.npc-service-icon { position:absolute; left:9px; top:7.5px; width:38px; height:33px; }
+.npc-service-root .npc-service-close {
+    position:absolute; left:206px; top:.5px; width:32px; height:32px;
+    background-image:url('../Artwork/en/user-equip/close.png'); -unity-background-scale-mode:stretch-to-fill;
+}
+.npc-service-root .npc-service-close:hover, .npc-service-root .npc-service-close:focus, .npc-service-root .npc-service-close:active {
+    background-image:url('../Artwork/en/user-equip/close-hover.png');
+}
+.transport-right {
+    background-image:url('../Artwork/en/transportation/skin/right_back.png');
+    -unity-slice-left:5; -unity-slice-right:10; -unity-slice-top:0; -unity-slice-bottom:0;
+}
+.transport-left {
+    background-image:url('../Artwork/en/transportation/skin/left_back.png');
+    -unity-slice-left:5; -unity-slice-right:5; -unity-slice-top:0; -unity-slice-bottom:0;
+}
+.transport-left-box {
+    background-image:url('../Artwork/en/transportation/skin/left_box.png');
+    -unity-slice-left:0; -unity-slice-right:0; -unity-slice-top:85; -unity-slice-bottom:55;
+}
 
 /* Shared UI Toolkit scrollbar adapter. Uses the accepted option-screen artwork;
    imported IMGUI screen geometry and GUISkin selectors stay in Retrobution.uss. */
@@ -18,6 +150,10 @@
     background-image:url("../Artwork/en/option/scroll-thumb.png");
     -unity-background-scale-mode:stretch-to-fill;
 }
+.retro-screen .unity-scroller--vertical .unity-base-slider__tracker,
+.retro-screen .unity-scroller--vertical .unity-base-slider__dragger {
+    -unity-slice-left:2; -unity-slice-right:2; -unity-slice-top:4; -unity-slice-bottom:4;
+}
 .retro-screen .unity-scroller__low-button, .retro-screen .unity-scroller__high-button { display:none; }
 .retro-screen TextField > .unity-base-text-field__input {
     margin:0; padding:0; border-width:0; border-radius:0; background-color:transparent; color:white;
@@ -25,6 +161,9 @@
 
 /* Inventory and mail share the original five-column equipment cabinet. */
 .inventory-copy { margin:0; padding:0; white-space:nowrap; overflow:hidden; -unity-text-align:middle-left; }
+.inventory-trade .inventory-character,
+.inventory-trade .inventory-character-background,
+.inventory-trade .equipment-panel { display:none; }
 .inventory-screen Button:disabled { opacity:1; }
 .inventory-screen .inventory-tab > .retro-background { background-image:none; }
 .inventory-screen .inventory-tab { background-color:transparent; -unity-background-scale-mode:stretch-to-fill; }
@@ -47,7 +186,7 @@
 .mail-button:disabled { color:rgb(89,142,167); }
 .inventory-screen .unity-scroller--vertical { width:17px; }
 .inventory-screen .unity-scroller--vertical .unity-base-slider__tracker { background-image:url('../Artwork/en/user-equip/scroll-track.png'); -unity-slice-top:4; -unity-slice-bottom:4; }
-.inventory-screen .unity-scroller--vertical .unity-base-slider__dragger { background-image:url('../Artwork/en/user-equip/scroll-thumb.png'); -unity-slice-top:5; -unity-slice-bottom:5; }
+.inventory-screen .unity-scroller--vertical .unity-base-slider__dragger { background-image:url('../Artwork/en/user-equip/scroll-thumb.png'); -unity-slice-top:4; -unity-slice-bottom:4; }
 .inventory-screen .unity-scroller__low-button, .inventory-screen .unity-scroller__high-button { display:flex; margin:0; padding:0; width:17px; height:12px; min-height:12px; border-width:0; background-color:transparent; -unity-background-scale-mode:stretch-to-fill; }
 .inventory-screen .unity-scroller__low-button { background-image:url('../Artwork/en/user-equip/scroll-up.png'); }
 .inventory-screen .unity-scroller__high-button { background-image:url('../Artwork/en/user-equip/scroll-down.png'); }
@@ -71,3 +210,199 @@
 .mail-trash:hover { background-image:url('../Artwork/en/user-equip/trash-hover.png'); }
 .mail-trash:disabled { opacity:.55; }
 .mail-item-attached { border-width:2px; border-color:rgb(255,241,0); }
+
+
+.nanocom-actions .retro-text { -unity-font-definition:url('../Fonts/jeffe-sdf.asset'); font-size:12px; }
+.nanocom-zoom-locked .nanocom-zoom-in, .nanocom-zoom-locked .nanocom-zoom-out { display:none; }
+
+.tutorial-npc-mission-top {
+    background-image:url('../Artwork/en/gameplay/mission/npc/mission_top.png');
+    -unity-slice-left:20; -unity-slice-right:45;
+}
+.tutorial-npc-mission-body {
+    background-image:url('../Artwork/en/gameplay/mission/npc/mission_body.png');
+    -unity-slice-left:10; -unity-slice-right:10;
+}
+.tutorial-npc-mission-bottom {
+    background-image:url('../Artwork/en/gameplay/mission/npc/mission_bottom_func.png');
+    -unity-slice-left:20; -unity-slice-right:20;
+}
+.tutorial-npc-mission-button {
+    background-image:url('../Artwork/en/gameplay/mission/npc/mission_button.png');
+    -unity-slice-left:5; -unity-slice-right:5; -unity-slice-top:5; -unity-slice-bottom:5;
+    white-space:normal;
+}
+.tutorial-npc-mission-button:hover, .tutorial-npc-mission-button:focus {
+    background-image:url('../Artwork/en/gameplay/mission/npc/mission_button_over.png');
+}
+
+
+.ff-journal-root .retro-text, .ff-mission-row .retro-text { -unity-font-definition:url('../Fonts/jeffe-sdf.asset'); font-size:12px; }
+.ff-journal-root .mission-primary { left:347px; width:218px; height:85px; }
+.ff-journal-root .mission-primary.mission-primary--complete { left:327px; width:233px; height:70px; }
+.ff-journal-details .mission-banner { top:1px; }
+.ff-journal-details--offer .mission-banner { top:10px; }
+.ff-mission-details-heading { left:90px; top:145px; width:300px; height:20px; }
+.ff-journal-details .mission-description { left:50px; top:164px; width:490px; height:338px; }
+.ff-journal-details--complete .ff-mission-details-heading { top:167px; }
+.ff-journal-details--complete .mission-description { top:185px; height:106px; }
+.ff-journal-details .mission-offer-panel, .ff-journal-details .mission-completed-panel { display:none; }
+.ff-journal-details--offer .mission-active-panel, .ff-journal-details--complete .mission-active-panel { display:none; }
+.ff-journal-details--offer .mission-offer-panel, .ff-journal-details--complete .mission-completed-panel { display:flex; }
+
+.ff-chat-resize {
+    display:none;
+    background-image:url('../Artwork/en/gameplay/chat/resize-normal.png');
+    -unity-background-scale-mode:stretch-to-fill;
+}
+.ff-chat-resize:hover, .ff-chat-resize:focus, .ff-chat-resize:active {
+    background-image:url('../Artwork/en/gameplay/chat/resize-hover.png');
+}
+.ff-chat-root--active .ff-chat-resize { display:flex; }
+.ff-location-debug {
+    display: none;
+    position: absolute;
+    left: 6px;
+    top: -24px;
+    color: white;
+    text-shadow: 1px 1px 1px black;
+}
+.ff-location-debug--visible { display: flex; }
+
+.ff-quick-menu { position:absolute; left:40px; bottom:14px; flex-direction:row; align-items:flex-end; }
+.ff-quick-menu--emotes { left:72px; }
+.ff-quick-choice-column {
+    align-items:stretch; flex-shrink:0; padding-right:20px; padding-bottom:5px;
+    background-image:url("../Artwork/en/gameplay/chat/chat_box.png");
+    -unity-background-scale-mode:stretch-to-fill;
+    -unity-slice-left:15; -unity-slice-right:20; -unity-slice-top:15; -unity-slice-bottom:20;
+}
+.ff-quick-choice-column--submenu { margin-left:-18px; }
+.ff-quick-menu--emotes .ff-quick-choice-column--submenu { margin-left:-15px; }
+.ff-button.ff-quick-choice {
+    height:18px; flex-shrink:0; justify-content:center; align-items:flex-start;
+    padding-left:8px; padding-right:6px;
+    -unity-background-scale-mode:stretch-to-fill;
+}
+.ff-quick-choice > .ff-quick-choice-copy { font-size:12px; white-space:nowrap; -unity-text-align:middle-left; }
+.ff-quick-choice.ff-quick-choice--category { padding-right:20px; }
+.ff-quick-choice.ff-quick-choice--emote { padding-left:32px; }
+.ff-quick-choice-arrow { position:absolute; right:7px; top:5px; width:7px; height:8px; }
+.ff-quick-choice:hover, .ff-quick-choice:focus, .ff-quick-choice:active {
+    background-image:url("../Artwork/en/gameplay/chat/menuchat_sel_over.png");
+}
+.ff-quick-choice--category:hover, .ff-quick-choice--category:focus, .ff-quick-choice--category:active,
+.ff-quick-choice.ff-quick-choice--open {
+    background-image:url("../Artwork/en/gameplay/chat/menuchat_over.png");
+    -unity-slice-right:20;
+}
+.ff-quick-choice:hover > .ff-quick-choice-copy, .ff-quick-choice:focus > .ff-quick-choice-copy,
+.ff-quick-choice:active > .ff-quick-choice-copy, .ff-quick-choice--open > .ff-quick-choice-copy {
+    color:rgb(0,87,128);
+}
+
+/* Cyrillic captions use the full tab span without wrapping under the neighbor. */
+.ff-journal-root .ff-tab-active-label, .ff-journal-root .ff-tab-completed-label {
+    top:0; bottom:0; -unity-text-align:middle-center;
+    white-space:nowrap; font-size:10px;
+}
+.ff-journal-root .ff-tab-active > .ff-tab-active-label,
+.ff-journal-root .ff-tab-completed > .ff-tab-completed-label { left:0; right:0; padding:0; margin:0; }
+.ff-journal-root .ff-tab-completed > .retro-background { left:-5px; right:-25px; }
+.ff-journal-root .ff-tab-active > .ff-tab-active-label.retro-text,
+.ff-journal-root .ff-tab-completed > .ff-tab-completed-label.retro-text { color:rgb(204,255,255); }
+.ff-journal-root .ff-tab-active:hover > .ff-tab-active-label,
+.ff-journal-root .ff-tab-completed:hover > .ff-tab-completed-label { color:rgb(0,36,62); }
+.ff-journal-root .ff-tab-active.retro-on > .ff-tab-active-label.retro-text,
+.ff-journal-root .ff-tab-completed.retro-on > .ff-tab-completed-label.retro-text {
+    visibility:visible; color:rgb(204,255,255);
+}
+.ff-journal-root .ff-journal-active-background-label,
+.ff-journal-root .ff-journal-completed-background-label { display:none; }
+.ff-journal-underlay {
+    position:absolute; left:2px; top:2px; right:2px; bottom:2px;
+    background-color:rgb(5,19,32);
+}
+.ff-journal-root .ff-journal-frame-label { top:0; height:14px; font-size:10px; -unity-text-align:middle-left; }
+.ff-journal-root .mission-description-copy { color:rgb(6,37,49); }
+.ff-mission-row .ff-row-objective-label {
+    -unity-font-definition:url("../Fonts/chaletbook-regular-sdf.asset");
+    -unity-text-align:middle-left;
+    font-size:11px;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+    overflow:hidden;
+}
+
+.ff-rank-location--selected > .ff-rank-location-copy,
+.ff-rank-location:hover > .ff-rank-location-copy,
+.ff-rank-location:focus > .ff-rank-location-copy,
+.ff-rank-section-caption { color:rgb(0,38,66); }
+
+/* The minimap's transform scales the timer and objective together. The timer
+   sits next to the map while the tracked mission has the space underneath. */
+.ff-race-hud {
+    position:absolute; left:-199px; top:100px; width:199px; height:64px;
+}
+.ff-race-hud-pod {
+    position:absolute; left:0; top:2px; width:37px; height:60px;
+    background-image:url('../Artwork/en/race/race_hud_pod.png');
+    -unity-background-scale-mode:scale-to-fit;
+}
+.ff-race-hud-copy {
+    position:absolute; left:41px; right:0; height:20px; font-size:14px;
+    -unity-text-align:middle-left;
+    color:rgb(255,230,31); text-shadow:1.5px 1.5px 0 black;
+}
+.ff-race-hud-count { top:2px; }
+.ff-race-hud-clock { top:22px; }
+.ff-race-hud-limit { top:42px; color:rgb(255,78,68); }
+
+.ff-chat-all, .ff-chat-active-tab { left:-40px; }
+.ff-chat-friend, .ff-chat-channel-friend .ff-chat-active-tab { left:95px; }
+.ff-chat-group, .ff-chat-channel-group .ff-chat-active-tab { left:230px; }
+.ff-chat-compact .ff-chat-friend, .ff-chat-compact.ff-chat-channel-friend .ff-chat-active-tab { left:71px; }
+.ff-chat-compact .ff-chat-group, .ff-chat-compact.ff-chat-channel-group .ff-chat-active-tab { left:182px; }
+.ff-chat-channel-all .ff-chat-all-label,
+.ff-chat-channel-friend .ff-chat-friend-label,
+.ff-chat-channel-group .ff-chat-group-label { visibility:hidden; }
+.ff-chat-empty-channel {
+    position:absolute; display:none;
+    background-image:url("../Artwork/en/gameplay/chat/empty-state-background.png");
+    -unity-background-scale-mode:stretch-to-fill;
+}
+.ff-chat-channel-empty .ff-chat-empty-channel { display:flex; }
+.ff-chat-channel-empty .ff-chat-history { display:none; }
+.ff-chat-empty-icon {
+    position:absolute; left:10px; top:15px; width:29px; height:29px;
+    background-image:url("../Artwork/en/gameplay/chat/icons/buddy.png");
+    -unity-background-scale-mode:stretch-to-fill;
+}
+.ff-chat-channel-group .ff-chat-empty-icon { background-image:url("../Artwork/en/gameplay/chat/icons/group.png"); }
+.ff-chat-empty-text {
+    position:absolute; left:50px; top:7px; right:5px; color:white; white-space:normal;
+}
+.reward-counters { position:absolute; left:50%; bottom:0; width:0; height:0; overflow:visible; transform-origin:0 0; }
+.reward-drop { position:absolute; top:0; width:178px; height:142px; display:none; -unity-background-scale-mode:stretch-to-fill; }
+.reward-drop--visible { display:flex; }
+.reward-drop--crate { left:-225px; background-image:url("../Artwork/en/gameplay/rewards/crate.png"); }
+.reward-inventory-full { left:-225px; background-image:url("../Artwork/en/gameplay/rewards/inventory-full.png"); }
+.reward-quest-notice { display:none; position:absolute; top:25%; align-self:center; font-size:14px; -unity-font-definition:url("../Fonts/jeffe-sdf.asset"); -unity-font-style:normal; -unity-text-align:middle-center; text-shadow:1px 1px 0px black; }
+.reward-quest-notice--found { color:rgb(166, 176, 255); }
+.reward-quest-notice--missing { color:rgb(234, 52, 36); }
+.reward-quest-notice--visible { display:flex; }
+.reward-drop--potion { left:-75px; background-image:url("../Artwork/en/gameplay/rewards/potion.png"); }
+.reward-drop--boost { left:75px; background-image:url("../Artwork/en/gameplay/rewards/boost.png"); }
+.reward-drop-text { position:absolute; left:0; top:110px; width:178px; height:30px; margin:0; padding:0; color:white; font-size:14px; -unity-font-definition:url("../Fonts/jeffe-sdf.asset"); -unity-text-align:middle-center; text-shadow:1px 1px 0px black; }
+.reward-counter { position:absolute; bottom:0; display:none; }
+.reward-counter--visible { display:flex; }
+.reward-counter--fusion { right:0; width:172px; height:63px; }
+.reward-counter--taros { left:0; width:170px; height:64px; }
+.reward-counter-art { position:absolute; left:0; top:0; width:100%; height:100%; }
+.reward-counter-digits { position:absolute; left:6px; top:31px; height:20px; flex-direction:row; }
+.reward-counter-digit {
+    width:10px; height:20px; margin:0 2px 0 0; padding:0;
+    color:white; font-size:14px; -unity-font-definition:url("../Fonts/jeffe-sdf.asset"); -unity-text-align:middle-center;
+}
+.nanocom-message-body { font-size: 11px; }
+.tutorial-mission-call .nanocom-message-body { font-size: 15px; white-space: normal; }

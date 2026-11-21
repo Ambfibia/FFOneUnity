@@ -13,12 +13,14 @@ namespace FFOne.World
         {
             internal float[] Times, Values, In, Out;
             internal int Pre, Post;
-            internal float Evaluate(float elapsed, float clipTime, bool material)
+            internal float Evaluate(float elapsed, float clipTime, bool material, bool racePodGlow = false)
             {
                 float time = Pre == 2 || Post == 2 ? elapsed : clipTime;
                 int last = Times.Length - 1;
                 float period = Times[last] - Times[0];
-                if (period > .00000001f && (material && (Pre == 2 || Post == 2) || time > Times[last] && Post == 2 || time < Times[0] && Pre == 2))
+                if (racePodGlow && period > .00000001f)
+                    time = Times[0] + Mathf.PingPong(elapsed * .5f, period);
+                else if (period > .00000001f && (material && (Pre == 2 || Post == 2) || time > Times[last] && Post == 2 || time < Times[0] && Pre == 2))
                     time = Times[0] + Mathf.Repeat(time - Times[0], period);
                 if (last == 0 || time <= Times[0]) return Values[0];
                 if (time >= Times[last]) return Values[last];
@@ -37,13 +39,13 @@ namespace FFOne.World
         internal sealed class Clip
         {
             internal string Id, Name; internal float Duration; internal bool Looped, ClosedMotion;
-            internal Channel[] Channels; internal FloatCurve[] Floats; internal int References;
+            internal Channel[] Channels; internal AnimationClip[] Native; internal FloatCurve[] Floats; internal int References;
         }
-        sealed class TransformTrack { internal Transform Target; internal string Property; internal Scalar[] Axes; }
+        sealed class TransformTrack { internal Transform Target; internal string Property; internal Scalar Clock; internal AnimationClip Native; }
         internal sealed class MaterialTrack
         {
             internal Material Material; internal string Property; internal int Id;
-            internal Scalar[] Axes; internal Vector4 Base; internal bool Offset, Scale, Rotation;
+            internal Scalar[] Axes; internal Vector4 Base; internal bool Offset, Scale, Rotation, RacePodGlow;
         }
         internal sealed class Player
         {
@@ -63,20 +65,17 @@ namespace FFOne.World
                 foreach (var entry in transforms)
                 {
                     if (!entry.Target) continue;
-                    float x = entry.Axes[0].Evaluate(Elapsed, trsTime, false), y = entry.Axes[1].Evaluate(Elapsed, trsTime, false), z = entry.Axes[2].Evaluate(Elapsed, trsTime, false);
-                    if (entry.Property == "translation") entry.Target.localPosition = new Vector3(-x, y, z);
-                    else if (entry.Property == "scale") entry.Target.localScale = new Vector3(x, y, z);
-                    else
-                    {
-                        float w = entry.Axes[3].Evaluate(Elapsed, trsTime, false);
-                        var rotation = new Quaternion(x, -y, -z, w);
-                        if (x*x+y*y+z*z+w*w > .00000001f) entry.Target.localRotation = rotation.normalized;
-                    }
+                    var clock = entry.Clock;
+                    float sample = clock.Pre == 2 || clock.Post == 2 ? Elapsed : trsTime;
+                    float first = clock.Times[0], last = clock.Times[clock.Times.Length-1], period = last-first;
+                    if (period > .00000001f && (sample > last && clock.Post == 2 || sample < first && clock.Pre == 2)) sample = first + Mathf.Repeat(sample-first,period);
+                    entry.Native.SampleAnimation(entry.Target.gameObject, Mathf.Clamp(sample,first,last));
+                    if (entry.Property == "rotation") entry.Target.localRotation = entry.Target.localRotation.normalized;
                 }
                 foreach (var entry in materials)
                 {
                     Vector4 value = entry.Base;
-                    for (int i = 0; i < entry.Axes.Length; i++) if (entry.Axes[i] != null) value[i] = entry.Axes[i].Evaluate(Elapsed, materialTime, true);
+                    for (int i = 0; i < entry.Axes.Length; i++) if (entry.Axes[i] != null) value[i] = entry.Axes[i].Evaluate(Elapsed, materialTime, true, entry.RacePodGlow);
                     if (entry.Offset) entry.Material.mainTextureOffset = new Vector2(value.x, value.y);
                     else if (entry.Scale) entry.Material.mainTextureScale = new Vector2(value.x, value.y);
                     else if (entry.Rotation) entry.Material.SetFloat(entry.Id, value.x);
@@ -84,17 +83,20 @@ namespace FFOne.World
                 }
             }
             static float Time(float elapsed, float duration, bool repeat) => duration <= .00000001f ? 0 : repeat ? Mathf.Repeat(elapsed, duration) : Mathf.Min(elapsed, duration);
-            internal void AddTransform(Transform target, Channel channel) => transforms.Add(new TransformTrack { Target = target, Property = channel.Property, Axes = channel.Axes });
+            internal void AddTransform(Transform target, Channel channel, AnimationClip native) => transforms.Add(new TransformTrack { Target = target, Property = channel.Property, Clock = channel.Axes[0], Native = native });
             internal void AddMaterial(MaterialTrack entry) => materials.Add(entry);
         }
         static readonly Dictionary<string, Clip> cache = new Dictionary<string, Clip>();
-        internal static Clip Acquire(JToken definition)
+        internal static Clip Acquire(JToken definition, WorldMotionBinding motion = null)
         {
             string id = (string)definition["id"];
             if (cache.TryGetValue(id, out var cached)) { cached.References++; return cached; }
             var clip = new Clip { Id = id, Name = (string)definition["name"], Duration = (float)definition["duration"],
                 Looped = (bool?)definition["looped"] ?? false, References = 1 };
             clip.Channels = (definition["channels"] ?? new JArray()).Select(CompileChannel).ToArray();
+            clip.Native = motion?.Channels ?? Array.Empty<AnimationClip>();
+            if (clip.Native.Length != clip.Channels.Length || clip.Native.Any(c => !c))
+                throw new InvalidDataException("Republish native motion clips for " + id);
             clip.Floats = (definition["floatCurves"] ?? new JArray()).Select(c => new FloatCurve { Target = (string)c["targetPath"],
                 Attribute = (string)c["attribute"], Class = (int)c["classId"], Curve = CompileScalar(c, -1) }).ToArray();
             clip.ClosedMotion = clip.Name == "nif-default" && clip.Channels.Length > 0
@@ -148,9 +150,10 @@ namespace FFOne.World
             var player = new Player { Clip = clip, Enabled = (bool?)record["enabled"] ?? true, Auto = (bool?)record["playAutomatically"] ?? true,
                 VisibleOnly = (bool?)record["animateOnlyIfVisible"] ?? false, Physics = (bool?)record["animatePhysics"] ?? false,
                 TransformRepeat = repeats, MaterialRepeat = repeats || clip.Name == "nif-default", Renderers = visibility };
-            foreach (var channel in clip.Channels)
+            for (int i = 0; i < clip.Channels.Length; i++)
             {
-                if (transforms.TryGetValue(channel.Target, out var target)) { player.AddTransform(target, channel); WorldObjectRange.MarkDynamic(target); owner.TransformChannels++; }
+                var channel = clip.Channels[i];
+                if (transforms.TryGetValue(channel.Target, out var target)) { player.AddTransform(target, channel, clip.Native[i]); WorldObjectRange.MarkDynamic(target); owner.TransformChannels++; }
                 else owner.Problem("Missing animated TRS target " + channel.Target + " in " + clip.Id);
             }
             var tracks = new Dictionary<(Material, string), MaterialTrack>();
@@ -185,7 +188,8 @@ namespace FFOne.World
                                 : scale ? (Vector4)new Vector2(material.mainTextureScale.x, material.mainTextureScale.y)
                                 : rotation ? new Vector4(material.GetFloat(property), 0, 0, 0) : material.GetVector(property);
                             track = new MaterialTrack { Material = material, Property = property, Id = Shader.PropertyToID(property),
-                                Axes = new Scalar[rotation ? 1 : offset || scale ? 2 : 4], Base = initial, Offset = offset, Scale = scale, Rotation = rotation };
+                                Axes = new Scalar[rotation ? 1 : offset || scale ? 2 : 4], Base = initial, Offset = offset, Scale = scale, Rotation = rotation,
+                                RacePodGlow = property == "_Emission" && material.name.Equals("fusion_ring-02 - defaultsssa-ring.dds", StringComparison.OrdinalIgnoreCase) };
                             tracks.Add(key, track); player.AddMaterial(track);
                         }
                         track.Axes[axis] = curve.Curve; owner.MaterialCurves++;

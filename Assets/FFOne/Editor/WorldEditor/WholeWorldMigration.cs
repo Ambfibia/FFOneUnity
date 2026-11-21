@@ -95,6 +95,7 @@ namespace FFOne.Editor
                 definition.SceneAddress="ffone/"+AssetDatabase.AssetPathToGUID(path);
                 definition.ImportedContentGuid=AssetDatabase.AssetPathToGUID(sourcePath);definition.ImportedContentSha256=EnvironmentWorldWorkspace.Hash(sourcePath);
                 definition.AuthoringNotes="Upgraded existing authoring scene in place. Object identities, poses and bindings retained. Source reimport must be staged.";
+                WorldCellPublication.Prepare(definition);
                 AssetDatabase.CreateAsset(definition,EnvironmentWorldWorkspace.DefinitionPath(id));
                 cell.Definition=definition;cell.View=null;cell.InitializeOnStart=false;
                 EnvironmentWorldWorkspace.EnsureFolder(EnvironmentWorldWorkspace.Folder(id)+"/Terrain");

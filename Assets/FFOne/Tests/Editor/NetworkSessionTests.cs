@@ -1,17 +1,134 @@
 using ContentPaths = FFOne.Content.ContentPaths;
 using System;
+using System.Collections;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using FFOne.Network;
+using FFOne.UI;
 using NUnit.Framework;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.TestTools;
+using UnityEngine.UIElements;
 
 namespace FFOne.Tests
 {
     public sealed partial class NetworkSessionTests
     {
+        [UnityTest]
+        public IEnumerator LoginFormRecoversFromInterruptedLoginAndRosterRequest()
+        {
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            yield return new EnterPlayMode();
+            var scenario = ExerciseLoginRecovery();
+            while (!scenario.IsCompleted) yield return null;
+            scenario.GetAwaiter().GetResult();
+            yield return new ExitPlayMode();
+        }
+
+        private static async Task ExerciseLoginRecovery()
+        {
+            using var fixture = new LoginFixture();
+            string endpoint = $"127.0.0.1:{fixture.Port}";
+            string directory = Path.Combine(Path.GetTempPath(), "ffone-login-recovery-" + Guid.NewGuid().ToString("N"));
+            const string profilesKey = "FFONE_DEV_PROFILES", serverKey = "FFONE_DEV_SERVER";
+            string previousProfiles = Environment.GetEnvironmentVariable(profilesKey), previousServer = Environment.GetEnvironmentVariable(serverKey);
+            Directory.CreateDirectory(directory);
+            try
+            {
+                File.WriteAllText(Path.Combine(directory, "login-profiles.json"),
+                    "{\"schema\":\"ffone.login-profiles.v1\",\"servers\":[{\"address\":\"" + endpoint + "\"}],\"selected\":0,\"accounts\":[]}");
+                Environment.SetEnvironmentVariable(profilesKey, directory);
+                Environment.SetEnvironmentVariable(serverKey, endpoint);
+                await EditorSceneManager.LoadSceneAsyncInPlayMode(FFOne.Editor.FrontendProject.ScenePath, new LoadSceneParameters(LoadSceneMode.Single));
+                FrontendController frontend = null;
+                await Until(() => {
+                    if (!frontend) frontend = UnityEngine.Object.FindAnyObjectByType<FrontendController>();
+                    return frontend && frontend.Root?.Q<Label>(className: "frontend-status") != null;
+                }, "client startup", 90);
+                var root = frontend.Root;
+                var login = root.Q(className: "ff-login-screen");
+                var submit = login.Q<Button>(className: "ff-login-submit");
+                var user = login.Q<TextField>(className: "ff-login-username");
+                var password = login.Q<TextField>(className: "ff-login-password");
+                var status = root.Q<Label>(className: "frontend-status");
+                Submit(login.Q<Button>(className: "ff-remember-account"));
+
+                void StartLogin()
+                {
+                    user.value = "tester";
+                    password.value = "test-only-password";
+                    Submit(submit);
+                    Assert.That(submit.enabledInHierarchy, Is.False, "A login should be pending.");
+                }
+                async Task ExpectLoginForm(string failure)
+                {
+                    await Until(() => login.resolvedStyle.display == DisplayStyle.Flex && submit.enabledInHierarchy &&
+                        user.enabledInHierarchy && password.enabledInHierarchy, "actionable login form after " + failure, 8);
+                    Assert.That(status.text, Does.Contain(failure));
+                    Assert.That(frontend.Session.IsLoggedIn, Is.False);
+                }
+
+                StartLogin();
+                using (await fixture.AcceptLogin()) { } // Server stops after reading LOGIN and before it replies.
+                await ExpectLoginForm("Server closed the connection");
+
+                StartLogin();
+                using (var peer = await fixture.AcceptLogin())
+                {
+                    await SendLogin(peer.GetStream(), 0, false);
+                    await Until(() => frontend.SelectionReady && login.resolvedStyle.display == DisplayStyle.None, "roster after retry", 15);
+                    frontend.Session.ReplyTimeout = TimeSpan.FromSeconds(1);
+                    // Drive the same frontend transaction wrapper without depending on a
+                    // rendered avatar or the creation cinematic in the batch Editor.
+                    var runOperation = typeof(FrontendController).GetMethod("RunOperation", BindingFlags.NonPublic | BindingFlags.Instance);
+                    Func<Task> reserveName = () => frontend.Session.ReserveCharacterNameAsync(new CharacterCreation {
+                        Slot = 1, FirstName = "Alice", LastName = "Test", Style = new CharacterStyle { Gender = 1 }
+                    });
+                    var operation = (Task)runOperation.Invoke(frontend, new object[] { reserveName, "Checking character name" });
+                    var request = Protocol0104.DecodeFrame(await ReadFrame(peer.GetStream()), LoginFixture.EmptyKey, 1);
+                    Assert.That(request.PacketType, Is.EqualTo(PacketId.CheckName));
+                    await ExpectLoginForm("Server reply timed out");
+                    await operation;
+                }
+
+                StartLogin();
+                using (var peer = await fixture.AcceptLogin())
+                {
+                    await SendLogin(peer.GetStream(), 0, false);
+                    await Until(() => frontend.SelectionReady && login.resolvedStyle.display == DisplayStyle.None, "empty roster after reconnect", 60);
+                }
+                await ExpectLoginForm("Server closed the connection");
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable(profilesKey, previousProfiles);
+                Environment.SetEnvironmentVariable(serverKey, previousServer);
+                Directory.Delete(directory, true);
+            }
+        }
+
+        private static void Submit(Button button)
+        {
+            Assert.That(button, Is.Not.Null);
+            Assert.That(button.enabledInHierarchy, Is.True);
+            using var submit = NavigationSubmitEvent.GetPooled();
+            submit.target = button;
+            button.SendEvent(submit);
+        }
+
+        private static async Task Until(Func<bool> condition, string stage, int seconds)
+        {
+            float deadline = Time.realtimeSinceStartup + seconds;
+            while (!condition() && Time.realtimeSinceStartup < deadline) await Task.Yield();
+            Assert.That(condition(), Is.True, stage);
+        }
+
         [Test]
         public async Task FragmentedLoginAndCoalescedRosterServiceHeartbeatWithContinuousSequence()
         {
@@ -140,6 +257,23 @@ namespace FFOne.Tests
             internal int Port => ((IPEndPoint)listener.LocalEndpoint).Port;
             internal LoginFixture() { listener.Start(); }
             internal Task<TcpClient> Accept() => listener.AcceptTcpClientAsync();
+            internal async Task<TcpClient> AcceptLogin()
+            {
+                using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(8));
+                using var stop = deadline.Token.Register(listener.Stop);
+                while (true)
+                {
+                    var peer = await Accept();
+                    try
+                    {
+                        var request = Protocol0104.DecodeFrame(await ReadFrame(peer.GetStream()), Protocol0104.DefaultKey, 0);
+                        Assert.That(request.PacketType, Is.EqualTo(PacketId.Login));
+                        return peer;
+                    }
+                    catch (EndOfStreamException) { peer.Dispose(); } // Login browser health probe.
+                    catch { peer.Dispose(); throw; }
+                }
+            }
             public void Dispose() => listener.Stop();
         }
 

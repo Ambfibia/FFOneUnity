@@ -9,17 +9,18 @@ namespace FFOne.Tutorial
     public sealed partial class TutorialCinematics
     {
         sealed class Move { public Transform Actor; public Vector3 Target; public float Speed; }
-        sealed class Sequence
+        internal sealed class Sequence
         {
             public readonly JToken Data;
             public readonly float Start;
             public int LastFrame = -1;
+            public float TimeScale = 1;
             public Vector3 Origin;
             public bool CapturedOrigin;
             public Sequence(JToken data, float start) { Data = data; Start = start; }
         }
         string cameraMode = "None";
-        Vector3 cameraStart, cameraTarget, cameraCurrentTarget, cameraPosition, shakeStart, shakeTarget;
+        Vector3 cameraStart, cameraTarget, cameraCurrentTarget, cameraPosition, storedPosition, shakeStart, shakeTarget;
         Quaternion cameraRotation;
         float cameraDistance = 5;
         bool forward = true, hasStart, hasTarget;
@@ -29,6 +30,7 @@ namespace FFOne.Tutorial
             cameraMode = "None"; hasStart = hasTarget = false; forward = true; cameraDistance = 5;
             var transform = owner.ViewCamera.transform;
             cameraPosition = cameraStart = transform.position; cameraRotation = transform.rotation;
+            storedPosition = cameraPosition;
             cameraTarget = cameraCurrentTarget = transform.position + transform.forward * 5;
             shakeStart = shakeTarget = Vector3.zero;
         }
@@ -43,7 +45,7 @@ namespace FFOne.Tutorial
                 case "Target": cameraTarget = expressions.Position(arg); hasTarget = true; shakeTarget = Vector3.zero; break;
                 case "FreezeCurrentTarget": cameraTarget = cameraCurrentTarget; hasTarget = true; shakeTarget = Vector3.zero; break;
                 case "Start": cameraStart = expressions.Position(arg); hasStart = true; shakeStart = Vector3.zero; break;
-                case "StoredStart": cameraPosition = expressions.Position(arg); break;
+                case "StoredStart": storedPosition = expressions.Position(arg); break;
                 case "TargetRotation": cameraRotation = expressions.Rotation(arg, owner.ViewCamera.transform.position); break;
                 case "Distance": cameraDistance = (float)arg; break;
                 case "ForwardInterpolation": forward = (bool)arg; break;
@@ -55,57 +57,73 @@ namespace FFOne.Tutorial
 
         void Advance(float delta)
         {
+            owner.TickVoiceSubtitles(delta);
+            owner.StepCinematicPlayer(delta);
             foreach (var pair in moves.ToArray())
             {
                 var motion = pair.Value;
                 if (!motion.Actor) { moves.Remove(pair.Key); continue; }
-                var direction = motion.Target - motion.Actor.position;
+                var actor = motion.Actor.GetComponent<TutorialActor>();
+                if (actor && (actor.ForceUpdate || actor.Class >= 100)) { moves.Remove(pair.Key); continue; }
+                var target = motion.Target;
+                target.y = motion.Actor.position.y;
+                var direction = target - motion.Actor.position;
                 if (direction.sqrMagnitude > .0001f)
                 {
                     direction.y = 0;
                     if (direction.sqrMagnitude > .0001f) motion.Actor.rotation = Quaternion.LookRotation(direction);
-                    motion.Actor.position = Vector3.MoveTowards(motion.Actor.position, motion.Target, motion.Speed * delta);
+                    motion.Actor.position = Vector3.MoveTowards(motion.Actor.position, target, motion.Speed * delta);
                 }
-                if ((motion.Target - motion.Actor.position).sqrMagnitude < .0001f) moves.Remove(pair.Key);
+                if ((target - motion.Actor.position).sqrMagnitude < .0001f)
+                {
+                    moves.Remove(pair.Key);
+                    if (IsPlayingLocomotion(motion.Actor.gameObject))
+                        AnimateLocomotionEnd(motion.Actor.gameObject, motion.Speed > 4);
+                }
             }
-            SampleSequences(elapsed + delta);
+            foreach (var clip in clips) if (clip.Fired) clip.Sample(sequenceSampleTime);
             float amount = Mathf.Clamp01(delta);
             if (cameraMode == "FromToCamera")
             {
-                if (hasStart) cameraPosition = forward ? Vector3.Lerp(cameraPosition, cameraStart, amount) : cameraStart;
+                if (hasStart)
+                {
+                    storedPosition = forward ? Vector3.Lerp(storedPosition, cameraStart, amount) : cameraStart;
+                    cameraPosition = storedPosition;
+                }
                 if (hasTarget) cameraCurrentTarget = forward ? Vector3.Lerp(cameraCurrentTarget, cameraTarget, amount) : cameraTarget;
             }
             else if (cameraMode == "EventCameraControl" && hasTarget)
             {
                 if (forward)
                 {
+                    storedPosition = cameraTarget;
                     cameraPosition = Vector3.Lerp(cameraPosition, cameraTarget - cameraRotation * Vector3.forward * cameraDistance, amount);
                     cameraCurrentTarget = cameraTarget;
                 }
                 else
                 {
-                    cameraCurrentTarget = Vector3.Lerp(cameraCurrentTarget, cameraTarget, amount);
+                    storedPosition = Vector3.Lerp(storedPosition, cameraTarget, amount);
+                    cameraCurrentTarget = storedPosition;
                     cameraPosition = cameraCurrentTarget - cameraRotation * Vector3.forward * cameraDistance;
                 }
             }
             if (cameraMode != "None")
             {
                 var transform = owner.ViewCamera.transform;
-                transform.position = cameraPosition + shakeStart;
+                transform.position = owner.ConstrainCinematicCamera(cameraPosition + shakeStart,
+                    cameraCurrentTarget + shakeTarget, definition ? definition.CameraCollisionRadius : 0);
                 transform.rotation = Look(transform.position, cameraCurrentTarget + shakeTarget);
             }
         }
 
-        void SampleSequences(float time)
+        void SampleSequence(Sequence sequence, float localTime)
         {
-            foreach (var sequence in sequences.ToArray())
-            {
                 var data = sequence.Data;
                 string kind = Kind(data);
                 if (kind == "Fade") data = Arg(data);
                 float step = (float?)data["seconds_per_frame"] ?? (float?)data["seconds_per_step"] ?? (float?)data["seconds_per_character"] ?? 1;
                 int count = (int?)data["frames"] ?? (int?)data["steps"] ?? (int?)data["canonical_english_chars"] ?? 1;
-                int frame = step <= 0 ? count - 1 : Mathf.Clamp(Mathf.FloorToInt((time - sequence.Start + .000001f) / step), 0, count - 1);
+                int frame = step <= 0 ? count - 1 : Mathf.Clamp(Mathf.FloorToInt((localTime + .000001f) / step), 0, count - 1);
                 if (frame != sequence.LastFrame)
                 {
                     switch (kind)
@@ -133,7 +151,7 @@ namespace FFOne.Tutorial
                             RequiredActor((int)data["id"]).transform.position = Vector3.LerpUnclamped(Vector(data["from"]), Vector(data["to"]), (frame + (int)data["numerator_offset"]) / (float)data["denominator"]);
                             break;
                         case "CameraShake":
-                            float sampleTime = sequence.Start + frame * step;
+                            float sampleTime = sequence.Start + frame * step * sequence.TimeScale;
                             shakeStart = Shake(data["start_wave"], sampleTime, (float)data["amplitude"]);
                             shakeTarget = Shake(data["target_wave"], sampleTime, (float)data["amplitude"]);
                             break;
@@ -145,8 +163,6 @@ namespace FFOne.Tutorial
                     }
                     sequence.LastFrame = frame;
                 }
-                if (time - sequence.Start >= count * step) sequences.Remove(sequence);
-            }
         }
         static Vector3 Shake(JToken wave, float time, float amplitude) => amplitude * new Vector3(
             Mathf.Sin(time * (float)wave["x_sin_multiplier"]),

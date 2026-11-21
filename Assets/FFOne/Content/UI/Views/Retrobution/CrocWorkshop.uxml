@@ -1,0 +1,56 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+  <ui:VisualElement name="croc-panel" class="retro-control croc-panel" picking-mode="Ignore">
+    <ui:VisualElement name="croc-background" class="ff-artwork croc-background" picking-mode="Ignore" />
+    <ui:Image name="croc-npc" class="retro-control croc-npc" scale-mode="StretchToFill" picking-mode="Ignore" />
+    <ui:Label name="croc-title" class="retro-control ff-label croc-copy croc-title" picking-mode="Ignore" enable-rich-text="false" />
+    <ui:Label name="croc-intro" class="retro-control ff-label croc-copy croc-copy--body croc-intro" picking-mode="Ignore" enable-rich-text="false" />
+    <ui:Label name="croc-style-caption" class="retro-control ff-label croc-copy croc-style-caption" picking-mode="Ignore" enable-rich-text="false" />
+    <ui:Label name="croc-stats-caption" class="retro-control ff-label croc-copy croc-stats-caption" picking-mode="Ignore" enable-rich-text="false" />
+    <ui:Label name="croc-new" class="retro-control ff-label croc-copy croc-new" picking-mode="Ignore" enable-rich-text="false" />
+    <ui:Label name="croc-cost" class="retro-control ff-label croc-copy croc-cost" picking-mode="Ignore" enable-rich-text="false" />
+    <ui:Label name="croc-taros" class="retro-control ff-label croc-copy croc-taros" picking-mode="Ignore" enable-rich-text="false" />
+    <ui:VisualElement name="croc-wallet-icon" class="ff-artwork croc-wallet-icon" picking-mode="Ignore" />
+    <ui:Label name="croc-chance-title" class="retro-control ff-label croc-copy croc-chance-title" picking-mode="Ignore" enable-rich-text="false" />
+    <ui:Label name="croc-chance" class="retro-control ff-label croc-copy croc-chance" picking-mode="Ignore" enable-rich-text="false" />
+    <ui:VisualElement name="croc-looks-selection" class="retro-control croc-looks-selection" picking-mode="Ignore">
+      <ui:VisualElement name="looks-back" class="ff-artwork looks-back" picking-mode="Ignore" />
+      <ui:Label name="looks-empty" class="retro-control ff-label croc-copy croc-copy--body croc-copy--center looks-empty" picking-mode="Ignore" enable-rich-text="false" />
+      <ui:Image name="looks-selected-icon" class="retro-control looks-selected-icon" scale-mode="StretchToFill" picking-mode="Ignore" />
+      <ui:Label name="looks-name" class="retro-control ff-label croc-copy croc-copy--body looks-name" picking-mode="Ignore" enable-rich-text="false" />
+      <ui:Label name="looks-level" class="retro-control ff-label croc-copy looks-level" picking-mode="Ignore" enable-rich-text="false" />
+      <ui:Label name="looks-description" class="retro-control ff-label croc-copy croc-copy--body looks-description" picking-mode="Ignore" enable-rich-text="false" />
+      <ui:Button name="croc-looks" class="retro-control ff-button croc-drop-area croc-looks" />
+      <ui:Button name="croc-looks-drop" class="retro-control ff-button croc-drop-area croc-looks-drop" />
+    </ui:VisualElement>
+    <ui:VisualElement name="croc-stats-selection" class="retro-control croc-stats-selection" picking-mode="Ignore">
+      <ui:VisualElement name="stats-back" class="ff-artwork stats-back" picking-mode="Ignore" />
+      <ui:Label name="stats-empty" class="retro-control ff-label croc-copy croc-copy--body croc-copy--center stats-empty" picking-mode="Ignore" enable-rich-text="false" />
+      <ui:Image name="stats-selected-icon" class="retro-control stats-selected-icon" scale-mode="StretchToFill" picking-mode="Ignore" />
+      <ui:Label name="stats-name" class="retro-control ff-label croc-copy croc-copy--body stats-name" picking-mode="Ignore" enable-rich-text="false" />
+      <ui:Label name="stats-level" class="retro-control ff-label croc-copy stats-level" picking-mode="Ignore" enable-rich-text="false" />
+      <ui:Label name="stats-description" class="retro-control ff-label croc-copy croc-copy--body stats-description" picking-mode="Ignore" enable-rich-text="false" />
+      <ui:Button name="croc-stats" class="retro-control ff-button croc-drop-area croc-stats" />
+      <ui:Button name="croc-stats-drop" class="retro-control ff-button croc-drop-area croc-stats-drop" />
+    </ui:VisualElement>
+    <ui:Button name="croc-clear" class="retro-control ff-button croc-action croc-clear" />
+    <ui:Button name="croc-combine" class="retro-control ff-button croc-action croc-combine" />
+  </ui:VisualElement>
+  <ui:VisualElement name="croc-overlay" class="retro-control croc-overlay">
+    <ui:VisualElement name="croc-shade" class="ff-artwork croc-shade" picking-mode="Ignore" />
+    <ui:VisualElement name="croc-wait" class="retro-control croc-wait" picking-mode="Ignore">
+      <ui:VisualElement name="croc-wait-art" class="ff-artwork croc-wait-art" picking-mode="Ignore" />
+      <ui:Image name="croc-waiting-npc" class="retro-control croc-waiting-npc" scale-mode="StretchToFill" picking-mode="Ignore" />
+    </ui:VisualElement>
+    <ui:VisualElement name="croc-success" class="retro-control croc-success" picking-mode="Ignore">
+      <ui:VisualElement name="croc-result-art" class="ff-artwork croc-result-art" picking-mode="Ignore" />
+      <ui:VisualElement name="croc-result-npc" class="ff-artwork croc-result-npc" picking-mode="Ignore" />
+      <ui:Label name="croc-result-title" class="retro-control ff-label croc-copy croc-copy--center croc-result-title" picking-mode="Ignore" enable-rich-text="false" />
+      <ui:Label name="croc-result-message" class="retro-control ff-label croc-copy croc-copy--body croc-result-message" picking-mode="Ignore" enable-rich-text="false" />
+      <ui:Image name="result-icon" class="retro-control result-icon" scale-mode="StretchToFill" picking-mode="Ignore" />
+      <ui:Label name="result-name" class="retro-control ff-label croc-copy croc-copy--body result-name" picking-mode="Ignore" enable-rich-text="false" />
+      <ui:Label name="croc-result-description" class="retro-control ff-label croc-copy croc-copy--body croc-result-description" picking-mode="Ignore" enable-rich-text="false" />
+      <ui:Button name="combine-more" class="retro-control ff-button croc-action combine-more" />
+      <ui:Button name="my-stuff" class="retro-control ff-button croc-action my-stuff" />
+    </ui:VisualElement>
+  </ui:VisualElement>
+</ui:UXML>

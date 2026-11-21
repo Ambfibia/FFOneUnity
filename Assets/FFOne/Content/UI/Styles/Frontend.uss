@@ -36,3 +36,42 @@
 .character-creation .creation-exit:hover, .character-creation .creation-exit:focus, .character-creation .creation-exit:active {
     color: rgb(165, 192, 192);
 }
+
+.frontend-root { background-color:black; }
+
+.ff-loading, .ff-loading-background { position:absolute; left:0; top:0; right:0; bottom:0; }
+.ff-loading { background-color:black; overflow:hidden; }
+.ff-loading-window {
+    position:absolute; width:509px; height:309px; transform-origin:0 0;
+    background-image:url('../Artwork/en/gameplay/loading/loadingwindow.png');
+    -unity-slice-left:4; -unity-slice-right:4; -unity-slice-top:3; -unity-slice-bottom:3;
+    -unity-background-scale-mode:stretch-to-fill;
+}
+.ff-loading--ru .ff-loading-window { background-image:url('../Artwork/ru/gameplay/loading/loadingwindow.png'); }
+.ff-loading-tip {
+    position:absolute; left:120px; top:62px; width:350px; height:112px; padding-right:15px;
+    -unity-font-definition:url('../Fonts/chaletbook-regular-sdf.asset');
+    -unity-text-align:upper-left; color:rgb(28,54,100); font-size:14px;
+}
+.ff-loading-caption, .ff-loading-resource {
+    position:absolute; left:29px; width:450px; height:19px;
+    -unity-text-align:middle-center; color:rgb(183,218,221);
+}
+.ff-loading-caption { top:236px; }
+.ff-loading-resource { top:196px; }
+.ff-loading-bar-clip { position:absolute; left:30px; width:448px; height:17px; overflow:hidden; }
+.ff-loading-bar-fill {
+    position:absolute; left:0; top:0; width:15px; height:17px;
+    background-image:url('../Artwork/en/gameplay/loading/loadingbar.png');
+    -unity-slice-left:3; -unity-slice-right:8; -unity-slice-top:2; -unity-slice-bottom:2;
+    -unity-background-scale-mode:stretch-to-fill;
+}
+
+.ff-login-art, .ff-login-panel { -unity-background-scale-mode:stretch-to-fill; }
+.ff-login-art { background-image:url('../Artwork/en/launcher/login/login_screen_bg_16x10.png'); }
+.ff-login-panel {
+    background-image:url('../Artwork/en/launcher/login/login_screen_button_bg.png');
+    -unity-slice-left:8; -unity-slice-right:8; -unity-slice-top:18; -unity-slice-bottom:8;
+}
+
+.ff-pad-focus { border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; border-color: rgb(70, 204, 255); }

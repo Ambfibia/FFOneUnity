@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using FFOne.Integration;
+using FFOne.Content;
 using FFOne.Network;
 using FFOne.World;
 using Newtonsoft.Json;
@@ -20,8 +21,9 @@ namespace FFOne.UI
         internal async Task LiveBuffLogin(int port, string account = "unitybuffa")
         {
             await Session.LoginAsync("127.0.0.1", port, account, "test-only-password", lifetime.Token);
-            ShowSelection(); SelectRosterSlot(1); await EnterSelectedWorldAsync();
+            await EnterLiveFixtureWorld();
         }
+        internal void LiveCastActiveNano() => UseActiveNanoSkill();
     }
     public sealed partial class GameplayUiController
     {
@@ -68,7 +70,10 @@ namespace FFOne.UI
                 plan = JsonConvert.DeserializeObject<Plan>(File.ReadAllText(Environment.GetEnvironmentVariable("FFONE_BUFF_PLAN")));
                 var endpoint = LoginServer.Parse(Environment.GetEnvironmentVariable(DevelopmentConnection.ServerVariable)).Endpoint;
                 if (!endpoint.IsLoopback) throw new InvalidOperationException("Buff acceptance requires loopback.");
-                await Wait(() => (frontend = FindFirstObjectByType<FrontendController>()) && frontend.Root?.panel != null, "native buff frontend ready");
+                await Wait(() => (frontend = FindFirstObjectByType<FrontendController>()) && frontend.LiveFrontendReady, "native buff frontend ready");
+                bool healthScenario = Environment.GetCommandLineArgs().Contains("--player-health");
+                if (healthScenario && Environment.GetEnvironmentVariable("FFONE_TEST_PROFILE_BUNDLE") is string bundlePath)
+                    await LoadInspectionProfiles(bundlePath);
                 await frontend.LiveBuffLogin(endpoint.Port); frontend.NetworkEventReceived += Observe;
                 Check(Protocol0104.Read16(frontend.Session.World.RawLoadData, 0) == 99, "native buffs retain normal account privilege99");
                 frontend.LiveWorld.Replicas.ContentError += failures.Add;
@@ -86,6 +91,13 @@ namespace FFOne.UI
                 await Wait(() => peerFrames.Any(f => f.PacketType == ProtocolSocial.Invite), "native buff group invitation reaches peer");
                 await observer.AnswerGroupAsync(frontend.Session.World.PlayerId, true);
                 await Wait(() => frames.Any(f => f.PacketType == ProtocolSocial.Join), "native buff group membership reaches frontend");
+                if (healthScenario || Environment.GetCommandLineArgs().Contains("--nano-targets") || Environment.GetCommandLineArgs().Contains("--combat-audio"))
+                {
+                    if (healthScenario) await ExercisePlayerHealth();
+                    else if (Environment.GetCommandLineArgs().Contains("--nano-targets")) await ExerciseNanoTargets();
+                    else await ExerciseCombatAudio(endpoint.Port);
+                    await observer.LeaveWorldAsync(); await frontend.LiveExit(); Write(true, null); Application.Quit(0); return;
+                }
                 await RenderClosures();
                 foreach (var item in plan.passives) await Passive(item);
                 await GroupLifecycle();
@@ -94,7 +106,7 @@ namespace FFOne.UI
                 foreach (var item in plan.items.Where(i => i.item != 126).OrderBy(i => i.item == 122 ? 1 : 0)) await UseItem(item);
                 await Nano(33);
                 await Wait(() => frontend.LiveWorld.Buffs.Value(15) == 500, "real stronger CashItem RewardBlob500 wins over weaker active Nano33 source");
-                Check(!string.IsNullOrEmpty(frontend.Root.Q<VisualElement>("buff-15")?.Q<Label>("remaining")?.text),
+                Check(!string.IsNullOrEmpty(frontend.Root.Q<VisualElement>("buff-15")?.Q<Label>(className: "gameplay-buff-timer")?.text),
                     "real authored timed item source displays its server duration in the native buff HUD");
                 await CheckVisibleIcon(15, "reward-strong-cash-item-hud");
                 Capture("reward-strong-cash-item-stack");
@@ -102,7 +114,7 @@ namespace FFOne.UI
                 var reward = plan.passives.Single(c => c.nano == 33);
                 await Wait(() => frontend.LiveWorld.Buffs.Has(15) && frontend.LiveWorld.Buffs.Value(15) == (frontend.LiveWorld.Buffs.Has(21) ? reward.boostedValue : reward.value),
                     "real stronger item expiry applies Change to surviving authored Nano value", 20);
-                Check(frontend.Root.Q<VisualElement>("buff-15")?.Q<Image>("icon")?.image != null,
+                Check(BuffIcon(15)?.image != null,
                     "stronger source expiry retains the weaker source buff HUD icon");
                 await CheckVisibleIcon(15, "reward-surviving-nano-hud");
                 Capture("reward-surviving-nano-stack");
@@ -135,11 +147,223 @@ namespace FFOne.UI
             // into its clear western approach before motor/VFX acceptance.
             await frontend.LiveMoveTo(631632, 187177, -5500);
         }
+        Image BuffIcon(int id) => frontend.Root.Q<VisualElement>("buff-" + id)?.Q<Image>(className: "gameplay-buff-icon");
+
+        async Task ExerciseNanoTargets()
+        {
+            var panel = frontend.Root.Q<VisualElement>(className: "gameplay-detectors");
+            var copy = panel.Q<Label>(className: "gameplay-detector-copy");
+            foreach (var item in plan.passives.Where(p => p.buff == 13 || p.buff == 14))
+            {
+                await Nano(item.nano);
+                string label = item.buff == 14 ? "E.G.G." : frontend.LiveWorld.Replicas.Actors.First(a => a.Hostile && a.Entity.NpcType == 59).Definition.Name;
+                await Wait(() => !panel.ClassListContains("ui-suppressed") && copy.text.Contains(label),
+                    "detector " + item.buff + " displays a live " + label + " interest");
+                int effect = GameplayUiCatalog.Load().BuffEffect(item.buff, true);
+                await Effect(frontend.LiveWorld.Player, effect, "detector-" + item.buff + "-pulse");
+                await CaptureHud("detector-" + item.buff + "-active");
+                await Wait(() => !frontend.LiveWorld.Player.GetComponentsInChildren<NativeCombatEffect>(true).Any(e => e.name == "Native combat ES" + effect),
+                    "one-shot detector effect ES" + effect + " expires while the detector still lists its target", 10);
+                await frontend.Session.ActivateNanoAsync(-1);
+                await Wait(() => !frontend.LiveWorld.Buffs.Has(item.buff) && panel.resolvedStyle.display == DisplayStyle.None &&
+                    !frontend.LiveWorld.Player.GetComponentsInChildren<NativeCombatEffect>(true).Any(e => e.name == "Native combat ES" + effect),
+                    "detector " + item.buff + " hides its list and clears its flag and effect ES" + effect + " after withdrawal");
+                await CaptureHud("detector-" + item.buff + "-withdrawn");
+            }
+            await Nano(16);
+            var world = frontend.LiveWorld;
+            var mobs = world.Replicas.Actors.Where(a => a.Hostile && a.Entity.NpcType == 59 && a.Entity.Hp > 0).ToArray();
+            var skill = WorldSkillCatalog.Load().Find(46);
+            var target = mobs.OrderByDescending(a => mobs.Count(b => Vector3.Distance(a.transform.position, b.transform.position) < skill.Area))
+                .ThenBy(a => a.Entity.X).First();
+            await frontend.LiveMoveTo(target.Entity.X - 650, target.Entity.Y, target.Entity.Z);
+            var before = world.Replicas.Actors.Where(a => a.Hostile && a.Entity.Hp > 0).ToDictionary(a => a.Entity.Id, a => a.Entity.Hp);
+            var center = target.GetComponent<Collider>().bounds.center;
+            var muzzle = world.Player.position + Vector3.up;
+            world.View.transform.SetPositionAndRotation(muzzle, Quaternion.LookRotation(center - muzzle));
+            target = world.Target(skill.Range + 3);
+            Check(target && target.Hostile && mobs.Any(m => m != target && Vector3.Distance(target.transform.position, m.transform.position) < skill.Area),
+                "crosshair acquires a real hostile Nano target with a second mob within its authored area");
+            int first = frames.Count, peerFirst = peerFrames.Count;
+            frontend.LiveCastActiveNano();
+            await Wait(() => frames.Skip(first).Any(f => f.PacketType == ProtocolNanoSkill.Success) &&
+                peerFrames.Skip(peerFirst).Any(f => f.PacketType == ProtocolNanoSkill.Broadcast), "offensive Nano input reaches owner and observer");
+            ProtocolNanoSkill.TryDecode(frames.Last(f => f.PacketType == ProtocolNanoSkill.Success), out var own);
+            ProtocolNanoSkill.TryDecode(peerFrames.Last(f => f.PacketType == ProtocolNanoSkill.Broadcast), out var peer);
+            transactions.Add(new { skill = own.SkillId, own.Stamina, focus = target.Entity.Id,
+                hits = own.Effects.Select(e => new { e.Id, e.Kind, previous = before.TryGetValue(e.Id, out int hp) ? hp : -1, e.Hp }).ToArray(),
+                observerHits = peer.Effects.Select(e => new { e.Id, e.Hp }).ToArray() });
+            Check(own.SkillId == 46 && peer.SkillId == own.SkillId && own.Stamina < 150 && own.Effects.Count >= 2 && own.Effects.Count <= 3 &&
+                own.Effects.Any(e => e.Id == target.Entity.Id) && own.Effects.All(e => e.Kind == WorldEntityKind.Npc && before.TryGetValue(e.Id, out var hp) &&
+                    e.Hp < hp && peer.Effects.Any(p => p.Id == e.Id && p.Hp == e.Hp)),
+                "area damage reduces HP for the focus and nearby mobs with one authoritative stamina cost and matching observer receipts");
+            Capture("offensive-nano-area");
+        }
+
+        async Task LoadInspectionProfiles(string path)
+        {
+            var bundle = AssetBundle.LoadFromFile(path);
+            Check(bundle != null, "opened the separate animation profile publication");
+            try
+            {
+                foreach (string gender in new[] { "male", "female" })
+                {
+                    string assetPath = "assets/ffone/content/characters/humanoids/animation/profiles/" + gender + "-profile.asset";
+                    var profile = bundle.LoadAsset<NativePlayerAnimationProfile>(assetPath);
+                    Check(profile && profile.Controller && profile.ClipNames.Contains("woundupper"), gender + " publication contains woundupper");
+                    var cached = await ContentAssets.GetAsync<NativePlayerAnimationProfile>(NativePlayerAnimator.ProfileAddress(gender), default);
+                    cached.Controller = profile.Controller;
+                    cached.ClipNames = profile.ClipNames;
+                }
+            }
+            finally { bundle.Unload(false); }
+        }
+
+        async Task ExercisePlayerHealth()
+        {
+            var world = frontend.LiveWorld;
+            var motion = world.Player.GetComponent<NativeAvatarPreview>().PlayerAnimation;
+            var animator = motion.Animator;
+            Check(motion.Supports("woundupper") && Mathf.Abs(motion.Duration("woundupper") - .466667f) < .001f,
+                "actual equipped player rig contains the original 0.4667 second woundupper clip");
+            Capture("player-before-damage");
+            int initialHp = frontend.LiveState.Snapshot.Hp, start = frames.Count;
+            var mob = world.Replicas.Actors.Where(a => a.Hostile && a.Entity.NpcType == 59 && a.Entity.Hp > 0)
+                .OrderBy(a => Mathf.Abs(a.Entity.X - 632932)).First();
+            await frontend.LiveMoveTo(mob.Entity.X - 80, mob.Entity.Y, mob.Entity.Z);
+            await frontend.Session.AttackNpcsAsync(new[] { mob.Entity.Id });
+            int hp = initialHp;
+            string lower = null;
+            float upperWeight = 0;
+            int inspectedFrames = start;
+            var incoming = new List<object>();
+            var samples = new List<object>();
+            var packetCounts = new Dictionary<uint, int>();
+            float started = Time.realtimeSinceStartup, nextSample = 0;
+            bool receivedHit = false, belowInitialHp = false;
+            int ownerId = frontend.Session.World.PlayerId;
+            try
+            {
+            await Wait(() =>
+            {
+                var state = animator.GetCurrentAnimatorStateInfo(1);
+                var upperClips = animator.GetCurrentAnimatorClipInfo(1);
+                upperWeight = upperClips.Where(c => c.clip && c.clip.name == "woundupper").Sum(c => c.weight);
+                lower = animator.GetCurrentAnimatorClipInfo(0).Concat(animator.GetNextAnimatorClipInfo(0))
+                    .Where(c => c.clip && c.weight > 0).OrderByDescending(c => c.weight).Select(c => c.clip.name).FirstOrDefault();
+                bool woundState = state.IsName(NativePlayerAnimator.UpperLayer + ".woundupper");
+                bool freshHit = false;
+                float elapsed = Time.realtimeSinceStartup - started;
+                for (; inspectedFrames < frames.Count; inspectedFrames++)
+                {
+                    var frame = frames[inspectedFrames];
+                    packetCounts.TryGetValue(frame.PacketType, out int count);
+                    packetCounts[frame.PacketType] = count + 1;
+                    if (!ProtocolGameplay.TryCombat(frame, out var combat)) continue;
+                    foreach (var hit in combat.Hits)
+                    {
+                        incoming.Add(new { elapsed, wire = frame.PacketType.ToString("x"), combat.AttackerId, combat.AttackerKind, hit.Id, hit.Kind, hit.Hp, hit.Damage });
+                        if (combat.AttackerKind != WorldEntityKind.Npc || hit.Id != ownerId || hit.Kind != WorldEntityKind.Player || hit.Hp <= 0) continue;
+                        freshHit = true; receivedHit |= hit.Damage > 0; belowInitialHp |= hit.Hp < initialHp;
+                    }
+                }
+                if (freshHit || elapsed >= nextSample || woundState)
+                {
+                    nextSample = elapsed + .20f;
+                    var next = animator.GetNextAnimatorStateInfo(1);
+                    samples.Add(new { elapsed, hp = frontend.LiveState.Snapshot.Hp, receivedHit, belowInitialHp, freshHit, woundState, state.normalizedTime,
+                        upper = state.shortNameHash, next = next.shortNameHash, weight = animator.GetLayerWeight(1), upperWeight, lower,
+                        currentClips = upperClips.Where(c => c.clip).Select(c => new { c.clip.name, c.weight }).ToArray(),
+                        nextClips = animator.GetNextAnimatorClipInfo(1).Where(c => c.clip).Select(c => new { c.clip.name, c.weight }).ToArray(),
+                        distance = mob ? Vector3.Distance(mob.transform.position, world.Player.position) : -1,
+                        targetHp = mob ? mob.Entity.Hp : -1, world.Ziplining, world.Riding, world.PersonalVehicleMounted });
+                }
+                if (!belowInitialHp || !woundState || state.normalizedTime < .12f || upperWeight < .01f || animator.GetLayerWeight(1) <= .5f || lower == null) return false;
+                hp = frontend.LiveState.Snapshot.Hp;
+                Capture("player-woundupper");
+                return true;
+            }, "source mob inflicts a nonlethal hit and the equipped player plays the weighted upper-body wound", 40);
+            }
+            finally
+            {
+                File.WriteAllText(Path.Combine(directory, "wound-observations.json"), JsonConvert.SerializeObject(new {
+                    initialHp, ownerId, mobId = mob ? mob.Entity.Id : 0, states = new { wound = Animator.StringToHash("woundupper"), empty = Animator.StringToHash("Empty") },
+                    packetCounts, hits = incoming, samples }, Formatting.Indented));
+            }
+            Check(lower != "woundupper", "a real locomotion clip still drives the lower body");
+            await frontend.LiveMoveTo(629232, 187177, -5500);
+            await Wait(() => animator.GetCurrentAnimatorStateInfo(1).IsName(NativePlayerAnimator.UpperLayer + ".Empty") &&
+                animator.GetLayerWeight(1) < .01f, "authored wound finishes and releases the upper body", 8);
+            Capture("player-after-damage");
+            transactions.Add(new { initialHp, hpAfterHit = hp, upper = "woundupper", upperWeight, lower, duration = motion.Duration("woundupper") });
+        }
+
+        async Task ExerciseCombatAudio(int port)
+        {
+            var audio = FindFirstObjectByType<RetrobutionAudioController>();
+            var tap = audio.UiEffects.gameObject.AddComponent<NanoAudioSourceTap>();
+            var cues = new Dictionary<string, NanoAudioRecording>();
+            var voices = new List<(string address, NanoAudioRecording recording)>();
+            NativeAvatarPreview actor = null;
+            NanoAudioSourceTap voiceTap = null;
+            void Record(string address)
+            {
+                if (address is not ("audio/sfx/ui/action_failure01" or "audio/sfx/world_events/resurrectm_warp")) return;
+                var recording = new NanoAudioRecording(AudioSettings.outputSampleRate);
+                cues[address] = recording;
+                tap.Recording = recording;
+            }
+            audio.UiCuePlayed += Record;
+            try
+            {
+                Check(frontend.LiveState.Snapshot.Equipment[ProtocolVehicle.EquipmentSlot].IsEmpty, "mount audio fixture has no equipped vehicle");
+                await frontend.LiveUi.ToggleVehicle();
+                await Recorded("audio/sfx/ui/action_failure01");
+                Check(!frontend.LiveState.Snapshot.VehicleMounted, "rejected mount leaves the player on foot");
+                await Phoenix(port, avatar => { actor = avatar; actor.VoicePlayed += RecordVoice; });
+                await Recorded("audio/sfx/world_events/resurrectm_warp");
+                foreach (string family in new[] { "damage", "defeat" })
+                {
+                    var played = voices.FirstOrDefault(v => (family == "defeat" ? v.address.Contains("defeatlng") :
+                        v.address.Contains("_hurt") || v.address.Contains("_critical")) && v.recording.Peak > .00001f);
+                    Check(played.recording != null, "server " + family + " produced audible samples from the local avatar voice source");
+                    string wav = Path.GetFileName(played.address) + ".wav";
+                    int samples = played.recording.Write(Path.Combine(directory, wav));
+                    Check(samples > 0, "captured " + wav);
+                    transactions.Add(new { played.address, played.recording.Peak, samples, wav });
+                }
+            }
+            finally
+            {
+                audio.UiCuePlayed -= Record; tap.Recording = null; Destroy(tap);
+                if (actor) actor.VoicePlayed -= RecordVoice;
+                if (voiceTap) { voiceTap.Recording = null; Destroy(voiceTap); }
+            }
+
+            void RecordVoice(string address, AudioSource source)
+            {
+                if (!voiceTap) voiceTap = source.gameObject.AddComponent<NanoAudioSourceTap>();
+                var recording = new NanoAudioRecording(AudioSettings.outputSampleRate);
+                voiceTap.Recording = recording;
+                voices.Add((address, recording));
+            }
+
+            async Task Recorded(string address)
+            {
+                await Wait(() => cues.TryGetValue(address, out var r) && r.Peak > .00001f, address + " produces non-silent output on the UI effects source", 8);
+                await Pause(.3f);
+                var recording = cues[address];
+                string filename = Path.GetFileName(address) + ".wav";
+                Check(recording.Write(Path.Combine(directory, filename)) > 0, "captured " + filename);
+                transactions.Add(new { address, recording.Peak, filename });
+            }
+        }
+
         async Task Passive(Case item)
         {
             await Nano(item.nano);
             await Wait(() => frontend.LiveWorld.Buffs.Has(item.buff) && frontend.LiveWorld.Buffs.Value(item.buff) == item.value, "native passive skill" + item.skill + " condition and exact source value");
-            await Wait(() => frontend.Root.Q<VisualElement>("buff-" + item.buff)?.Q<Image>("icon")?.image != null, "native passive skill" + item.skill + " resolves real XDT buff icon");
+            await Wait(() => BuffIcon(item.buff)?.image != null, "native passive skill" + item.skill + " resolves real XDT buff icon");
             // Authored instants can last just one second (ES429 maxTimer1,
             // longestLifeTime0). Observe their real activation before waiting
             // for grounded physics, jumping, teleporting or HUD pixel frames.
@@ -159,7 +383,8 @@ namespace FFOne.UI
                 await Wait(() => world.IsReady && world.Player.GetComponent<CharacterController>().isGrounded,
                     "native jump waits for actual world collision grounding before production launch", 15);
                 var displacement = world.AcceptBuffJumpStep(.05f);
-                Check(Math.Abs(world.JumpLaunchVelocity - (5.68f + item.value / 100f)) < .0001f && displacement.y > .05f && world.Jumping,
+                float launch = (5.68f + item.value / 100f) * NativePlayerMotor.JumpMultiplier;
+                Check(Math.Abs(world.JumpLaunchVelocity - launch) < .0001f && displacement.y > .05f && world.Jumping,
                     "real jump source launches actual CharacterController with exact source velocity");
                 await frontend.LiveMoveTo(631632, 187177, -5500);
             }
@@ -236,7 +461,7 @@ namespace FFOne.UI
             else Check(frontend.LiveState.Snapshot.Inventory[item.slot].Option == remaining, "native unsupported item" + item.item + " rejection preserves inventory");
             transactions.Add(new { kind = "item", item.item, item.skill, item.supported });
         }
-        async Task Phoenix(int port)
+        async Task Phoenix(int port, Action<NativeAvatarPreview> observeAvatar = null)
         {
             // Item healing legitimately leaves Buffa at its level36 maximum.
             // The existing separate level1/HP500 fixture exercises actual death
@@ -250,6 +475,7 @@ namespace FFOne.UI
                 "existing isolated Phoenix frontend completes real world and collider admission");
             frontend.LiveWorld.View.targetTexture = image;
             frontend.LiveWorld.Replicas.ContentError += failures.Add;
+            observeAvatar?.Invoke(frontend.LiveWorld.Player.GetComponent<NativeAvatarPreview>());
             Check(Protocol0104.Read16(frontend.Session.World.RawLoadData, 0) == 99 && frontend.LiveState.Snapshot.Level == 1,
                 "Phoenix uses the existing normal privilege99 level1 character without live stat changes");
             Check(frontend.Session.World.Hp == 500 && frontend.LiveState.Snapshot.Nanos.Single(n => n.Id == 8).Stamina == 150 &&
@@ -270,7 +496,7 @@ namespace FFOne.UI
             await Wait(() => frontend.LiveState.Snapshot.Hp == 0 && frontend.LiveRevivePrompt != null,
                 "actual source mob combat kills native frontend and opens its Phoenix revival dialog", 150);
             Check(frontend.LiveState.Snapshot.HasBuff(5), "native death retains the valid self Phoenix condition for its real dialog");
-            var confirm = frontend.LiveRevivePrompt.Q<Button>("prompt-confirm");
+            var confirm = frontend.LiveRevivePrompt.Q<Button>("revive-phoenix");
             Check(confirm != null && confirm.enabledInHierarchy, "native Phoenix dialog exposes enabled source revival action");
             await CaptureHud("phoenix-self-dialog");
             await Wait(() => peerFrames.Skip(peerDeathStart).Any(f => ReportsDeath(f, frontend.Session.World.PlayerId)) &&
@@ -367,9 +593,19 @@ namespace FFOne.UI
             var renderers = root.GetComponentsInChildren<Renderer>(true).Where(r => r.enabled && r.gameObject.activeInHierarchy).ToArray();
             return renderers.Length > 0 && renderers.Any(r => r.sharedMaterials.Length > 0) &&
                 renderers.SelectMany(r => r.sharedMaterials).All(m => m && m.shader && m.shader.isSupported && m.shader.name != "Hidden/InternalErrorShader") &&
-                renderers.Any(r => RenderedMesh(r) && RenderedMesh(r).vertexCount > 0);
+                renderers.Any(r =>
+                {
+                    var mesh = RenderedMesh(r);
+                    return mesh && mesh.vertexCount > 0 &&
+                        (r is not ParticleSystemRenderer || r.GetComponent<ParticleSystem>().particleCount > 0);
+                });
         }
-        static Mesh RenderedMesh(Renderer renderer) => renderer is SkinnedMeshRenderer skin ? skin.sharedMesh : renderer.GetComponent<MeshFilter>()?.sharedMesh;
+        static Mesh RenderedMesh(Renderer renderer) => renderer switch
+        {
+            SkinnedMeshRenderer skin => skin.sharedMesh,
+            ParticleSystemRenderer particles => particles.mesh,
+            _ => renderer.GetComponent<MeshFilter>()?.sharedMesh
+        };
         void ApplyPeer(ProtocolFrame frame)
         {
             peerFrames.Add(frame); peerWorld?.Apply(frame);
@@ -428,7 +664,7 @@ namespace FFOne.UI
         async Task CheckVisibleIcon(int buff, string name)
         {
             await Frames(8);
-            var icon = frontend.Root.Q<VisualElement>("buff-" + buff)?.Q<Image>("icon");
+            var icon = BuffIcon(buff);
             Check(icon != null && icon.visible && icon.image && icon.worldBound.width > 0 && icon.worldBound.height > 0,
                 "native buff" + buff + " icon participates in the actual HUD panel layout");
             Rect bounds = icon.worldBound;

@@ -8,7 +8,7 @@ namespace FFOne.Tutorial
     {
         TutorialAuxiliarySequence auxiliarySequence;
         TutorialAuxiliaryTimeline auxiliaryTimeline;
-        float auxiliaryElapsed, auxiliaryCaptionTime, auxiliaryMessageTime;
+        float auxiliaryElapsed, auxiliaryMessageTime;
         int auxiliaryCursor, auxiliaryRepeatCycle, auxiliaryFusionMatter, auxiliaryWaypoint;
         bool auxiliaryMyPoint, auxiliaryWaypointFlash;
         string auxiliarySecondary, auxiliaryCaption, auxiliaryMessage;
@@ -43,19 +43,13 @@ namespace FFOne.Tutorial
             auxiliaryPicture = auxiliaryPointer = null; auxiliarySecondary = "";
             auxiliaryMyPoint = auxiliaryWaypointFlash = false;
             auxiliaryMessage = ""; auxiliaryMessageTime = 0;
-            if (subtitle == auxiliaryCaption) subtitle = "";
-            auxiliaryCaption = ""; auxiliaryCaptionTime = 0;
+            if (VoiceSubtitleText == auxiliaryCaption) voiceSubtitles.Clear();
+            auxiliaryCaption = "";
         }
 
         void TickAuxiliary(float delta)
         {
             if (!float.IsFinite(delta) || delta < 0) return;
-            if (!string.IsNullOrEmpty(auxiliaryCaption))
-            {
-                auxiliaryCaptionTime -= delta;
-                if (auxiliaryCaptionTime <= 0 && (!voice || !voice.isPlaying))
-                { if (subtitle == auxiliaryCaption) subtitle = ""; auxiliaryCaption = ""; }
-            }
             auxiliaryMessageTime = Mathf.Max(0, auxiliaryMessageTime - delta);
             if (auxiliaryTimeline == null) return;
             float end = auxiliaryElapsed + delta;
@@ -92,8 +86,10 @@ namespace FFOne.Tutorial
                     PlayVoice(action.Text);
                     if (action.Value != 0)
                     {
-                        Subtitle("content.tutorial.scene.2." + action.Value); auxiliaryCaption = subtitle;
-                        auxiliaryCaptionTime = voice && voice.clip ? Mathf.Max(1, voice.clip.length) : 5;
+                        // Preserve explicit VOSubtitleOut lines, including audio-only cue identities.
+                        auxiliaryCaption = Localized("content.tutorial.scene.2." + action.Value);
+                        float duration = Mathf.Max(voiceSubtitles.Remaining, voice && voice.clip ? voice.clip.length : 5);
+                        voiceSubtitles.Set(auxiliaryCaption, duration);
                     }
                     break;
                 case TutorialAuxiliaryCommand.Picture:
@@ -124,44 +120,6 @@ namespace FFOne.Tutorial
             }
         }
 
-        void RenderAuxiliary(float width, float height)
-        {
-            if (IsCinematic) return;
-            if (AuxiliaryPresentationVisible)
-            {
-                if (auxiliaryPicture)
-                    GUI.DrawTexture(TutorialAuxiliaryGeometry.Rect(auxiliaryPictureAnchor, false, PictureSize(auxiliaryPicture.name), (int)width, (int)height, Time.time), auxiliaryPicture);
-                if (auxiliaryPointer)
-                    GUI.DrawTexture(TutorialAuxiliaryGeometry.Rect(auxiliaryPointerAnchor, true, new Vector2(88, 69), (int)width, (int)height, Time.time), auxiliaryPointer);
-                if (!string.IsNullOrEmpty(auxiliarySecondary))
-                    GUI.Label(new Rect(width * .1f, 0, width * .8f, 65), auxiliarySecondary, instructionStyle);
-            }
-            if (Stage.Chapter == 4 && Stage.Step <= 2)
-            {
-                var meter = new Rect(width - 182, 201, 160, 14);
-                Box(meter, new Color(.08f, .02f, .15f, .9f));
-                Box(new Rect(meter.x, meter.y, meter.width * auxiliaryFusionMatter / 220f, meter.height), new Color(.61f, .24f, .9f));
-                GUI.Label(new Rect(meter.x, meter.y + 14, meter.width, 25), auxiliaryFusionMatter + " / 220", labelStyle);
-            }
-            if (auxiliaryMessageTime > 0 && !string.IsNullOrEmpty(auxiliaryMessage))
-            {
-                var rect = new Rect(24, 68, Mathf.Min(350, width * .34f), 115);
-                Box(rect, new Color(.02f, .08f, .1f, .92f));
-                GUI.Label(new Rect(rect.x + 10, rect.y + 8, rect.width - 20, 25), Localized("content.npc.2671.name"), instructionStyle);
-                GUI.Label(new Rect(rect.x + 10, rect.y + 34, rect.width - 20, 75), auxiliaryMessage, labelStyle);
-            }
-            if (auxiliaryMyPoint || auxiliaryWaypointFlash)
-            {
-                Vector2 center = new(width - 102, 100);
-                if (auxiliaryWaypointFlash && Actor(auxiliaryWaypoint))
-                {
-                    var difference = Actor(auxiliaryWaypoint).transform.position - Player.position;
-                    center += Vector2.ClampMagnitude(new Vector2(difference.x, -difference.z) * .8f, 70);
-                }
-                float size = 10 + 8 * (.5f + .5f * Mathf.Sin(Time.time * Mathf.PI * 4));
-                Box(new Rect(center.x - size / 2, center.y - size / 2, size, size), new Color(1, 1, 0, .45f));
-            }
-        }
         static Vector2 PictureSize(string resource) => resource.StartsWith("tut_move", StringComparison.Ordinal) ? new Vector2(182, 131) : new Vector2(116, 154);
     }
 
@@ -179,13 +137,15 @@ namespace FFOne.Tutorial
                 TutorialPointerAnchor.Waypoint => new Vector2(width - 140, 0),
                 TutorialPointerAnchor.Talk => new Vector2(width / 2 - 100, height / 4),
                 TutorialPointerAnchor.Mission => new Vector2(width * 3 / 4 - 246, height / 2 - 41),
-                TutorialPointerAnchor.FusionMatter => new Vector2(width - 259, 200),
+                // The restored HUD displays Fusion Matter around the NanoCom
+                // disk. Point at its left edge, not the objective text below it.
+                TutorialPointerAnchor.FusionMatter => new Vector2(width - 259, 50),
                 _ => throw new ArgumentOutOfRangeException(nameof(anchor))
             };
             Vector2 pivot = anchor switch {
                 TutorialPointerAnchor.MoveKeys or TutorialPointerAnchor.NanoMouse => new Vector2(0, height),
                 TutorialPointerAnchor.Talk => new Vector2(width / 2, height / 4),
-                TutorialPointerAnchor.Mission or TutorialPointerAnchor.FusionMatter => new Vector2(width * 3 / 4, height / 2),
+                TutorialPointerAnchor.Mission => new Vector2(width * 3 / 4, height / 2),
                 _ => new Vector2(width, 0)
             };
             if (pointer) position.x += -10 + Mathf.Sin(time * Mathf.PI * 4) * 10;

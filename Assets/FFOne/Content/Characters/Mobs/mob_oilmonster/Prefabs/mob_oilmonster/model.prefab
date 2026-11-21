@@ -562,7 +562,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6951347686494428333}
-  - component: {fileID: 3358239942682693457}
+  - component: {fileID: 1109885058696805015}
+  - component: {fileID: 4145964297684824822}
+  - component: {fileID: 267681751128738304}
   m_Layer: 0
   m_Name: model
   m_TagString: Untagged
@@ -586,39 +588,122 @@ Transform:
   - {fileID: 8846537604610569434}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!111 &3358239942682693457
-Animation:
+--- !u!95 &1109885058696805015
+Animator:
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1866053902958541849}
   m_Enabled: 1
-  serializedVersion: 4
-  m_Animation: {fileID: 7400000, guid: c82200731054de84594de6eaa36e9287, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: dd3d6c5cdc31118409e767af86bc0608, type: 2}
-  - {fileID: 7400000, guid: e0c4cea1583e06046af63b0af14df4cf, type: 2}
-  - {fileID: 7400000, guid: da7edf5668a93384981f8d5d501dab74, type: 2}
-  - {fileID: 7400000, guid: b424bfade91fa7b4aa9657e210a79bb3, type: 2}
-  - {fileID: 7400000, guid: 334a8093d79ed9643a511734735cfb96, type: 2}
-  - {fileID: 7400000, guid: 6d6dfb085952cb44ca6330d500a3fcfb, type: 2}
-  - {fileID: 7400000, guid: 0228dc7ed42186848a929e26929b7831, type: 2}
-  - {fileID: 7400000, guid: 65f91e3eb67073e448329fb403435e02, type: 2}
-  - {fileID: 7400000, guid: 8e810e144c0459940a76ca188c2c7641, type: 2}
-  - {fileID: 7400000, guid: 41ee81fc1cb5e2d4085e5127f4771a7a, type: 2}
-  - {fileID: 7400000, guid: c82200731054de84594de6eaa36e9287, type: 2}
-  - {fileID: 7400000, guid: 009ec4281727b5b4b95a7d2955e0aed2, type: 2}
-  - {fileID: 7400000, guid: 41c8a0a2cdc9710419405623688c0ff1, type: 2}
-  - {fileID: 7400000, guid: 89a871df66306b84792e6bf77acc0c9f, type: 2}
-  - {fileID: 7400000, guid: 74031c0c292e918419cd8de9514ab827, type: 2}
-  - {fileID: 7400000, guid: 641f1c6438dbfcb408c1b9976779c7f8, type: 2}
-  - {fileID: 7400000, guid: a2a556e4109dc554da0eabddebbfd23b, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 81ac51b300ffe534dabe3d7171a70ee7, type: 2}
+  m_CullingMode: 0
   m_UpdateMode: 0
-  m_CullingType: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 1
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &4145964297684824822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1866053902958541849}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b7ac68c382befc4d9fc82662c17e418, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.Content.NativeNpcAnimator
+  animator: {fileID: 1109885058696805015}
+  AnimationSounds:
+  - Cue: OilMonster_OO_Melee1_1.wav
+    Variants:
+    - {fileID: 8300000, guid: 98b256cd4b8187c4d858e964a2922c6d, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: OilMonster_OO_Death.wav
+    Variants:
+    - {fileID: 8300000, guid: 5c1e70059d5afe04fbe3582d50af2a14, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: OilMonster_OO_Dodge.wav
+    Variants:
+    - {fileID: 8300000, guid: 0c12f26ee9dcd2141afe411d896ff1f7, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: OilMonster_OO_Melee1_(RAND:1-2).wav
+    Variants:
+    - {fileID: 8300000, guid: 98b256cd4b8187c4d858e964a2922c6d, type: 3}
+    - {fileID: 8300000, guid: 0fd2b0f1f8d331c4596710262e68167a, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+    - {fileID: 0}
+  - Cue: OilMonster_OO_Melee1Upper.wav
+    Variants:
+    - {fileID: 8300000, guid: 0124edc70fb4f8848ba7a7798beb0286, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: OilMonster_OO_Melee2_(RAND:1-2).wav
+    Variants:
+    - {fileID: 8300000, guid: c8f966f98d648654c89a21f80cbbbc30, type: 3}
+    - {fileID: 8300000, guid: daee9cd584355c845a662653954a90f1, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+    - {fileID: 0}
+  - Cue: OilMonster_OO_Ready.wav
+    Variants:
+    - {fileID: 8300000, guid: 17cfe03b042fcce4eb45e50f512695a1, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: OilMonster_OO_Run.wav
+    Variants:
+    - {fileID: 8300000, guid: e7dc649b4a7c5204fb5d5de6eb6d21de, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: OilMonster_OO_Skill0.wav
+    Variants:
+    - {fileID: 8300000, guid: 48524b1d9e9495c4099172432184aa7e, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: OilMonster_OO_Stand1.wav
+    Variants:
+    - {fileID: 8300000, guid: 9c5d5686d7c2b544ba67cc714c511d4f, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: OilMonster_OO_Stand2.wav
+    Variants:
+    - {fileID: 8300000, guid: 14e432dba2d66114483807b31dc186d4, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: OilMonster_OO_Stand3.wav
+    Variants:
+    - {fileID: 8300000, guid: 5367fc7d694d4cd4ea88fcf07798dd29, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: OilMonster_OO_Stand4.wav
+    Variants:
+    - {fileID: 8300000, guid: c2a51cfda7e08fa438ba23f50e49b121, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: OilMonster_OO_Standup.wav
+    Variants:
+    - {fileID: 8300000, guid: 112740edb36e0584cb205d5d0f25cb52, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: OilMonster_OO_Walk_LOOP.wav
+    Variants:
+    - {fileID: 8300000, guid: e33e822a74c4e2f468434ed9861d6b7a, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  Faces: []
 --- !u!1 &2041865024525231164
 GameObject:
   m_ObjectHideFlags: 0
@@ -3093,3 +3178,22 @@ Transform:
   - {fileID: 550425295366114915}
   m_Father: {fileID: 488163343788236534}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &267681751128738304
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1866053902958541849}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ee3989daf214b8c805f250337cb2f41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.World.WorldNpcSkins
+  surfaces:
+  - Renderer: {fileID: 6059685833520529996}
+    Slot: 0
+    Default: {fileID: 2100000, guid: 369e89c4e2fafd44da3a8e5f68ea80a6, type: 2}
+    Choices:
+    - Types: 50020000
+      Material: {fileID: 2100000, guid: 8bdd394b32955bc89d2688725267c551, type: 2}

@@ -15,6 +15,19 @@ namespace FFOne.UI
             if (weaponBattery.HasValue) next.WeaponBattery = weaponBattery.Value;
             return next;
         }
+        internal GameplayUiState WithOperatorValue(byte[] payload)
+        {
+            Protocol0104.RequireSize(payload, 12);
+            if (Protocol0104.Read32(payload, 0) != PlayerId) return this;
+            int kind = Protocol0104.Read32(payload, 4), value = Protocol0104.Read32(payload, 8);
+            if (kind == 1) return WithHealth(value);
+            if (kind == 5) return WithMailBalance(value);
+            if (kind != 4) return this;
+            var next = (GameplayUiState)MemberwiseClone();
+            next.FusionMatter = value;
+            return next;
+        }
+
         internal GameplayUiState WithServerLocation(int map, int x, int y, int z)
         {
             var next = WithPosition(new Vector3(x, z, y) / 100f); next.MapNumber = map; return next;
@@ -164,13 +177,48 @@ namespace FFOne.UI
                 case ProtocolGameplay.RegenSuccess:
                     Protocol0104.RequireSize(p, 48); Publish(Snapshot.WithRegen(p)); return true;
                 case ProtocolGameplay.Reward:
-                    Publish(Snapshot.WithReward(p)); return true;
+                {
+                    var previous = Snapshot;
+                    var reward = previous.WithReward(p);
+                    Publish(reward);
+                    RewardReceived?.Invoke(previous, reward);
+                    ReportQuestLoot(previous, p);
+                    return true;
+                }
                 case ProtocolGameplay.NanoCreate:
                     Protocol0104.RequireSize(p, 28);
                     Publish(Snapshot.WithNanoCreation(p, levelLimits(Protocol0104.Read16(p, 26)))); return true;
                 default: return ApplyMissionFrame(frame);
             }
         }
+        void ReportQuestLoot(GameplayUiState previous, byte[] reward)
+        {
+            int npc = ProtocolGameplay.I(reward, 28);
+            if (npc <= 0) return;
+            bool found = false;
+            for (int i = 0; i < reward[16]; i++)
+            {
+                int row = 36 + i * 20;
+                if (Protocol0104.Read16(reward, row) != 8 || ProtocolGameplay.I(reward, row + 12) != 2) continue;
+                int item = Protocol0104.Read16(reward, row + 2);
+                if (item <= 0) continue;
+                found = true;
+                QuestLootReceived?.Invoke(npc, item, true);
+            }
+            if (found) return;
+            int task = ProtocolGameplay.I(reward, 32);
+            if (task <= 0 || !previous.RunningQuests.Any(q => q.TaskId == task)) return;
+            var rule = FFOne.World.WorldMissionCatalog.Load().Find(task);
+            if (rule == null) return;
+            for (int i = 0; i < rule.KillTypes.Length; i++)
+            {
+                if (rule.KillTypes[i] != npc || rule.KillCounts[i] != 0 || rule.ItemIds[i] <= 0) continue;
+                if (previous.QuestInventory.Any(v => v.ItemId == rule.ItemIds[i] && v.Quantity >= rule.ItemCounts[i])) continue;
+                QuestLootReceived?.Invoke(npc, rule.ItemIds[i], false);
+                return;
+            }
+        }
+
         internal static GameplayNanoState LiveNano(byte[] p, int o)
         {
             int id = Protocol0104.Read16(p, o), skill = Protocol0104.Read16(p, o + 2), stamina = Protocol0104.Read16(p, o + 4);

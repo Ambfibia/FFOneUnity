@@ -19,11 +19,16 @@ namespace FFOne.Content
         float vehicleLandingUntil;
         public int PersonalVehicleId => vehicleId;
         public GameObject PersonalVehicleObject => personalVehicle;
-        public string LocomotionClip(string clip) => vehicleId > 0 && clip is "stand1" or "run" or "runback" or "jumpstart" or "jump" or "jumpend" or "jumplandrun"
+        public string LocomotionClip(string clip) => vehicleId > 0 && clip is "stand1" or "run" or "runback" or "jumpstart" or "jump" or "jumpend" or "jumplandrun" or "inven"
             ? vehiclePrefix + clip : clip;
         public bool PlayLocomotion(string clip, bool restart = false)
         {
             if (!playerAnimation) return false;
+            if (emoteCode != 0)
+            {
+                if (clip == "stand1" && !restart) return true;
+                CancelEmote();
+            }
             if (vehicleId > 0)
             {
                 // AvatarJump uses CrossFade(.15), including a fresh local jump.
@@ -55,6 +60,7 @@ namespace FFOne.Content
         public bool SetPersonalVehicle(int itemId)
         {
             if (vehicleId == itemId && (itemId == 0 || personalVehicle)) return true;
+            CancelEmote();
             ClearVehicleVisual(); vehicleId = 0; vehiclePrefix = null; vehicleJumpActive = false; vehicleLandingUntil = 0;
             if (itemId == 0 || !actor || actorBones == null) { if (itemId == 0) playerAnimation?.Play("stand1"); return itemId == 0; }
             try
@@ -94,7 +100,8 @@ namespace FFOne.Content
         {
             if (actorBones == null) return;
             foreach (var pair in actorBones.Where(p => p.Key.EndsWith("/Bip01 Rweapon01", StringComparison.Ordinal) || p.Key.EndsWith("/Bip01 Lweapon01", StringComparison.Ordinal)))
-                foreach (var renderer in pair.Value.GetComponentsInChildren<Renderer>(true)) renderer.enabled = visible;
+                foreach (var renderer in pair.Value.GetComponentsInChildren<Renderer>(true))
+                    if (!ziplineTrolley || !renderer.transform.IsChildOf(ziplineTrolley.transform)) renderer.enabled = visible;
         }
         void RestorePersonalVehicle()
         {

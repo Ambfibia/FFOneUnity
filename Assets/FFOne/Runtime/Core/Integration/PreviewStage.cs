@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using FFOne.Content;
 using FFOne.Network;
 using FFOne.UI;
@@ -18,10 +20,17 @@ namespace FFOne.Integration
         {
             public GameObject Root;
             public NativeAvatarPreview Avatar;
+            public readonly Dictionary<int, NativeAvatarPreview> Genders = new();
             public Camera Camera;
-            public RenderTexture Texture;
+            public RenderTexture Texture, PresentedTexture;
             public Image Target;
             public string AppearanceKey;
+            public string PendingKey, FramingKey;
+            public string PresentedKey, Error;
+            public float PreloadProgress;
+            public Transform Focus;
+            public int Revision;
+            public int Gender;
             public bool Visible, HasFrame, NeedsFraming;
             public int FrameDelay, ResizeStableFrames;
             public int RenderedFrames;
@@ -29,20 +38,45 @@ namespace FFOne.Integration
             public void Dispose()
             {
                 if (Target != null && Target.image == Texture) Target.image = null;
+                if (Target != null && Target.image == PresentedTexture) Target.image = null;
                 if (Camera) Camera.targetTexture = null;
-                if (Texture) { Texture.Release(); Release(Texture); }
+                if (PresentedTexture && PresentedTexture != Texture) ReleaseTexture(PresentedTexture);
+                if (Texture) ReleaseTexture(Texture);
                 if (Root) Release(Root);
             }
         }
-        FrontendController frontend;
+        [SerializeField] FrontendController frontend;
         readonly List<View> slots = new List<View>();
         View main;
         Image creatorTarget;
         Image gameplayPortrait;
         Image gameplayAvatar;
         int gameplaySlot;
+        readonly CancellationTokenSource lifetime = new();
         float zoom = 3;
         public RenderTexture Texture => main?.Texture;
+        static bool Presented(View view) => view != null && view.PendingKey == null && view.Avatar.IsReady &&
+            view.Camera.enabled && view.AppearanceKey != null && view.PresentedKey == view.AppearanceKey;
+        public bool DraftReady => creatorTarget != null && Presented(main);
+        public string DraftError => main?.Error;
+        public bool GameplayPortraitReady => !Displayed(gameplayPortrait) || slots.Exists(view => view.Target == gameplayPortrait && Presented(view));
+        public bool SelectedPreviewReady => main?.Target == frontend?.PreviewImage && Presented(main);
+        public bool SelectedPreviewFailed => main?.Target == frontend?.PreviewImage && main?.Error != null;
+        public bool SelectionReady => (frontend?.SelectedCharacter == null || SelectedPreviewReady) &&
+            slots.TrueForAll(view => view.AppearanceKey == null && view.PendingKey == null || Presented(view));
+        public string SelectionError => main?.Error ?? slots.Find(view => view.Error != null)?.Error;
+        public float SelectionResourceProgress
+        {
+            get
+            {
+                float total = 0; int count = 0;
+                if (frontend?.SelectedCharacter != null) { total += main.PreloadProgress; count++; }
+                foreach (var view in slots) if (view.AppearanceKey != null || view.PendingKey != null) { total += view.PreloadProgress; count++; }
+                return count == 0 ? 1 : total / count;
+            }
+        }
+        public int DraftGender => main?.Gender ?? 0;
+        public Camera DraftCamera => main?.Camera;
         public void SetGameplayPortrait(Image image)
         {
             gameplayPortrait = image;
@@ -51,12 +85,14 @@ namespace FFOne.Integration
         public void SetGameplayAvatar(Image image) { gameplayAvatar = image; RequestFrame(main, 0); }
         void Start()
         {
-            frontend = GetComponent<FrontendController>();
+            if (!frontend) TryGetComponent(out frontend);
+            frontend.BindRosterPreview(this);
             main = CreateView(0);
             for (var i = 0; i < 4; i++) slots.Add(CreateView(i + 1));
             frontend.CharacterSelected += Select;
             frontend.RosterChanged += Roster;
             frontend.RotatePreview += Rotate;
+            RenderPipelineManager.endCameraRendering += PresentedCamera;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (Array.IndexOf(Environment.GetCommandLineArgs(), "--gameplay-ui-smoke") >= 0)
                 RenderPipelineManager.endCameraRendering += DiagnoseRenderedCamera;
@@ -102,7 +138,7 @@ namespace FFOne.Integration
             RequestFrame(main, 2);
             Select(frontend.SelectedCharacter);
         }
-        void Select(CharacterInfo info) { if (main != null) Apply(main, info); }
+        void Select(CharacterInfo info) { if (main != null) Apply(main, info, true); }
         public void RefreshGameplayAppearance(CharacterInfo character)
         {
             if (character == null) return;
@@ -117,35 +153,79 @@ namespace FFOne.Integration
             {
                 CharacterInfo character = null;
                 foreach (var entry in roster) if (entry.Slot == i + 1) character = entry;
-                Apply(slots[i], character);
+                Apply(slots[i], character, true);
             }
         }
-        void Apply(View view, CharacterInfo character)
+        void Apply(View view, CharacterInfo character, bool roster = false)
         {
             if (character == null)
             {
+                view.Revision++; view.PendingKey = null;
                 view.AppearanceKey = null;
                 view.Avatar.Clear();
+                foreach (var cached in view.Genders.Values) if (cached != view.Avatar) cached.Clear();
+                view.FramingKey = null;
+                view.PresentedKey = view.Error = null; view.Focus = null; view.PreloadProgress = 0;
                 view.HasFrame = view.NeedsFraming = false;
                 view.Camera.enabled = false;
                 if (view.Target != null) view.Target.image = null;
                 return;
             }
             var s = character.Style;
-            var key = $"{character.Uid}:{s.Gender}:{s.FaceStyle}:{s.HairStyle}:{s.SkinColor}:{s.HairColor}:{s.EyeColor}:{s.Height}:{s.Body}";
+            var key = $"{character.Uid}:{roster}:{s.AppearanceComplete}:{s.Gender}:{s.FaceStyle}:{s.HairStyle}:{s.SkinColor}:{s.HairColor}:{s.EyeColor}:{s.Height}:{s.Body}";
             foreach (var item in character.Equipment) key += $":{item.ItemType}/{item.ItemId}/{(uint)item.Option >> 16}";
             if (key == view.AppearanceKey && view.Avatar.IsReady && view.Avatar.LastError == null) return;
+            if (key == view.PendingKey) return;
+            view.PendingKey = key; view.Error = null; view.PreloadProgress = 0;
+            _ = ApplyAsync(view, NativeAvatarPreview.Snapshot(character), key, ++view.Revision, roster);
+        }
+        async Task ApplyAsync(View view, CharacterInfo character, string key, int revision, bool roster)
+        {
             try
             {
-                view.Avatar.Apply(character);
-                if (!view.Avatar.IsReady || view.Avatar.LastError != null) throw new InvalidOperationException(view.Avatar.LastError ?? "Avatar dependencies are not imported.");
+                if (roster && !character.Style.AppearanceComplete)
+                    character = await FFOne.Creation.CreationCatalog.RosterPreviewAsync(character, lifetime.Token);
+                await NativeAvatarPreview.PreloadAsync(character, lifetime.Token,
+                    value => { if (revision == view.Revision) view.PreloadProgress = value; });
+                if (!this || revision != view.Revision || lifetime.IsCancellationRequested) return;
+                var previous = view.Avatar;
+                if (!view.Genders.TryGetValue(character.Style.Gender, out var next))
+                {
+                    if (view.Genders.Count == 0) next = previous;
+                    else
+                    {
+                        var root = new GameObject("Avatar " + character.Style.Gender);
+                        root.transform.SetParent(view.Root.transform, false);
+                        next = root.AddComponent<NativeAvatarPreview>();
+                    }
+                    view.Genders.Add(character.Style.Gender, next);
+                }
+                next.gameObject.SetActive(true);
+                next.transform.localRotation = previous.transform.localRotation;
+                next.Apply(character);
+                if (!next.IsReady || next.LastError != null)
+                {
+                    if (next != previous) next.gameObject.SetActive(false);
+                    throw new InvalidOperationException(next.LastError ?? "Avatar dependencies are not imported.");
+                }
+                if (next != previous) previous.gameObject.SetActive(false);
+                view.Avatar = next;
+                view.Gender = character.Style.Gender;
                 view.AppearanceKey = key;
+                view.PresentedKey = null; view.Focus = null;
                 foreach (var child in view.Avatar.GetComponentsInChildren<Transform>(true)) child.gameObject.layer = 31;
-                RequestFrame(view, 2);
+                var s = character.Style;
+                string framing = $"{s.Gender}:{s.Height}:{s.Body}";
+                // Clothing and idle bounds are not a camera pivot. Keep the established body
+                // framing until the body shape or viewport actually changes.
+                if (view.FramingKey != framing || !view.HasFrame) RequestFrame(view, 2);
+                view.FramingKey = framing;
             }
             // Apply commits new meshes atomically and retains the previous rig on missing assets.
             // Clearing here would erase the player's portrait for an unsupported equipment model.
-            catch (Exception e) { frontend.ShowError(e.Message); }
+            catch (OperationCanceledException) { }
+            catch (Exception e) { if (this && revision == view.Revision) { view.Error = e.Message; frontend.ShowError(e.Message); } }
+            finally { if (revision == view.Revision) view.PendingKey = null; }
         }
         public void Rotate(float degrees) { if (main != null) main.Avatar.Rotate(degrees); }
         public void Zoom(float delta) { zoom = Mathf.Clamp(zoom + delta, 1, 3); RequestFrame(main, 0); }
@@ -153,83 +233,39 @@ namespace FFOne.Integration
         {
             if (view == null) return;
             view.NeedsFraming = true;
+            view.PresentedKey = null;
             view.FrameDelay = delay;
         }
         void Frame(View view)
         {
-            // A newly rebound skin's Renderer.bounds may still describe its previous
-            // render. Frame the current pose, as the accepted avatar render tests do.
-            if (!TryPoseBounds(view.Avatar, out var bounds)) { view.HasFrame = false; return; }
-            if (view == main && gameplayAvatar != null && view.Target == gameplayAvatar)
-            {
-                // InventoryManagerScript.AvatarClothes + cnSimpleCharRenderCamera:
-                // source FOV45, distance2.65, look at the clone before adding height1.
-                view.Camera.fieldOfView = 45;
-                Vector3 origin = view.Avatar.transform.position;
-                view.Camera.transform.position = origin + Quaternion.Euler(-10, 0, 0) * Vector3.forward * 2.65f;
-                view.Camera.transform.LookAt(origin);
-                view.Camera.transform.position += Vector3.up;
-                view.Camera.farClipPlane = 1000;
-                view.HasFrame = true; view.NeedsFraming = false;
-                return;
-            }
-            view.Camera.fieldOfView = 30;
-            var center = bounds.center;
-            var halfHeight = Mathf.Max(bounds.extents.y, bounds.extents.x / view.Camera.aspect) * 1.13f;
+            var kind = view != main ? view.Target == gameplayPortrait ? AvatarPreviewView.Hud : AvatarPreviewView.Roster
+                : view.Target == gameplayAvatar ? AvatarPreviewView.Inventory : creatorTarget != null ? AvatarPreviewView.Creation : AvatarPreviewView.Selection;
+            Vector3 target = view.Avatar.transform.position;
             if (view != main)
             {
-                // The roster and HUD use head portraits, including the equipped helmet.
-                // Body preview framing makes the face unreadable in a 63x85 slot.
-                foreach (var bone in view.Avatar.GetComponentsInChildren<Transform>())
+                if (!view.Focus)
                 {
-                    if (bone.name != "Bip01 Head") continue;
-                    float bottom = bone.position.y - bounds.size.y * .08f;
-                    float portraitHeight = Mathf.Max(.1f, bounds.max.y - bottom);
-                    center = new Vector3(bone.position.x, (bounds.max.y + bottom) / 2, bone.position.z);
-                    halfHeight = Mathf.Max(portraitHeight / 2, portraitHeight * .4f / view.Camera.aspect) * 1.08f;
-                    break;
+                    string boneName = kind == AvatarPreviewView.Hud ? "Bip01 Neck" : "Bip01 Head";
+                    foreach (var bone in view.Avatar.GetComponentsInChildren<Transform>())
+                        if (bone.name == boneName) { view.Focus = bone; break; }
                 }
+                if (!view.Focus) { view.Error = "Avatar portrait target is missing."; view.HasFrame = false; return; }
+                target = view.Focus.position;
             }
-            var distance = halfHeight / Mathf.Tan(view.Camera.fieldOfView * .5f * Mathf.Deg2Rad) + bounds.extents.z;
-            if (view == main) distance *= zoom / 3;
-            view.Camera.transform.position = center + new Vector3(0, 0, Mathf.Max(distance, .5f));
-            view.Camera.transform.LookAt(center);
-            view.Camera.farClipPlane = Mathf.Max(100, distance + bounds.extents.magnitude * 2);
-            view.HasFrame = true;
-            view.NeedsFraming = false;
+            AvatarPreviewCamera.Apply(view.Camera, kind, target, view.Avatar.transform.rotation, view == main ? zoom : 3);
+            view.HasFrame = true; view.NeedsFraming = false;
         }
-        static bool TryPoseBounds(NativeAvatarPreview avatar, out Bounds bounds)
+        void PresentedCamera(ScriptableRenderContext context, Camera camera)
         {
-            bounds = default;
-            bool found = false;
-            var baked = new Mesh();
-            try
+            View view = main?.Camera == camera ? main : slots.Find(item => item.Camera == camera);
+            if (view != null && view.PendingKey == null && view.HasFrame && !view.NeedsFraming && view.Texture && view.Avatar.IsReady)
             {
-                foreach (var renderer in avatar.GetComponentsInChildren<Renderer>())
-                {
-                    if (!renderer.enabled) continue;
-                    if (renderer is SkinnedMeshRenderer skin && skin.sharedMesh)
-                    {
-                        skin.BakeMesh(baked); baked.RecalculateBounds();
-                        var local = baked.bounds;
-                        for (int x = -1; x <= 1; x += 2)
-                            for (int y = -1; y <= 1; y += 2)
-                                for (int z = -1; z <= 1; z += 2)
-                                {
-                                    var point = skin.transform.TransformPoint(local.center + Vector3.Scale(local.extents, new Vector3(x, y, z)));
-                                    if (found) bounds.Encapsulate(point);
-                                    else { bounds = new Bounds(point, Vector3.zero); found = true; }
-                                }
-                    }
-                    else if (renderer is MeshRenderer && renderer.GetComponent<MeshFilter>()?.sharedMesh)
-                    {
-                        if (found) bounds.Encapsulate(renderer.bounds);
-                        else { bounds = renderer.bounds; found = true; }
-                    }
-                }
+                var previous = view.PresentedTexture;
+                view.PresentedTexture = view.Texture;
+                if (view.Target != null && view.Target.image != view.Texture) view.Target.image = view.Texture;
+                view.PresentedKey = view.AppearanceKey;
+                if (previous && previous != view.Texture) ReleaseTexture(previous);
             }
-            finally { Release(baked); }
-            return found;
         }
         void LateUpdate()
         {
@@ -248,17 +284,17 @@ namespace FFOne.Integration
             if (view == null || view.Target == target) return;
             // The previous target must not retain a texture that this view may resize
             // and release after switching from a creator panel to the inventory.
-            if (view.Target != null && view.Target.image == view.Texture) view.Target.image = null;
+            if (view.Target != null && view.Target.image == view.PresentedTexture) view.Target.image = null;
             view.Target = target;
+            view.Focus = null; RequestFrame(view, 0);
             // Appearance controls rebuild their Image. Keep its last rendered avatar while the new
             // element acquires its layout, rather than presenting an empty image for that frame.
-            if (target != null && view.Avatar.IsReady && view.Texture != null) target.image = view.Texture;
+            if (target != null && view.Avatar.IsReady && view.PresentedTexture && view.PresentedTexture.IsCreated())
+                target.image = view.PresentedTexture;
         }
         void Bind(View view)
         {
-            bool visible = view.Target != null && view.Target.panel != null;
-            for (VisualElement element = view.Target; visible && element != null; element = element.parent)
-                visible &= element.resolvedStyle.display != DisplayStyle.None && element.resolvedStyle.visibility != Visibility.Hidden;
+            bool visible = Displayed(view.Target);
             view.Visible = visible && view.Avatar.IsReady;
             if (view.Visible)
             {
@@ -266,10 +302,17 @@ namespace FFOne.Integration
                 // New or temporarily detached UI elements have no usable pixel rectangle yet.
                 if (float.IsFinite(physicalSize.x) && float.IsFinite(physicalSize.y) && physicalSize.x >= 1 && physicalSize.y >= 1)
                     ResizeTexture(view, PreviewRenderQuality.Resolution(view.Target));
-                if (view.Texture != null && view.Target.image != view.Texture) view.Target.image = view.Texture;
                 if (view.Texture != null && view.NeedsFraming && view.FrameDelay-- <= 0) Frame(view);
+                else if (view.Texture != null && view != main && view.HasFrame) Frame(view);
             }
             view.Camera.enabled = view.Visible && view.HasFrame && view.Texture != null;
+        }
+        static bool Displayed(VisualElement target)
+        {
+            bool visible = target != null && target.panel != null;
+            for (var element = target; visible && element != null; element = element.parent)
+                visible &= element.resolvedStyle.display != DisplayStyle.None && element.resolvedStyle.visibility != Visibility.Hidden;
+            return visible;
         }
         static void ResizeTexture(View view, Vector2Int size)
         {
@@ -293,11 +336,16 @@ namespace FFOne.Integration
             view.Texture = next;
             view.Camera.targetTexture = next;
             view.Camera.aspect = (float)size.x / size.y;
-            if (view.Target != null) view.Target.image = next;
             view.ResizeStableFrames = 0;
             view.NeedsFraming = true;
+            view.PresentedKey = null;
             // Preserve the delay requested by a freshly assembled avatar until animation is evaluated.
-            if (previous) { previous.Release(); Release(previous); }
+            if (previous && previous != view.PresentedTexture) ReleaseTexture(previous);
+        }
+        static void ReleaseTexture(RenderTexture texture)
+        {
+            texture.Release();
+            Release(texture);
         }
         static void Release(UnityEngine.Object value)
         {
@@ -306,6 +354,8 @@ namespace FFOne.Integration
         public static Vector2Int PreviewResolution(Vector2 physicalSize) => PreviewRenderQuality.Resolution(physicalSize);
         void OnDestroy()
         {
+            lifetime.Cancel(); lifetime.Dispose();
+            RenderPipelineManager.endCameraRendering -= PresentedCamera;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             RenderPipelineManager.endCameraRendering -= DiagnoseRenderedCamera;
 #endif

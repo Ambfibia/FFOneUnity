@@ -1,0 +1,358 @@
+{
+  "schema": "ffone.studio.preservation.v1",
+  "date": "2026-11-14",
+  "entries": [
+    {
+      "id": "FP-001",
+      "name": "Accepted NPC identity variants",
+      "category": "PRESERVE",
+      "sources": [
+        "primary",
+        "previous"
+      ],
+      "status": "preserved",
+      "confidence": "observed",
+      "obligation": "Keep separate variants and selected older appearances",
+      "acceptance": "Inspect current consumer plus focused tests; actual client and isolated server when affected. Preserve accepted identity/save/asset references.",
+      "evidence": [
+        "../FusionForge/recipes/native/identities/accepted-native-identities.json",
+        "Docs/Studio/actor-presentation-audit-2026-11-20.md",
+        "Docs/Studio/actor-repair-2026-11-20.md"
+      ]
+    },
+    {
+      "id": "FP-002",
+      "name": "Previous appearance retention",
+      "category": "PRESERVE",
+      "sources": [
+        "previous",
+        "primary"
+      ],
+      "status": "preserved",
+      "confidence": "observed",
+      "obligation": "Previous for selected retained appearances; fusion_deedee primary",
+      "acceptance": "Inspect current consumer plus focused tests; actual client and isolated server when affected. Preserve accepted identity/save/asset references.",
+      "evidence": [
+        "../FusionForge/recipes/native/retention/previous-build-retention.json"
+      ]
+    },
+    {
+      "id": "FP-003",
+      "name": "Nano52 and Unstable identity conflict",
+      "category": "PRESERVE",
+      "sources": [
+        "primary",
+        "alternate",
+        "retro-010920"
+      ],
+      "status": "conflict",
+      "confidence": "observed",
+      "obligation": "Unresolved: current behavior retained pending decision",
+      "acceptance": "Inspect current consumer plus focused tests; actual client and isolated server when affected. Preserve accepted identity/save/asset references.",
+      "evidence": [
+        "../FFOneClient/docs/nano-roster.md"
+      ]
+    },
+    {
+      "id": "FP-004",
+      "name": "Academy Nano donors",
+      "category": "PRESERVE",
+      "sources": [
+        "alternate"
+      ],
+      "status": "partial",
+      "confidence": "observed",
+      "obligation": "Preserve accepted additions, unresolved exact animation parity",
+      "acceptance": "Inspect current consumer plus focused tests; actual client and isolated server when affected. Preserve accepted identity/save/asset references.",
+      "evidence": [
+        "../FusionForge/recipes/native/characters/academy-incubator-nanos.json"
+      ]
+    },
+    {
+      "id": "FP-005",
+      "name": "Native world scenes and collision",
+      "category": "PRESERVE",
+      "sources": [
+        "primary"
+      ],
+      "status": "implemented",
+      "confidence": "observed",
+      "obligation": "Current authored geometry and bindings; no legacy physics restoration",
+      "acceptance": "Inspect current consumer plus focused tests; actual client and isolated server when affected. Preserve accepted identity/save/asset references.",
+      "evidence": [
+        "Docs/native-collision-contract.md"
+      ]
+    },
+    {
+      "id": "FP-006",
+      "name": "Native tutorial Timeline",
+      "category": "PRESERVE",
+      "sources": [
+        "primary"
+      ],
+      "status": "implemented",
+      "confidence": "observed",
+      "obligation": "Preserve native editable Timeline and skip/cleanup",
+      "acceptance": "Inspect current consumer plus focused tests; actual client and isolated server when affected. Preserve accepted identity/save/asset references.",
+      "evidence": [
+        "Docs/native-tutorial-timeline.md"
+      ]
+    },
+    {
+      "id": "FP-007",
+      "name": "Async first character presentation",
+      "category": "PRESERVE",
+      "sources": [
+        "primary",
+        "previous"
+      ],
+      "status": "implemented",
+      "confidence": "observed",
+      "obligation": "Current accepted identity plus no blocking appearance load",
+      "acceptance": "Inspect current consumer plus focused tests; actual client and isolated server when affected. Preserve accepted identity/save/asset references.",
+      "evidence": [
+        "Docs/Studio/unity-discovery.md"
+      ]
+    },
+    {
+      "id": "FP-008",
+      "name": "Stable Addressables authoring",
+      "category": "PRESERVE",
+      "sources": [],
+      "status": "implemented",
+      "confidence": "observed",
+      "obligation": "Keep native assets and single-writer publication",
+      "acceptance": "Inspect current consumer plus focused tests; actual client and isolated server when affected. Preserve accepted identity/save/asset references.",
+      "evidence": [
+        "README.md"
+      ]
+    },
+    {
+      "id": "FP-009",
+      "name": "Accepted travel and mission route repairs",
+      "category": "PRESERVE",
+      "sources": [
+        "primary"
+      ],
+      "status": "partial",
+      "confidence": "observed",
+      "obligation": "Preserve repairs; label authored extensions separate from historical parity",
+      "acceptance": "Inspect current consumer plus focused tests; actual client and isolated server when affected. Preserve accepted identity/save/asset references.",
+      "evidence": [
+        "../RustyFusion/docs/instance-route-repairs.md"
+      ]
+    },
+    {
+      "id": "FP-010",
+      "name": "Network protocol and sessions",
+      "category": "PRESERVE",
+      "sources": [
+        "primary"
+      ],
+      "status": "implemented",
+      "confidence": "observed",
+      "obligation": "Keep accepted active wire layouts and extensions",
+      "acceptance": "Inspect current consumer plus focused tests; actual client and isolated server when affected. Preserve accepted identity/save/asset references.",
+      "evidence": [
+        "Docs/Studio/client-server-contract.md"
+      ]
+    },
+    {
+      "id": "FP-011",
+      "name": "Nano acquisition vs progression",
+      "category": "PRESERVE",
+      "sources": [
+        "primary",
+        "alternate"
+      ],
+      "status": "implemented",
+      "confidence": "observed",
+      "obligation": "Never infer level from Nano ID",
+      "acceptance": "Inspect current consumer plus focused tests; actual client and isolated server when affected. Preserve accepted identity/save/asset references.",
+      "evidence": [
+        "../RustyFusion/src/server/shard/nano_acquisition_tests.rs"
+      ]
+    },
+    {
+      "id": "FP-012",
+      "name": "EN/RU text voice and fonts",
+      "category": "PRESERVE",
+      "sources": [
+        "primary",
+        "previous"
+      ],
+      "status": "partial",
+      "confidence": "observed",
+      "obligation": "Preserve accepted fonts and selected variant before locale fallback",
+      "acceptance": "Verify localized artwork resolves under EN/RU including mission badges and loading; verify independent voice selection and fallback in the actual client.",
+      "evidence": [
+        "../FFOneClient/docs/localization-and-voice.md",
+        "Docs/Studio/asset-audit-2026-11-16.md",
+        "Docs/Studio/asset-cleanup-2026-11-17.md",
+        "Docs/Studio/asset-cleanup-expanded-2026-11-17.md"
+      ]
+    },
+    {
+      "id": "FP-013",
+      "name": "Inventory trade social and services",
+      "category": "PRESERVE",
+      "sources": [
+        "primary"
+      ],
+      "status": "partial",
+      "confidence": "observed",
+      "obligation": "Keep server authority and existing service extensions",
+      "acceptance": "Inspect current consumer plus focused tests; actual client and isolated server when affected. Preserve accepted identity/save/asset references.",
+      "evidence": [
+        "Docs/Studio/client-server-contract.md"
+      ]
+    },
+    {
+      "id": "FP-014",
+      "name": "Rust server extensions and shared crate",
+      "category": "PRESERVE",
+      "sources": [],
+      "status": "implemented",
+      "confidence": "observed",
+      "obligation": "Retain shared crate and extensions",
+      "acceptance": "Inspect current consumer plus focused tests; actual client and isolated server when affected. Preserve accepted identity/save/asset references.",
+      "evidence": [
+        "../RustyFusion/Cargo.toml"
+      ]
+    },
+    {
+      "id": "FP-015",
+      "name": "Combat buffs vehicles and Recall",
+      "category": "PRESERVE",
+      "sources": [
+        "primary"
+      ],
+      "status": "partial",
+      "confidence": "observed",
+      "obligation": "Preserve existing functionality; audit missing handlers individually",
+      "acceptance": "Inspect current consumer plus focused tests; actual client and isolated server when affected. Preserve accepted identity/save/asset references.",
+      "evidence": [
+        "Docs/weapon-combat-runtime.md"
+      ]
+    },
+    {
+      "id": "FP-016",
+      "name": "Loading stalls and resource lifetime",
+      "category": "IMPROVE",
+      "sources": [],
+      "status": "partial",
+      "confidence": "observed",
+      "obligation": "Improve only after current measured reproduction",
+      "acceptance": "Inspect current consumer plus focused tests; actual client and isolated server when affected. Preserve accepted identity/save/asset references.",
+      "evidence": [
+        "Docs/Studio/unity-discovery.md"
+      ]
+    },
+    {
+      "id": "FP-017",
+      "name": "Missing combat and Nano behavior",
+      "category": "RECONSTRUCT",
+      "sources": [
+        "primary"
+      ],
+      "status": "partial",
+      "confidence": "observed",
+      "obligation": "Bound one missing behavior and obtain evidence",
+      "acceptance": "Inspect current consumer plus focused tests; actual client and isolated server when affected. Preserve accepted identity/save/asset references.",
+      "evidence": [
+        "Docs/weapon-combat-runtime.md"
+      ]
+    },
+    {
+      "id": "FP-018",
+      "name": "Additional Academy quests",
+      "category": "CANDIDATE",
+      "sources": [
+        "alternate"
+      ],
+      "status": "planned",
+      "confidence": "observed",
+      "obligation": "Candidate until per-quest review",
+      "acceptance": "Inspect current consumer plus focused tests; actual client and isolated server when affected. Preserve accepted identity/save/asset references.",
+      "evidence": [
+        "../FusionForge/docs/source-contract.md"
+      ]
+    },
+    {
+      "id": "FP-019",
+      "name": "Reborn future mechanics",
+      "category": "CANDIDATE",
+      "sources": [
+        "reborn-cache"
+      ],
+      "status": "planned",
+      "confidence": "observed",
+      "obligation": "Candidate, never default authority",
+      "acceptance": "Inspect current consumer plus focused tests; actual client and isolated server when affected. Preserve accepted identity/save/asset references.",
+      "evidence": [
+        "../FusionForge/tools/legacy-sources/sources.json"
+      ]
+    },
+    {
+      "id": "FP-020",
+      "name": "Fusion Kimchi mixed donor atlas",
+      "category": "PRESERVE",
+      "sources": [
+        "alternate"
+      ],
+      "status": "preserved",
+      "confidence": "observed",
+      "obligation": "Preserve the accepted Academy model and the beta-20101123 Fusion atlas verified against its original NpcTexture container.",
+      "acceptance": "Inspect current consumer plus focused tests; actual client and isolated server when affected. Preserve accepted identity/save/asset references.",
+      "evidence": [
+        "../FusionForge/docs/source-contract.md",
+        "Docs/Studio/actor-presentation-audit-2026-11-20.md",
+        "Docs/Studio/actor-repair-2026-11-20.md"
+      ]
+    },
+    {
+      "id": "FP-021",
+      "name": "Recovered XDT actor variants and clip data",
+      "category": "PRESERVE",
+      "sources": ["primary", "alternate"],
+      "status": "partial",
+      "confidence": "observed",
+      "obligation": "Preserve exact XDT identities, native editable prefab and controller bindings, donor meshes, atlas assignments and animation events.",
+      "acceptance": "Resolve the native XDT route in the Windows client and execute the available world states and clip callbacks.",
+      "evidence": ["Docs/Studio/xdt-model-recovery.md", "Docs/Studio/actor-repair-2026-11-20.md"]
+    },
+    {
+      "id": "FP-022",
+      "name": "Original Time Deviant material bindings",
+      "category": "PRESERVE",
+      "sources": ["primary", "alternate"],
+      "status": "implemented",
+      "confidence": "observed",
+      "obligation": "Preserve the donor's original base and secondary DXT5 bytes, mip chains, sampler settings and exact assignment to the Time Deviant materials.",
+      "acceptance": "Verify the authored texture dependencies and inspect the first rendered Time Deviant frame for types 3254 and 3255 in the Windows player.",
+      "evidence": ["Docs/Studio/xdt-model-recovery.md"]
+    },
+    {
+      "id": "FP-023",
+      "name": "Project-specific Nano normal and ready art",
+      "category": "PRESERVE",
+      "sources": ["primary", "previous", "alternate"],
+      "status": "partial",
+      "confidence": "observed",
+      "obligation": "Preserve the FFOneClient normal and ready art, including separate Finn and Jake portrait bindings.",
+      "acceptance": "Verify XDT-to-semantic-icon routing in the gallery and HUD, including Academy 71/72 fallback and Nano form changes.",
+      "evidence": ["Docs/Studio/asset-audit-2026-11-16.md"]
+    },
+    {
+      "id": "FP-024",
+      "name": "Player and HNPC cosmetic transforms and materials",
+      "category": "PRESERVE",
+      "sources": ["primary", "previous"],
+      "status": "implemented",
+      "confidence": "observed",
+      "obligation": "Keep actor and preview pivots stable when equipping accessories. Preserve model-local transforms, texture roles, weighted independent bones and existing identity routes.",
+      "acceptance": "Resolve accessories through authored ownership, validate the exact sockets in both rigs and inspect the first assembled player and HNPC frames.",
+      "evidence": ["Docs/Studio/cosmetics-audit-2026-11-21.md"]
+    }
+  ]
+}

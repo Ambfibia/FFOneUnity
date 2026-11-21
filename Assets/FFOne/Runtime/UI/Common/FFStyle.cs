@@ -13,14 +13,14 @@ namespace FFOne.UI
 
         public static void Background(VisualElement element, string path, Vector4? overrideBorder = null)
         {
+            var border = overrideBorder ?? FFSpriteBorders.For(path);
             var sprite = string.IsNullOrEmpty(path) ? null : FFOne.Content.ContentAssets.Load<Sprite>(path);
-            // Shared artwork can have a different border in the creation GUISkin.
-            // Use a texture for that style so Unity does not override the Sprite border.
-            if (sprite != null && overrideBorder.HasValue && sprite.border != overrideBorder.Value) sprite = null;
+            // The UI Toolkit renderer falls back to the Sprite's border when all style
+            // slices are zero. Use the texture for a mismatched border, including a
+            // requested full stretch, to apply the selected GUIStyle's exact slices.
+            if (sprite != null && sprite.border != border) sprite = null;
             element.style.backgroundImage = sprite != null ? new StyleBackground(sprite) :
                 new StyleBackground(string.IsNullOrEmpty(path) ? null : FFOne.Content.ContentAssets.Load<Texture2D>(path));
-            // Explicit pixel borders also work on a Texture2D while an import is pending.
-            var border = overrideBorder ?? FFSpriteBorders.For(path);
             element.style.unitySliceLeft = (int)border.x;
             element.style.unitySliceBottom = (int)border.y;
             element.style.unitySliceRight = (int)border.z;

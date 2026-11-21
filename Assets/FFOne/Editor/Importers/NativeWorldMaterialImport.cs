@@ -18,6 +18,10 @@ namespace FFOne.Editor
         public static void Apply(AssetImportContext context, JObject document, JToken definition, Material material)
         {
             var data = definition["extras"];
+            // Toon characters share the fixed-function fog contract with world
+            // props. Configure this before the world-only normalized path exits.
+            if (material.HasProperty("_FixedFogMode"))
+                material.SetFloat("_FixedFogMode", FixedFogMode(definition));
             if (data?["ffone"] != null)
             {
                 ApplyNormalizedWorld(context, document, data["ffone"], material);
@@ -95,11 +99,23 @@ namespace FFOne.Editor
             }
             ApplyExactStaticExceptions(shaderName, material);
         }
+        public static int FixedFogMode(JToken definition)
+        {
+            var data = definition["extras"];
+            string declared = (string)data?["ffone"]?["declaredShaderName"] ?? (string)data?["shaderName"] ?? "";
+            bool additive = (string)data?["ffone"]?["passes"]?.FirstOrDefault()?["blend"]?["destinationColor"] == "one";
+            return FixedFogMode(declared, additive);
+        }
+        internal static int FixedFogMode(string declared, bool additive) => UsesFixedFog(declared) ? additive ? 2 : 1 : 0;
+        internal static bool IsActorAdditiveMesh(string name) => name is
+            "normal_blendOneOne_zwriteOff_cullOff" or "normal_blendSrcalphaOne" or
+            "normal_blendSrcalphaOne_zwriteOff" or "normal_blendSrcalphaOne_zwriteOff_cullOff" or
+            "normal_blendSrcalphaOne_zwriteOff_cullOff_vertexColorAD" or "normal_blendSrcalphaOneTest_cullOff";
         static void ApplyNormalizedWorld(AssetImportContext context, JObject document, JToken data, Material material)
         {
             string name = (string)data["declaredShaderName"] ?? "";
-            if (!WorldModelTextureAssets.IsWorld(context.assetPath, document) || (string)data["nativeSurfaceStyle"] == "cel"
-                || !(name == "normal" || name.StartsWith("normal_",StringComparison.Ordinal))) return;
+            if ((string)data["nativeSurfaceStyle"] == "cel" || !(name == "normal" || name.StartsWith("normal_",StringComparison.Ordinal))
+                || !WorldModelTextureAssets.IsWorld(context.assetPath, document)) return;
             material.shader = Shader.Find("FFOne/NativeWorld") ?? throw new InvalidDataException("Missing FFOne/NativeWorld shader");
             foreach (var entry in data["colors"] ?? new JArray())
             {
@@ -142,7 +158,7 @@ namespace FFOne.Editor
                 or "normal_blendSrccolorInvsrcalpha_zwriteOff_cullOff" or "normal_blendSrcalphaOneTest_cullOff" ? 1 : 0);
             material.SetFloat("_FixedFogMode",UsesFixedFog(name) ? destination == BlendMode.One ? 2 : 1 : 0);
         }
-        static BlendMode Blend(string value) => value switch {
+        internal static BlendMode Blend(string value) => value switch {
             "zero" => BlendMode.Zero,"one" => BlendMode.One,"sourceColor" => BlendMode.SrcColor,"oneMinusSourceColor" => BlendMode.OneMinusSrcColor,
             "sourceAlpha" => BlendMode.SrcAlpha,"oneMinusSourceAlpha" => BlendMode.OneMinusSrcAlpha,"destinationColor" => BlendMode.DstColor,
             "oneMinusDestinationColor" => BlendMode.OneMinusDstColor,"destinationAlpha" => BlendMode.DstAlpha,"oneMinusDestinationAlpha" => BlendMode.OneMinusDstAlpha,

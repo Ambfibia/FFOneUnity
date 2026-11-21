@@ -31,8 +31,17 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--player', type=Path)
     parser.add_argument('--skip-build', action='store_true')
+    profile = parser.add_mutually_exclusive_group()
+    profile.add_argument('--weapon-change-only', action='store_true',
+                         help='Exercise the WeaponChange input in the player using the isolated inventory fixture.')
+    profile.add_argument('--grenade-only', action='store_true',
+                         help='Run only the grenade impact, observer and damage checks in the supplied player.')
     parser.add_argument('--result-path', type=Path, default=ROOT / 'Logs/WeaponValidationResult.json')
     args = parser.parse_args()
+    if args.weapon_change_only and not args.player:
+        parser.error('--weapon-change-only requires --player')
+    if args.grenade_only and not args.player:
+        parser.error('--grenade-only requires --player')
     if not args.skip_build:
         run(['cargo', 'build', '--bin', 'hybrid', '--locked'], cwd=SERVER)
         run(['dotnet', 'build', str(ROOT / 'Tools/LiveGameplay/LiveGameplay.csproj'), '--nologo', '-v', 'quiet'], cwd=ROOT)
@@ -81,6 +90,11 @@ def main():
                     SERVER / 'src/server/shard/combat.rs', SERVER / 'src/server/shard/weapon_combat_tests.rs',
                     SERVER / 'src/skills.rs', SERVER / 'src/entity/player.rs']
     source_paths += list((ROOT / 'Assets/FFOne/Runtime/UI').glob('Frontend*.cs'))
+    if args.weapon_change_only:
+        source_paths += [ROOT / 'Assets/InputSystem_Actions.inputactions',
+                         ROOT / 'Assets/FFOne/Runtime/UI/GameplayInput.cs',
+                         ROOT / 'Assets/FFOne/Runtime/UI/Gameplay/GameplayInventoryDrag.cs',
+                         SERVER / 'src/server/shard/item.rs']
     source_paths += list((ROOT / 'Assets/FFOne/Content/UI').rglob('*.uss'))
     source_paths += list((ROOT / 'Assets/FFOne/Content/UI').rglob('*.uxml'))
     source_paths = sorted(set(source_paths))
@@ -122,8 +136,9 @@ def main():
                     run(['dotnet', str(HARNESS), 'create-weapons', str(login), str(folder / 'create.json')], cwd=ROOT, timeout=120)
                     time.sleep(.5)
                     result['accountLevels'] = weapon_combat.seed(database)
-                    run(['dotnet', str(HARNESS), 'exercise-weapons', str(login), str(folder / 'network.json')], cwd=ROOT, timeout=300)
-                    result['network'] = json.loads((folder / 'network.json').read_text('utf-8'))
+                    if not args.weapon_change_only:
+                        run(['dotnet', str(HARNESS), 'exercise-weapons', str(login), str(folder / 'network.json')], cwd=ROOT, timeout=300)
+                        result['network'] = json.loads((folder / 'network.json').read_text('utf-8'))
                 else:
                     profile = folder / 'player-profile'
                     profile.mkdir()
@@ -131,7 +146,11 @@ def main():
                     startup = subprocess.STARTUPINFO()
                     startup.dwFlags |= subprocess.STARTF_USESHOWWINDOW
                     startup.wShowWindow = subprocess.SW_HIDE
-                    run([str(player), '-batchmode', '--live-weapon-smoke', '-screen-width', '1280', '-screen-height', '720',
+                    mode = ['-batchmode', '--live-grenade-smoke' if args.grenade_only else '--live-weapon-smoke']
+                    if args.weapon_change_only:
+                        mode = ['-screen-fullscreen', '0', '--live-weapon-change-smoke']
+                        startup = None
+                    run([str(player), *mode, '-screen-width', '1280', '-screen-height', '720',
                          '-logFile', str(folder / 'player.log')], cwd=ROOT, env=env, startupinfo=startup, timeout=900)
                     result['player'] = json.loads((profile / 'weapons-result.json').read_text('utf-8'))
                     result['playerExceptions'] = re.findall(r'^\w+(?:\.\w+)*Exception:.*$', (folder / 'player.log').read_text('utf-8', errors='replace'), re.MULTILINE)
@@ -159,7 +178,10 @@ def main():
         result['harnessAssemblySha256After'] = sha(HARNESS)
         if result['sourceHashesAfter'] != result['sourceHashes'] or result['serverBinarySha256After'] != result['serverBinarySha256'] or result['harnessAssemblySha256After'] != result['harnessAssemblySha256']:
             raise AssertionError('Weapon runtime source or binaries changed during acceptance')
-        result['passed'] = result['network']['passed'] and (not player or result['player']['passed'])
+        if args.weapon_change_only:
+            result['passed'] = result['player']['passed']
+        else:
+            result['passed'] = result['network']['passed'] and (not player or result['player']['passed'])
         if not result['passed']:
             raise AssertionError('Weapon/PvP acceptance reported failed checks')
     except Exception as error:

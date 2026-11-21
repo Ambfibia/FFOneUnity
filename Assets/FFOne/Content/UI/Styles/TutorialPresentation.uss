@@ -1,0 +1,108 @@
+.cinematic-placed { position: absolute; }
+.cinematic-fill { position: absolute; left: 0; top: 0; right: 0; bottom: 0; }
+.cinematic-clip { overflow: hidden; }
+.cinematic-copy {
+    flex-shrink: 0;
+    margin: 0;
+    padding: 0;
+    white-space: normal;
+    -unity-text-align: middle-center;
+    -unity-font-definition: url("../Fonts/jeffe-sdf.asset");
+    color: white;
+}
+.cinematic-copy.cinematic-chalet, .cinematic-chalet {
+    -unity-font-definition: url("../Fonts/chaletbook-regular-sdf.asset");
+}
+.cinematic-copy.cinematic-shadow { color: black; }
+.cinematic-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 15.673982%;
+    background-color: black;
+}
+.cinematic-bar--top { top: 0; }
+.cinematic-bar--bottom { bottom: 0; }
+.tutorial-fade, .dexter-ship-cutscene, .dexter-ship-blackout { background-color: black; }
+.tutorial-localized-jump-key {
+    position: absolute;
+    width: 298px;
+    height: 91px;
+    transform-origin: 0 0;
+}
+.tutorial-jump-strip { position: absolute; }
+.tutorial-jump-strip-0 { left: 0; top: 0; width: 298px; height: 30px; }
+.tutorial-jump-strip-1 { left: 0; top: 55px; width: 298px; height: 36px; }
+.tutorial-jump-strip-2 { left: 0; top: 30px; width: 30px; height: 25px; }
+.tutorial-jump-strip-3 { left: 265px; top: 30px; width: 33px; height: 25px; }
+.tutorial-jump-strip-4 { left: 30px; top: 30px; width: 235px; height: 25px; }
+.cinematic-copy.tutorial-jump-label {
+    position: absolute;
+    left: 38px;
+    top: 30px;
+    width: 219px;
+    height: 25px;
+    color: rgb(41, 110, 143);
+    font-size: 14px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-left;
+}
+.cinematic-copy.tutorial-location-copy { -unity-text-align: middle-left; }
+.cinematic-copy.tutorial-location { color: rgb(255, 254, 255); }
+.tutorial-dialogue-copy, .ff-button.tutorial-cinematic-skip { -unity-text-align: upper-center; }
+.ff-button.tutorial-cinematic-skip { color: white; }
+.ff-button.tutorial-cinematic-skip, .tutorial-pause-button { -unity-font-definition: url("../Fonts/chaletbook-regular-sdf.asset"); }
+.tutorial-pause {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    width: 360px;
+    height: 200px;
+    background-color: rgba(10, 18, 20, 0.96);
+}
+.tutorial-pause-title { position: absolute; left: 20px; top: 15px; width: 320px; height: 40px; font-size: 22px; }
+.tutorial-pause-button { position: absolute; left: 50px; width: 260px; height: 38px; font-size: 14px; }
+.tutorial-resume { top: 70px; }
+.tutorial-exit { top: 120px; }
+.dexter-ship-background {
+    position: absolute;
+    width: 1920px;
+    height: 1440px;
+    background-image: url("../Artwork/en/character/creation/background/CharCreationBG.png");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+.dexter-ship-hologram { position: absolute; width: 512px; height: 512px; }
+.dexter-ship-title-canvas, .dexter-ship-skip-canvas { transform-origin: 50% 0; }
+.cinematic-copy.dexter-ship-location-title {
+    position: absolute;
+    width: 300px;
+    height: 100px;
+    padding: 4px 6px 6px 10px;
+    -unity-text-align: middle-left;
+    font-size: 16px;
+    color: rgb(255, 254, 255);
+}
+.cinematic-copy.dexter-ship-title-shadow { color: black; left: 51px; }
+.dexter-ship-title { left: 50px; }
+.cinematic-copy.dexter-ship-error { font-size: 12px; color: red; }
+.dexter-ship-subtitle-area { flex-direction: column; transform-origin: 0 0; }
+.dexter-ship-subtitle-speaker { height: 13.71px; font-size: 12px; }
+.cinematic-copy.dexter-ship-subtitle-dialogue {
+    padding: 4px 6px 6px 10px;
+    margin: 4px;
+    font-size: 14px;
+    color: rgb(255, 254, 255);
+}
+.cinematic-copy.dexter-ship-skip-label {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 30px;
+    padding: 4px 6px 6px 10px;
+    font-size: 12px;
+    color: rgb(255, 254, 255);
+}
+.dexter-ship-loading { position: absolute; left: 45%; top: 48%; color: white; }
+.ui-suppressed { display: none; }

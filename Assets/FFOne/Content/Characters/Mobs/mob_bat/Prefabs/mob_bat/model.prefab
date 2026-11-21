@@ -1521,7 +1521,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8330011323436933071}
-  - component: {fileID: 3473545076548564883}
+  - component: {fileID: 1883022390845833439}
+  - component: {fileID: 7453011234920272779}
+  - component: {fileID: 3531711005395179940}
   m_Layer: 0
   m_Name: model
   m_TagString: Untagged
@@ -1545,36 +1547,114 @@ Transform:
   - {fileID: 5242840696648662577}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!111 &3473545076548564883
-Animation:
+--- !u!95 &1883022390845833439
+Animator:
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6764186642908471840}
   m_Enabled: 1
-  serializedVersion: 4
-  m_Animation: {fileID: 7400000, guid: bef2e00287974f14db1a50c4989cac03, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: a5cd8e65ac0486c45a077e8b19c1a119, type: 2}
-  - {fileID: 7400000, guid: 7607cb541e123e147adc27127508db6e, type: 2}
-  - {fileID: 7400000, guid: 540090a111349b747a5308889c0e4d44, type: 2}
-  - {fileID: 7400000, guid: 5693aa7d262bb0d45b1d92bd708d4e6d, type: 2}
-  - {fileID: 7400000, guid: 4536fbeddb038694c8bcfc635882f8e1, type: 2}
-  - {fileID: 7400000, guid: 0afeaf623804a0d44be734bac6a8cfc0, type: 2}
-  - {fileID: 7400000, guid: 21620be1fa1bbbe4492f201564c3be4f, type: 2}
-  - {fileID: 7400000, guid: b20e953436c33724fb01f74bd9ce9cd7, type: 2}
-  - {fileID: 7400000, guid: bef2e00287974f14db1a50c4989cac03, type: 2}
-  - {fileID: 7400000, guid: 45c47009846b8ae4fa9839859bcfb7b7, type: 2}
-  - {fileID: 7400000, guid: 9b5b35efe474b0b4ca36b524bd7b4f25, type: 2}
-  - {fileID: 7400000, guid: 13bfb722658667e4696a13721b9ea863, type: 2}
-  - {fileID: 7400000, guid: 217b8914d4c29af4f90cd7c28355ebab, type: 2}
-  - {fileID: 7400000, guid: 9667ab0c16d7ef742a5614c08d52136d, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 8f50d356cc0f38c4a8f23ff1c3ea3fff, type: 2}
+  m_CullingMode: 0
   m_UpdateMode: 0
-  m_CullingType: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 1
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7453011234920272779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6764186642908471840}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b7ac68c382befc4d9fc82662c17e418, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.Content.NativeNpcAnimator
+  animator: {fileID: 1883022390845833439}
+  AnimationSounds:
+  - Cue: DexbotBat_TW_Corruptak.wav
+    Variants:
+    - {fileID: 8300000, guid: 2478cb91ff239cd4081210f09a902ed2, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: DexbotBat_TW_Death.wav
+    Variants:
+    - {fileID: 8300000, guid: e22d10c2d173b1c4e9cc7087d29c149e, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: DexbotBat_TW_Dodge.wav
+    Variants:
+    - {fileID: 8300000, guid: 1fd1c9ecd2823474397c2bf5261d1856, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: DexbotBat_TW_Range1.wav
+    Variants:
+    - {fileID: 8300000, guid: c0b4ee1cd4a52a04a84310cba23fa899, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: DexbotBat_TW_Range2.wav
+    Variants:
+    - {fileID: 8300000, guid: 6f373af5b4ab7ef439dcbf80af35f340, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: DexbotBat_TW_Ready(RAND:1-2).wav
+    Variants:
+    - {fileID: 8300000, guid: 788ad4776e5c44247bfa95b74b261130, type: 3}
+    - {fileID: 8300000, guid: f237659f2f2c6ec47b60d245e88540e5, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+    - {fileID: 0}
+  - Cue: DexbotBat_TW_Run(RAND:1-2).wav
+    Variants:
+    - {fileID: 8300000, guid: 892ae2cb7280d9d49acfff2f866bd871, type: 3}
+    - {fileID: 8300000, guid: b960bfa2f4ac6cc4c9966960ec82bf7b, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+    - {fileID: 0}
+  - Cue: DexbotBat_TW_Skill0.wav
+    Variants:
+    - {fileID: 8300000, guid: 38ecc937c9e773446a5c042e2d268fed, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: DexbotBat_TW_Stand1.wav
+    Variants:
+    - {fileID: 8300000, guid: 5b3d63c390a4108488c4470ffa1141b2, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: DexbotBat_TW_Stand2.wav
+    Variants:
+    - {fileID: 8300000, guid: e452110efee77bc449a09f8c7c4c7679, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: DexbotBat_TW_Stand3.wav
+    Variants:
+    - {fileID: 8300000, guid: f08adad3139fc704993bf6d67769da6f, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: DexbotBat_TW_Stand4.wav
+    Variants:
+    - {fileID: 8300000, guid: add7585c0e43166448c07a118ec0371b, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: DexbotBat_TW_Walk(RAND:1-2).wav
+    Variants:
+    - {fileID: 8300000, guid: c110f71f980b4a34b80856582f0c76e8, type: 3}
+    - {fileID: 8300000, guid: 1ca1ab09594a90d42856f4537489c76a, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+    - {fileID: 0}
+  Faces: []
 --- !u!1 &6798348922001515911
 GameObject:
   m_ObjectHideFlags: 0
@@ -2419,3 +2499,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2674927731972499436}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3531711005395179940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6764186642908471840}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ee3989daf214b8c805f250337cb2f41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.World.WorldNpcSkins
+  surfaces:
+  - Renderer: {fileID: 1170453667656269062}
+    Slot: 0
+    Default: {fileID: 2100000, guid: c6a702682df5cd64988e83c20a9d7ef5, type: 2}
+    Choices:
+    - Types: 25010000
+      Material: {fileID: 2100000, guid: 00721d00c688529d8d6554a53cf61ee0, type: 2}
+    - Types: e701000040020000ee040000
+      Material: {fileID: 2100000, guid: acb514d128d85eb6a10dd7eebc37e0fa, type: 2}

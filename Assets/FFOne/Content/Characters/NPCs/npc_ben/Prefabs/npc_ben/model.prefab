@@ -1702,7 +1702,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5468824440414738316}
-  - component: {fileID: 2985672360119232083}
+  - component: {fileID: 3653206314857095562}
+  - component: {fileID: 4859172266200749586}
+  - component: {fileID: 1025126649904059616}
   m_Layer: 0
   m_Name: model
   m_TagString: Untagged
@@ -1726,39 +1728,70 @@ Transform:
   - {fileID: 4580358452760437601}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!111 &2985672360119232083
-Animation:
+--- !u!95 &3653206314857095562
+Animator:
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6737714872921750292}
   m_Enabled: 1
-  serializedVersion: 4
-  m_Animation: {fileID: 7400000, guid: 302fbabfe3999e54796ef8194bcf2faf, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: 4d49ecd47b0f59542b868d4e55032637, type: 2}
-  - {fileID: 7400000, guid: 56ed72c61fa8227499f508a8871a9ee3, type: 2}
-  - {fileID: 7400000, guid: d54ccafca2fa0364facd2e49635cf150, type: 2}
-  - {fileID: 7400000, guid: dba2792c998062548b26a8eb9729be3d, type: 2}
-  - {fileID: 7400000, guid: 345e154a38aa94c4291b67cc6f220ddd, type: 2}
-  - {fileID: 7400000, guid: 74b57c202f3a0b64d95cbf99234c0f94, type: 2}
-  - {fileID: 7400000, guid: 441f92d69f1d2d9499e517c14c0f6879, type: 2}
-  - {fileID: 7400000, guid: 1222fc933ec298845a3aa40ac679ccca, type: 2}
-  - {fileID: 7400000, guid: 02a0c20fd3fb12741999f26ce6ec716b, type: 2}
-  - {fileID: 7400000, guid: b1d9553ebe29b3649b1314373c3197bb, type: 2}
-  - {fileID: 7400000, guid: 51cb902d188c8914785f80686e316199, type: 2}
-  - {fileID: 7400000, guid: 302fbabfe3999e54796ef8194bcf2faf, type: 2}
-  - {fileID: 7400000, guid: ca443b9bfa953aa4bbf094c5829bba53, type: 2}
-  - {fileID: 7400000, guid: 4cb078df45d4584448a6bc2c318fd5d0, type: 2}
-  - {fileID: 7400000, guid: 32dcf4c40bb4f5d4097ace69a69c1c6b, type: 2}
-  - {fileID: 7400000, guid: 8953451fb45cf0b4fb52c446ef6f0aca, type: 2}
-  - {fileID: 7400000, guid: 8f0d7c41b078fdf4cb68698b4cc4b82d, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: d5eb553badd06f243805ffe9be80ce69, type: 2}
+  m_CullingMode: 0
   m_UpdateMode: 0
-  m_CullingType: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 1
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &4859172266200749586
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6737714872921750292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b7ac68c382befc4d9fc82662c17e418, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.Content.NativeNpcAnimator
+  animator: {fileID: 3653206314857095562}
+  AnimationSounds:
+  - Cue: Ben_AttackGrunt_0(RAND:1-7).wav
+    Variants:
+    - {fileID: 8300000, guid: 929bc4d700298034f82815373b2430db, type: 3}
+    - {fileID: 8300000, guid: 0e53c74334c5975418aa7c33354dc498, type: 3}
+    - {fileID: 8300000, guid: 2c98da42aab4ca24a8d8c066907307ba, type: 3}
+    - {fileID: 8300000, guid: 9067d3074bc729348a44b72063d33c7d, type: 3}
+    - {fileID: 8300000, guid: dac4cf85f57c66f46b58a94d08746044, type: 3}
+    - {fileID: 8300000, guid: cf40e88d8be86274183b01464af01844, type: 3}
+    - {fileID: 8300000, guid: 72d38a76b7a1d2b46a62f1bd7b9b7056, type: 3}
+    RussianVariants:
+    - {fileID: 8300000, guid: cf82c63eabd67c343bab84afc6835661, type: 3}
+    - {fileID: 8300000, guid: c20c3cbc4f01b1447b9d566902cab025, type: 3}
+    - {fileID: 8300000, guid: cde5eb28b0278d94c8ba6063155982df, type: 3}
+    - {fileID: 8300000, guid: 0feaeacd9b886ea4b9296cfed60f8ccb, type: 3}
+    - {fileID: 8300000, guid: 9e5e4a9276e2f9844846ef1d9c07975c, type: 3}
+    - {fileID: 8300000, guid: 4e72542230bba214b99114e8dc02e11d, type: 3}
+    - {fileID: 8300000, guid: c170b741af9917e4c99762a9133ac554, type: 3}
+  - Cue: Ben_AttackWhoosh_02.wav
+    Variants:
+    - {fileID: 8300000, guid: 1db8ea93368d7404bab4e9940a8742b6, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: Ben_AttackWhoosh_01.wav
+    Variants:
+    - {fileID: 8300000, guid: 1a0c257800175e94895100bcbea1959d, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  Faces: []
 --- !u!1 &6776607683600731065
 GameObject:
   m_ObjectHideFlags: 0
@@ -2359,3 +2392,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4125329090383025611}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1025126649904059616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6737714872921750292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ee3989daf214b8c805f250337cb2f41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.World.WorldNpcSkins
+  surfaces:
+  - Renderer: {fileID: 5724362395886267354}
+    Slot: 0
+    Default: {fileID: 2100000, guid: e44901e4b67ccb94a83bde80dd0c6075, type: 2}
+    Choices:
+    - Types: b9020000
+      Material: {fileID: 2100000, guid: 580276b44fe65bb1b81c8fa7a238ac9d, type: 2}

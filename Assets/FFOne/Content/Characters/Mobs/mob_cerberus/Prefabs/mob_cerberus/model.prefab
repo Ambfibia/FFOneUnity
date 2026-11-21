@@ -495,7 +495,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3023974812216004119}
-  - component: {fileID: 5481707767991140601}
+  - component: {fileID: 2280215470496088104}
+  - component: {fileID: 6765815643299192927}
+  - component: {fileID: 4208215531167896033}
   m_Layer: 0
   m_Name: model
   m_TagString: Untagged
@@ -519,38 +521,119 @@ Transform:
   - {fileID: 4221588456995347638}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!111 &5481707767991140601
-Animation:
+--- !u!95 &2280215470496088104
+Animator:
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1168380417471126042}
   m_Enabled: 1
-  serializedVersion: 4
-  m_Animation: {fileID: 7400000, guid: b1553487b3079e4479c4d756a04fae66, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: 2c6fe30367dff64409f62152cb9db4fd, type: 2}
-  - {fileID: 7400000, guid: 2f3345dc1fce2d547bae30960af25089, type: 2}
-  - {fileID: 7400000, guid: 755ce5f9c05b8b049b5327b09460ceae, type: 2}
-  - {fileID: 7400000, guid: c3c9a4dddd717b24dad3d0f40b617ee0, type: 2}
-  - {fileID: 7400000, guid: 9533ee7f2198d804a929b9aee20039d3, type: 2}
-  - {fileID: 7400000, guid: ade71d06910290b42aa98841801cf220, type: 2}
-  - {fileID: 7400000, guid: b6caf0bb21f86694fb66df624f2d43e1, type: 2}
-  - {fileID: 7400000, guid: 5d62545d6b1a8914a824417af0dad2e7, type: 2}
-  - {fileID: 7400000, guid: 7725f5110910a014199771c83dc71a25, type: 2}
-  - {fileID: 7400000, guid: b1332ebf9f4ee4c45b2912423f94c388, type: 2}
-  - {fileID: 7400000, guid: b1553487b3079e4479c4d756a04fae66, type: 2}
-  - {fileID: 7400000, guid: ff7c2070588125a4983dc88846c4edd5, type: 2}
-  - {fileID: 7400000, guid: d40908ab380d1fe48a971666a66d37f4, type: 2}
-  - {fileID: 7400000, guid: 743c22fc13379f248972f6e5840bbc33, type: 2}
-  - {fileID: 7400000, guid: 8261499fc9152a14bb8d38731e0a96ef, type: 2}
-  - {fileID: 7400000, guid: 68ee577d06c9b2743ab257a85cc91712, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 295c6145a83ba7d4bacc17e9d22bf22b, type: 2}
+  m_CullingMode: 0
   m_UpdateMode: 0
-  m_CullingType: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 1
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &6765815643299192927
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1168380417471126042}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b7ac68c382befc4d9fc82662c17e418, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.Content.NativeNpcAnimator
+  animator: {fileID: 2280215470496088104}
+  AnimationSounds:
+  - Cue: DexbotCerberus_CB_Corruptak.wav
+    Variants:
+    - {fileID: 8300000, guid: e6f9849acde0a22428e7a0a24e632e07, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: DexbotCerberus_CB_Death.wav
+    Variants:
+    - {fileID: 8300000, guid: c0da599f95354c04f86355c167fb69da, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: DexbotCerberus_CB_Melee1_(RAND:1-3).wav
+    Variants:
+    - {fileID: 8300000, guid: 0366bd0b66988b642a0df08121d309c7, type: 3}
+    - {fileID: 8300000, guid: 7910b3880f254164fbb48290178ea9d3, type: 3}
+    - {fileID: 8300000, guid: 894d9072b08314444abf0ae6e14dfb75, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+  - Cue: DexbotCerberus_CB_Melee1upper.wav
+    Variants:
+    - {fileID: 8300000, guid: 6ae180a7008f06d4cb9951c98b1fcd77, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: DexbotCerberus_CB_Melee1_3.wav
+    Variants:
+    - {fileID: 8300000, guid: 894d9072b08314444abf0ae6e14dfb75, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: DexbotCerberus_CB_Melee2upper.wav
+    Variants:
+    - {fileID: 8300000, guid: 783574917b6a22e47973ec3991df2b38, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: DexbotCerberus_CB_Ready1_(RAND:1-2).wav
+    Variants:
+    - {fileID: 8300000, guid: cde295570a0192448bbfeb4a62bca148, type: 3}
+    - {fileID: 8300000, guid: 18e76fd2e5d9f9d4bb32abbf758d2f9c, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+    - {fileID: 0}
+  - Cue: DexbotCerberus_CB_Run.wav
+    Variants:
+    - {fileID: 8300000, guid: a6a46f70a43bf004bb0db16706e5ef37, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: DexbotCerberus_CB_Skill0.wav
+    Variants:
+    - {fileID: 8300000, guid: 6c9979f23d554af4484371093d6c0191, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: DexbotCerberus_CB_Stand1.wav
+    Variants:
+    - {fileID: 8300000, guid: 78ac1397820588f41b215f22e395d378, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: DexbotCerberus_CB_Stand2.wav
+    Variants:
+    - {fileID: 8300000, guid: 68be932aac42eba408282c8f9b1803a0, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: DexbotCerberus_CB_Stand3.wav
+    Variants:
+    - {fileID: 8300000, guid: 3c76bc2529e5a314499aeecddc65b35b, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: DexbotCerberus_CB_Stand4.wav
+    Variants:
+    - {fileID: 8300000, guid: 63d9d71573ff1444283775d3293222d1, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: DexbotCerberus_CB_Walk.wav
+    Variants:
+    - {fileID: 8300000, guid: 8e5c6810ec4f1be4ca6e758de981e69f, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  Faces: []
 --- !u!1 &1208049236639027107
 GameObject:
   m_ObjectHideFlags: 0
@@ -2679,3 +2762,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8092535846005896833}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4208215531167896033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1168380417471126042}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ee3989daf214b8c805f250337cb2f41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.World.WorldNpcSkins
+  surfaces:
+  - Renderer: {fileID: 501281907336421563}
+    Slot: 0
+    Default: {fileID: 2100000, guid: c1f56238e04e97949bed8892c8fd6e18, type: 2}
+    Choices:
+    - Types: 4d020000
+      Material: {fileID: 2100000, guid: 7c3122281d8d51f5a7a787b487777e29, type: 2}

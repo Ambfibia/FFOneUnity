@@ -11,7 +11,7 @@ using Object = UnityEngine.Object;
 
 namespace FFOne.Editor
 {
-    /// <summary>Bounded import of accepted tutorial map 01_01 and its exact dependencies.</summary>
+    /// <summary>Imports tutorial actors, audio and UI. The editable world cell owns map 01_01.</summary>
     public static class TutorialContentImport
     {
         const string ScenePath = "map/tiles/map_01_01/scene.json";
@@ -19,7 +19,7 @@ namespace FFOne.Editor
         const string Output = "Assets/Resources/Tutorial";
         // Original tutorial runtime NPC types; IDs are independent of mesh/voice IDs.
         static readonly int[] GameplayNpcTypes = { 2669, 2670, 2671, 2672, 2673, 2674, 2675, 2676, 2677, 2678,
-            2694, 2695, 2696, 2800, 2897, 2902, 2374, 2375, 2376, 2377, 2378 };
+            2694, 2695, 2696, 2800, 2897, 2902, 2968, 2374, 2375, 2376, 2377, 2378 };
         static int[] NpcTypes() => GameplayNpcTypes.Concat(JObject.Parse(File.ReadAllText(ContentPaths.FilePath("Assets/Resources/data/tutorial/cinematics.json")))
             .Descendants().OfType<JProperty>().Where(p => p.Name == "npc_type").Select(p => (int)p.Value)).Distinct().OrderBy(id => id).ToArray();
         static JObject Read(string source, string path) => JObject.Parse(File.ReadAllText(ContentPaths.FilePath(NativeContentImport.ResolveSafe(source, path))));
@@ -57,15 +57,12 @@ namespace FFOne.Editor
         }
         public static List<string> Plan(string source)
         {
-            var scene = Read(source, ScenePath);
-            var terrain = Read(source, TerrainPath);
             var xdt = Read(source, "data/tables/xdt.json");
             var routes = Routes(xdt);
-            var files = new HashSet<string>(StringComparer.Ordinal) { ScenePath, TerrainPath,
+            var files = new HashSet<string>(StringComparer.Ordinal) {
                 "audio/ambient/tutorialmain_wambient_loop.ogg",
                 "characters/player/items/weapon/rifle_electricgun/models/rifle_electricgun/model.glb",
                 "characters/player/items/weapon/rifle_electricgun/textures/rifle_electricgun.png" };
-            foreach (var model in scene["models"]!) files.Add((string)model["path"]);
             foreach (int type in NpcTypes()) files.Add(Model(xdt, routes, type));
             foreach (string path in TutorialCinematicEffects.RequiredNativePaths()) files.Add(path);
             // Buttercup Nano uses the accepted native model route, not NPC numeric equality.
@@ -80,10 +77,6 @@ namespace FFOne.Editor
             foreach (string folder in new[] { "ui/en/gameplay/intro", "ui/en/gameplay/tutorial" })
                 foreach (string file in ContentPaths.GetFiles(NativeContentImport.ResolveSafe(source, folder), "*.png"))
                     files.Add(Path.GetRelativePath(source, file).Replace('\\', '/'));
-            string terrainFolder = Path.GetDirectoryName(TerrainPath)!.Replace('\\', '/');
-            files.Add(terrainFolder + "/" + (string)terrain["heightmap"]!["path"]);
-            foreach (var layer in terrain["splat"]!["layers"]!) files.Add((string)layer["albedo"]!["path"]);
-            foreach (var weights in terrain["splat"]!["weightMaps"]!) files.Add(terrainFolder + "/" + (string)weights["path"]);
             foreach (string glb in files.Where(f => f.EndsWith(".glb", StringComparison.OrdinalIgnoreCase)).ToArray())
             {
                 var document = NativeGlbDocument.Read(NativeContentImport.ResolveSafe(source, glb));
@@ -100,12 +93,52 @@ namespace FFOne.Editor
         public static void ImportDefault() => Import(NativeContentImport.DefaultSource);
         [MenuItem("FFOne/Rebuild Tutorial Presentation")]
         public static void RebuildDerivedContent() => RebuildDerivedContent(NativeContentImport.DefaultSource);
+        [MenuItem("FFOne/Tutorial/Repair Actor Definitions")]
+        public static void RepairActorDefinitions()
+        {
+            var content = AssetDatabase.LoadAssetAtPath<TutorialContent>(ContentPaths.Resolve(Output + "/Content.asset"))
+                ?? throw new InvalidDataException("Tutorial content is missing; no authored content replaced.");
+            int changed = RefreshActorDefinitions(content, FFOne.Content.NativeData.Object("data/tables/xdt"));
+            if (changed > 0) { EditorUtility.SetDirty(content); AssetDatabase.SaveAssets(); }
+            Debug.Log($"FFOne tutorial actor definitions: {changed} repaired, {content.Actors.Length} verified against the accepted NPC table.");
+        }
+
+        public static int RefreshActorDefinitions(TutorialContent content, JObject xdt)
+        {
+            if (!content || content.Actors == null) throw new InvalidDataException("Tutorial actor definitions are missing.");
+            // Resolve and validate every exact NPC row before changing any asset fields.
+            // Model/name identities and authored cinematic bindings are independent of these attributes.
+            var updates = content.Actors.Select(actor => {
+                if (actor == null) throw new InvalidDataException("Null tutorial actor definition.");
+                var row = Npc(xdt, actor.NpcType);
+                return (Actor: actor, Values: new TutorialActorDefinition {
+                    MaxHp = (int)row["m_iHP"]!, Style = (int)row["m_iNpcStyle"]!, Class = (int)row["m_iNpcType"]!,
+                    Scale = (float)row["m_fScale"]!, AttackRange = (int)row["m_iAtkRange"]! / 100f,
+                    Height = (int)row["m_iHeight"]! / 100f, Radius = (int)row["m_iRadius"]! / 100f,
+                    WalkAnimationSpeed = (float?)row["m_fWalkAnimationSpeed"] ?? 1,
+                    RunAnimationSpeed = (float?)row["m_fRunAnimationSpeed"] ?? 1
+                });
+            }).ToArray();
+            int changed = 0;
+            foreach (var update in updates)
+            {
+                var actor = update.Actor; var values = update.Values;
+                if (actor.MaxHp == values.MaxHp && actor.Style == values.Style && actor.Class == values.Class
+                    && actor.Scale == values.Scale && actor.AttackRange == values.AttackRange && actor.Height == values.Height && actor.Radius == values.Radius
+                    && actor.WalkAnimationSpeed == values.WalkAnimationSpeed && actor.RunAnimationSpeed == values.RunAnimationSpeed) continue;
+                actor.MaxHp = values.MaxHp; actor.Style = values.Style; actor.Class = values.Class;
+                actor.Scale = values.Scale; actor.AttackRange = values.AttackRange; actor.Height = values.Height; actor.Radius = values.Radius;
+                actor.WalkAnimationSpeed = values.WalkAnimationSpeed; actor.RunAnimationSpeed = values.RunAnimationSpeed;
+                changed++;
+            }
+            return changed;
+        }
         public static void RebuildDerivedContent(string source)
         {
-            // Rebuild only the two generated containers; imported editable source assets and
-            // the geometry subassets retain their GUIDs and references.
+            // The world is an editable authored scene. Never rebuild the obsolete monolithic prefab.
             NativeContentImport.Preflight(source, Plan(source));
-            BuildWorld(source); BuildContent(source); AssetDatabase.SaveAssets();
+            BuildContent(source); AssetDatabase.SaveAssets();
+            TutorialActorPresentationImport.Repair();
         }
         public static void Import(string source)
         {
@@ -126,17 +159,21 @@ namespace FFOne.Editor
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
             Directory.CreateDirectory(ContentPaths.FilePath(Output));
             AssetDatabase.Refresh();
-            if (!File.Exists(ContentPaths.FilePath(Output + "/World.prefab"))) BuildWorld(source);
             if (!File.Exists(ContentPaths.FilePath(Output + "/Content.asset"))) BuildContent(source);
             else
             {
                 var existing = AssetDatabase.LoadAssetAtPath<TutorialContent>(ContentPaths.Resolve(Output + "/Content.asset"))
                     ?? throw new InvalidDataException("Existing tutorial content could not be loaded; no authored content replaced.");
-                var routes = Routes(Read(source, "data/tables/xdt.json"));
+                var xdt = Read(source, "data/tables/xdt.json"); var routes = Routes(xdt);
                 Debug.Log("FFOne tutorial audio refresh: " + TutorialAudioRefresh.Apply(existing, AudioDefinitions(routes)));
+                Debug.Log("FFOne tutorial actor definitions refreshed: " + RefreshActorDefinitions(existing, xdt));
+                existing.World = null;
+                existing.Skybox = AssetDatabase.LoadAssetAtPath<Material>(TutorialSkyboxImport.MaterialPath);
+                EditorUtility.SetDirty(existing);
             }
             AssetDatabase.SaveAssets();
             Debug.Log("FFOne tutorial content: " + preflight);
+            TutorialActorPresentationImport.Repair();
         }
         static T Asset<T>(string path) where T : Object => AssetDatabase.LoadAssetAtPath<T>(ContentPaths.Resolve(AbsoluteAsset(path)))
             ?? throw new InvalidDataException("Native dependency failed Unity import: " + path);
@@ -144,17 +181,18 @@ namespace FFOne.Editor
         {
             var xdt = Read(source, "data/tables/xdt.json"); var routes = Routes(xdt);
             var content = ScriptableObject.CreateInstance<TutorialContent>();
-            content.World = AssetDatabase.LoadAssetAtPath<GameObject>(ContentPaths.Resolve(Output + "/World.prefab"));
+            content.Skybox = AssetDatabase.LoadAssetAtPath<Material>(TutorialSkyboxImport.MaterialPath);
             content.ButtercupNano = Asset<GameObject>("characters/nanos/nano_buttercup/nano_buttercup.glb");
             content.Actors = NpcTypes().Select(id => {
                 var row = Npc(xdt, id);
                 return new TutorialActorDefinition { NpcType = id, MaxHp = (int)row["m_iHP"]!, Style = (int)row["m_iNpcStyle"]!, Class = (int)row["m_iNpcType"]!,
                     Scale = (float)row["m_fScale"]!, AttackRange = (int)row["m_iAtkRange"]! / 100f, Height = (int)row["m_iHeight"]! / 100f, Radius = (int)row["m_iRadius"]! / 100f,
+                    WalkAnimationSpeed = (float?)row["m_fWalkAnimationSpeed"] ?? 1, RunAnimationSpeed = (float?)row["m_fRunAnimationSpeed"] ?? 1,
                     Name = (string)xdt["m_pNpcTable"]!["m_pNpcStringData"]![(int)row["m_iNpcName"]!]["m_strName"], Model = Asset<GameObject>(Model(xdt, routes, id)) };
             }).ToArray();
             content.Audio = AudioDefinitions(routes).ToArray();
             var existing = AssetDatabase.LoadAssetAtPath<TutorialContent>(ContentPaths.Resolve(Output + "/Content.asset"));
-            if (existing) { EditorUtility.CopySerialized(content, existing); EditorUtility.SetDirty(existing); Object.DestroyImmediate(content); }
+            if (existing) { content.Cinematics = existing.Cinematics; EditorUtility.CopySerialized(content, existing); EditorUtility.SetDirty(existing); Object.DestroyImmediate(content); }
             else AssetDatabase.CreateAsset(content, ContentPaths.Resolve(Output + "/Content.asset"));
         }
         static IEnumerable<TutorialAudioDefinition> AudioDefinitions(JObject routes) => CueNames().Select(cue => {

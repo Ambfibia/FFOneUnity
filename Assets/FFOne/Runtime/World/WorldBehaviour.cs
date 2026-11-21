@@ -10,6 +10,7 @@ using Object = UnityEngine.Object;
 namespace FFOne.World
 {
     // Consumes the accepted editable world documents; no legacy bundle is opened.
+    [DefaultExecutionOrder(-120)]
     public sealed class WorldBehaviour : MonoBehaviour
     {
         public int AnimationRecords, AnimationPlayers, TransformChannels, MaterialCurves;
@@ -36,6 +37,10 @@ namespace FFOne.World
         readonly List<Platform> platforms = new List<Platform>();
         readonly List<Spin> spins = new List<Spin>();
         readonly List<Material> ownedMaterials = new List<Material>();
+        readonly Dictionary<string, WorldMotionBinding> nativeMotion = new();
+        Transform motionSample;
+        AnimationClip spinClip;
+        internal FFOne.Content.NativeWorldEffectLibrary NativeEffects;
         WorldBehaviourParticles particles;
         WorldBehaviourEpEffects elementEffects;
         Dictionary<string, List<Transform>> legacy, source;
@@ -43,21 +48,52 @@ namespace FFOne.World
         bool acceptedOlderTile;
         ISet<string> sourceModelOmissions;
         readonly HashSet<string> reportedSourceOmissions = new();
+        internal sealed class RaceRing
+        {
+            internal string Key;
+            internal Vector3 Center;
+            internal float Radius;
+            internal Renderer[] Models;
+            bool? visible;
+            internal void Show(bool value)
+            {
+                if (visible == value) return;
+                visible = value;
+                // WorldObjectRange owns forceRenderingOff. Keep race visibility independent of distance.
+                foreach (var renderer in Models) if (renderer) renderer.enabled = value;
+            }
+        }
+        internal static readonly List<RaceRing> RaceRings = new();
+        readonly List<RaceRing> cellRings = new();
+        readonly List<WorldZipline> cellZiplines = new();
+        readonly List<WorldLauncher> cellLaunchers = new();
+
+        internal void AddAuthoredLaunchers(WorldLauncherPlacement[] placements)
+        {
+            foreach (var placement in placements)
+            {
+                var launcher = new WorldLauncher(this, view, placement);
+                cellLaunchers.Add(launcher);
+                WorldLauncher.Loaded.Add(launcher);
+            }
+        }
 
         sealed class Billboard { internal Transform Pivot; internal int Mode; internal bool Enabled; internal Renderer[] Renderers; }
         sealed class Spin { internal Transform Target; internal Quaternion Initial; }
         sealed class Platform
         {
             internal Transform Pivot; internal Vector3 Position, Scale, Delta; internal Quaternion Rotation;
-            internal float Velocity, Spin; internal int Mode; internal Vector3[] Path;
+            internal float Velocity; internal int Mode; internal AnimationClip Clip;
         }
 
         public static WorldBehaviour Attach(GameObject root, string behaviourJson,
             Dictionary<string, List<Transform>> legacyModels, Dictionary<string, List<Transform>> sourceNodes, Camera camera,
-            ISet<string> acceptedSourceOmissions = null)
+            ISet<string> acceptedSourceOmissions = null, WorldMotionBinding[] motion = null, FFOne.Content.NativeWorldEffectLibrary effects = null)
         {
             var result = root.AddComponent<WorldBehaviour>();
             result.sourceModelOmissions = acceptedSourceOmissions;
+            result.NativeEffects = effects;
+            if (motion != null) foreach (var binding in motion) result.nativeMotion.Add(binding.SourceId, binding);
             var iterator = result.Initialize(behaviourJson, legacyModels, sourceNodes, camera);
             while (iterator.MoveNext()) { }
             return result;
@@ -66,10 +102,12 @@ namespace FFOne.World
         // A chunk loader can spread admitted records over frames and include this work in its load timing.
         public static IEnumerator AttachAsync(GameObject root, string behaviourJson,
             Dictionary<string, List<Transform>> legacyModels, Dictionary<string, List<Transform>> sourceNodes,
-            Camera camera, Action<WorldBehaviour> completed, ISet<string> acceptedSourceOmissions = null)
+            Camera camera, Action<WorldBehaviour> completed, ISet<string> acceptedSourceOmissions = null, WorldMotionBinding[] motion = null, FFOne.Content.NativeWorldEffectLibrary effects = null)
         {
             var result = root.AddComponent<WorldBehaviour>();
             result.sourceModelOmissions = acceptedSourceOmissions;
+            result.NativeEffects = effects;
+            if (motion != null) foreach (var binding in motion) result.nativeMotion.Add(binding.SourceId, binding);
             yield return result.Initialize(behaviourJson, legacyModels, sourceNodes, camera);
             completed?.Invoke(result);
         }
@@ -84,6 +122,8 @@ namespace FFOne.World
             acceptedOlderTile = (string)document["id"] == "map_01_01";
             if (acceptedOlderTile)
                 SourceCoverageNotes.Add("map_01_01 retains 105 legacy animation records without targets/models; the accepted Rust document has the same source binding gap. These records are counted as missing, while its published geometry and particle closures are admitted.");
+            motionSample = new GameObject("Native motion sample").transform; motionSample.SetParent(transform, false);
+            if (nativeMotion.TryGetValue("world-spin", out var spin)) spinClip = spin.Channels[0];
             var timer = Stopwatch.StartNew();
             foreach (var record in document["billboards"] ?? new JArray())
             {
@@ -101,7 +141,7 @@ namespace FFOne.World
             }
             foreach (var definition in document["animationClips"] ?? new JArray())
             {
-                try { var clip = WorldBehaviourAnimation.Acquire(definition); clips.Add(clip.Id, clip); }
+                try { nativeMotion.TryGetValue((string)definition["id"], out var native); var clip = WorldBehaviourAnimation.Acquire(definition, native); clips.Add(clip.Id, clip); }
                 catch (Exception error) { Problem("Invalid AnimationClip: " + error.Message, true); }
                 if (timer.ElapsedMilliseconds >= 3) { yield return null; timer.Restart(); }
             }
@@ -109,19 +149,50 @@ namespace FFOne.World
             {
                 BindAnimation(record); if (timer.ElapsedMilliseconds >= 3) { yield return null; timer.Restart(); }
             }
-            particles = new WorldBehaviourParticles(this, document["effectPrefabClosures"] as JArray, view);
+            particles = new WorldBehaviourParticles(this, NativeEffects ? NativeEffects.Particles : null, view);
             elementEffects = new WorldBehaviourEpEffects(this, particles, view);
             foreach (var record in document["effectEmitters"] ?? new JArray())
             {
                 BindEffect(record); if (timer.ElapsedMilliseconds >= 3) { yield return null; timer.Restart(); }
             }
             particles.Complete();
-            var waypoints = (document["waypoints"] ?? new JArray()).ToDictionary(w => (string)w["node"], w => w);
+            var ziplineTriggers = new Dictionary<string, JToken>();
             foreach (var record in document["triggers"] ?? new JArray())
             {
-                if ((string)record["kind"] == "platform") BindPlatform(record, waypoints);
+                if ((string)record["kind"] == "platform") BindPlatform(record);
+                if ((string)record["kind"] == "launcher" && (bool?)record["enabled"] != false)
+                {
+                    var launcher = new WorldLauncher(this, view, record);
+                    cellLaunchers.Add(launcher);
+                    WorldLauncher.Loaded.Add(launcher);
+                }
+                if ((string)record["kind"] == "zipline" && (bool?)record["enabled"] != false &&
+                    (string)record["node"] is string ziplineNode)
+                    ziplineTriggers[ziplineNode] = record;
+                if ((string)record["kind"] == "ring")
+                {
+                    var matrix = NativeMatrix(record["worldMatrix"]);
+                    var ring = new RaceRing {
+                        Key = (string)document["id"] + "/" + (string)record["node"],
+                        Center = transform.TransformPoint(matrix.MultiplyPoint3x4(NativeVector(record["startPosition"]))),
+                        Radius = (float?)record["radius"] ?? 0, Models = Renderers(Resolve(record)).Where(r => r.enabled).ToArray()
+                    };
+                    ring.Show(false);
+                    if ((bool?)record["enabled"] != false) { cellRings.Add(ring); RaceRings.Add(ring); }
+                }
                 if (timer.ElapsedMilliseconds >= 3) { yield return null; timer.Restart(); }
             }
+            if (ziplineTriggers.Count != 0)
+                foreach (var volume in document["triggerVolumes"] ?? new JArray())
+                {
+                    if ((bool?)volume["enabled"] == false || (bool?)volume["isTrigger"] != true ||
+                        (string)volume["node"] is not string node || !ziplineTriggers.TryGetValue(node, out var record)) continue;
+                    var route = new WorldZipline(this, view, record, volume);
+                    float length = Vector3.Distance(route.Start, route.End);
+                    if (!float.IsFinite(length) || length <= .01f || !float.IsFinite(route.Speed) || route.Speed <= 0) continue;
+                    cellZiplines.Add(route);
+                    WorldZipline.Loaded.Add(route);
+                }
             foreach (var blocker in document["blockers"] ?? new JArray()) Problem("Published behaviour blocker: " + blocker.ToString(), true);
             Ready = true;
         }
@@ -234,6 +305,8 @@ namespace FFOne.World
             var player = WorldBehaviourAnimation.Bind(this, clip, record, targets, rendererTargets, Renderers(Resolve(record)));
             animations.Add(player); AnimationPlayers++;
         }
+        public static bool IsRotatingNanoSign(string effectName) => effectName is "neededjump_nano" or "roket_symbol";
+
         void BindEffect(JToken record)
         {
             EffectRecords++;
@@ -242,7 +315,7 @@ namespace FFOne.World
             var root = Pivot("Effect " + name, record["worldMatrix"]);
             particles.Bind(record, root);
             elementEffects.Bind(record, root);
-            if (name == "neededjump_nano")
+            if (IsRotatingNanoSign(name))
                 foreach (var model in Resolve(record)) { WorldObjectRange.MarkDynamic(model); spins.Add(new Spin { Target = model, Initial = model.rotation }); }
             if (name != "blackhole") return;
             var contract = FFOne.Content.ContentAssets.Load<TextAsset>("map/shared/effects/blackhole.nif-animation");
@@ -262,22 +335,18 @@ namespace FFOne.World
             animations.Add(WorldBehaviourAnimation.Bind(this, clip, record, new Dictionary<string, Transform>(), targets,
                 Renderers(Resolve(record))));
         }
-        void BindPlatform(JToken record, Dictionary<string, JToken> waypoints)
+        void BindPlatform(JToken record)
         {
             PlatformRecords++;
             if ((bool?)record["enabled"] == false) return;
             int mode = (int?)record["moveType"] ?? 0;
             if (mode < 0 || mode > 10) { Problem("Unsupported platform mode " + mode, true); return; }
             var models = Resolve(record); var pivot = Pivot("Platform " + (string)record["node"], record["worldMatrix"]);
-            Reparent(models, pivot); WorldObjectRange.MarkDynamic(pivot); var path = new List<Vector3>(); string next = (string)record["head"];
-            for (int i = 0, count = Math.Min(4096, ((int?)record["waypointCount"] ?? 0) + 1); i < count && next != null; i++)
-            {
-                if (!waypoints.TryGetValue(next, out var waypoint)) { Problem("Missing platform waypoint " + next); break; }
-                path.Add(Vector(waypoint["point"])); next = (string)waypoint["next"];
-            }
+            Reparent(models, pivot); WorldObjectRange.MarkDynamic(pivot);
+            if (!nativeMotion.TryGetValue("platform:" + (string)record["node"], out var native)) { Problem("Republish platform motion " + (string)record["node"], true); return; }
+            pivot.gameObject.AddComponent<MovingWorldPlatform>();
             platforms.Add(new Platform { Pivot = pivot, Position = pivot.position, Rotation = pivot.rotation, Scale = pivot.localScale,
-                Mode = mode, Velocity = (float?)record["velocity"] ?? 0, Spin = (float?)record["spinVelocity"] ?? 0,
-                Delta = Vector(record["to"]) - Vector(record["from"]), Path = path.ToArray() });
+                Mode = mode, Velocity = (float?)record["velocity"] ?? 0, Clip = native.Channels[0] });
             PlatformBindings += models.Count;
         }
         void Update()
@@ -285,33 +354,23 @@ namespace FFOne.World
             if (!Ready) return;
             foreach (var animation in animations) animation.Update(Time.deltaTime);
             float elapsed = WorldSimulationClock.Seconds;
-            foreach (var spin in spins) if (spin.Target) spin.Target.rotation = Quaternion.AngleAxis(elapsed * 90, Vector3.up) * spin.Initial;
+            if (spinClip)
+            {
+                motionSample.localRotation = Quaternion.identity;
+                spinClip.SampleAnimation(motionSample.gameObject, Mathf.Repeat(elapsed, 4));
+                foreach (var spin in spins) if (spin.Target) spin.Target.rotation = motionSample.localRotation * spin.Initial;
+            }
             foreach (var platform in platforms) UpdatePlatform(platform, elapsed);
         }
-        static void UpdatePlatform(Platform motion, float elapsed)
+        void UpdatePlatform(Platform motion, float elapsed)
         {
-            if (!motion.Pivot || Mathf.Abs(motion.Velocity) < .000001f) return;
-            bool pathMotion = motion.Mode >= 8; float phase = elapsed * Mathf.Abs(motion.Velocity);
-            float cycle = phase % (pathMotion ? 1 : 2); bool returning = !pathMotion && cycle >= 1;
-            float t = returning ? 2 - cycle : cycle;
-            float eased = Mathf.Clamp01(t - Mathf.Sin(t * Mathf.PI * 2) * .15f);
-            float angle = (returning ? Mathf.PI * 2 - t * Mathf.PI : t * Mathf.PI) + Mathf.PI / 2;
-            Vector3 point = Vector3.zero; float radius = motion.Delta.magnitude * .5f;
-            switch (motion.Mode)
-            {
-                case 0: case 6: case 7: point = motion.Delta * eased; break;
-                case 1: point = motion.Delta * .5f + new Vector3(0, Mathf.Sin(angle), Mathf.Cos(angle)) * radius; break;
-                case 2: point = motion.Delta * .5f + new Vector3(-Mathf.Sin(angle), Mathf.Cos(angle), 0) * radius; break;
-                case 3: point = motion.Delta * .5f + new Vector3(-Mathf.Sin(angle), 0, Mathf.Cos(angle)) * radius; break;
-                case 8: case 9: case 10:
-                    if (motion.Path.Length >= 2) { float p = t * (motion.Path.Length - 1); int i = Mathf.Min((int)p, motion.Path.Length - 2); point = Vector3.Lerp(motion.Path[i], motion.Path[i + 1], p - i); }
-                    break;
-            }
-            float scale = motion.Mode >= 1 && motion.Mode <= 3 || pathMotion ? motion.Scale.x : 1;
-            motion.Pivot.position = motion.Position + motion.Rotation * (point * scale);
-            float degrees = (pathMotion ? t * 360 : (returning ? -1 : 1) * eased * 180) * motion.Spin;
-            motion.Pivot.rotation = motion.Rotation * (motion.Mode is 4 or 6 or 9 ? Quaternion.AngleAxis(degrees, Vector3.right)
-                : motion.Mode is 5 or 7 or 10 ? Quaternion.AngleAxis(degrees, Vector3.forward) : Quaternion.identity);
+            if (!motion.Pivot || !motion.Clip || Mathf.Abs(motion.Velocity) < .000001f) return;
+            bool followsPath = motion.Mode >= 8;
+            motionSample.localPosition = Vector3.zero; motionSample.localRotation = Quaternion.identity;
+            motion.Clip.SampleAnimation(motionSample.gameObject, Mathf.Repeat(elapsed * Mathf.Abs(motion.Velocity), followsPath ? 1 : 2));
+            float scale = motion.Mode >= 1 && motion.Mode <= 3 || followsPath ? motion.Scale.x : 1;
+            motion.Pivot.position = motion.Position + motion.Rotation * (motionSample.localPosition * scale);
+            motion.Pivot.rotation = motion.Rotation * motionSample.localRotation;
         }
         void LateUpdate()
         {
@@ -330,6 +389,9 @@ namespace FFOne.World
             Pivot = target, Mode = mode, Enabled = true, Renderers = target.GetComponentsInChildren<Renderer>(true) });
         void OnDestroy()
         {
+            foreach (var ring in cellRings) RaceRings.Remove(ring);
+            foreach (var route in cellZiplines) WorldZipline.Loaded.Remove(route);
+            foreach (var launcher in cellLaunchers) WorldLauncher.Loaded.Remove(launcher);
             particles?.Dispose(); elementEffects?.Dispose(); foreach (var clip in clips.Values) WorldBehaviourAnimation.Release(clip);
             foreach (var material in ownedMaterials) Release(material);
         }

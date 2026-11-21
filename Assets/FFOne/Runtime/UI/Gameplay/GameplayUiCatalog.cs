@@ -15,7 +15,15 @@ namespace FFOne.UI
         public string Description { get; internal set; }
         public string IconAddress { get; internal set; }
         public int RequiredLevel { get; internal set; }
+        public int PointRating { get; internal set; }
+        public int GroupRating { get; internal set; }
+        public int DefenseRating { get; internal set; }
+        public int RequiredGender { get; internal set; }
+        public int RequiredGuide { get; internal set; }
+        public bool UnavailableTo(GameplayUiState player) => player != null && (player.Level < RequiredLevel ||
+            RequiredGender > 0 && player.Gender != RequiredGender || RequiredGuide > 0 && player.Guide != RequiredGuide);
         public int GeneralKind { get; internal set; }
+        public int ChestKind { get; internal set; }
         public int LinkedSkillId { get; internal set; }
         public int MaxStack { get; internal set; }
         public int SellPrice { get; internal set; }
@@ -47,17 +55,18 @@ namespace FFOne.UI
     }
 
     /// <summary>Compact typed lookups projected from exact XDT IDs/row references; never matches by display names.</summary>
-    public sealed class GameplayUiCatalog
+    public sealed partial class GameplayUiCatalog
     {
         sealed class ItemRow
         {
-            public int Type, Id, Level, Stack, SellPrice, BuyPrice, Rarity;
+            public int PointRating, GroupRating, DefenseRating;
+            public int Type, Id, Level, Gender, Guide, Stack, SellPrice, BuyPrice, Rarity;
             public bool Sellable;
             public int? NanoStyle, NanoMaxStamina;
             public string NameKey, Name, DescriptionKey, Description, Icon, NanoModel, NanoReadyIcon;
             public int NanoSortOrder;
             public float? AttackRange;
-            public int VehicleSpeed, VehicleEquipType, GeneralKind, LinkedSkillId;
+            public int VehicleSpeed, VehicleEquipType, GeneralKind, LinkedSkillId, ChestKind;
             public string VehicleEngineSound;
         }
         sealed class MissionRow
@@ -76,6 +85,7 @@ namespace FFOne.UI
         readonly Dictionary<int, string> skillIcons = new Dictionary<int, string>();
         readonly Dictionary<int, string> skillNames = new Dictionary<int, string>();
         readonly Dictionary<int, string> npcPortraits = new Dictionary<int, string>();
+        readonly Dictionary<int, int> npcLevels = new Dictionary<int, int>();
         static GameplayUiCatalog cached;
         public static GameplayUiCatalog Load() => cached ?? (cached = ContentAssets.Read<NativeDataDocument, GameplayUiCatalog>(
             NativeData.Resource("data/tables/xdt"), FromDocument));
@@ -84,7 +94,8 @@ namespace FFOne.UI
         {
             if (!items.TryGetValue((itemType, itemId), out var row)) return null;
             return new GameplayItemPresentation { ItemType = itemType, ItemId = itemId, Name = Localize(row.NameKey, row.Name, language),
-                Description = Localize(row.DescriptionKey, row.Description, language), IconAddress = row.Icon, RequiredLevel = row.Level, MaxStack = row.Stack, GeneralKind = row.GeneralKind, LinkedSkillId = row.LinkedSkillId,
+                Description = Localize(row.DescriptionKey, row.Description, language), IconAddress = row.Icon, RequiredLevel = row.Level, RequiredGender = row.Gender, RequiredGuide = row.Guide,
+                PointRating = row.PointRating, GroupRating = row.GroupRating, DefenseRating = row.DefenseRating, MaxStack = row.Stack, GeneralKind = row.GeneralKind, LinkedSkillId = row.LinkedSkillId, ChestKind = row.ChestKind,
                 NanoStyle = row.NanoStyle, NanoMaxStamina = row.NanoMaxStamina, NanoModelResource = row.NanoModel,
                 NanoReadyIconAddress = row.NanoReadyIcon, NanoSortOrder = row.NanoSortOrder, AttackRange = row.AttackRange,
                 VehicleSpeed = row.VehicleSpeed, VehicleEquipType = row.VehicleEquipType, VehicleEngineSound = row.VehicleEngineSound,
@@ -94,10 +105,27 @@ namespace FFOne.UI
         public GameplayItemPresentation Nano(int id, string language = "en") => Item(19, id, language);
         public IEnumerable<int> NanoIds => items.Keys.Where(key => key.Item1 == 19).Select(key => key.Item2).OrderBy(id => id);
         public IEnumerable<GameplayItemPresentation> Nanos(string language = "en") => NanoIds.Select(id => Nano(id, language));
+        internal sealed class NanoTune
+        {
+            public int Id, Skill, Item, Count, TextIndex;
+            public string Description;
+        }
+        readonly Dictionary<int, List<NanoTune>> tunes = new();
+        readonly Dictionary<int,int> tunePrices=new();
+        internal int TuningPrice(int level) => tunePrices.TryGetValue(level,out var cost)?cost:0;
+        internal IReadOnlyList<NanoTune> Tunes(int nano) => tunes.TryGetValue(nano, out var rows) ? rows : Array.Empty<NanoTune>();
         public string SkillIcon(int id) => skillIcons.TryGetValue(id, out var icon) ? icon : null;
         public string SkillName(int id, string language = "en") => skillNames.TryGetValue(id, out var name)
             ? Localize("content.tabledata.skill.skill_string." + id + ".str_name", name, language) : "";
+        internal string NanoPowerName(int nano, int skill, string language)
+        {
+            string name = SkillName(skill, language);
+            if (!string.IsNullOrWhiteSpace(name)) return name;
+            var tune = Tunes(nano).FirstOrDefault(row => row.Skill == skill);
+            return tune == null ? "" : Localize("content.tabledata.nano.nano_tune_string." + tune.TextIndex + ".str_name", "", language);
+        }
         public string NpcPortrait(int npcId) => npcPortraits.TryGetValue(npcId, out var icon) ? icon : null;
+        public int? NpcLevel(int npcId) => npcLevels.TryGetValue(npcId, out var level) ? level : (int?)null;
 
         public string BuffIcon(int id) => buffIcons.TryGetValue(id, out var icon) ? icon : null;
         public int BuffEffect(int id, bool instant = false) => buffEffects.TryGetValue(id, out var value) ? instant ? value.instant : value.loop : 0;
@@ -136,16 +164,37 @@ namespace FFOne.UI
         {
             if (!document || document.Nodes.Length == 0) throw new InvalidDataException("Missing gameplay XDT.");
             var result = new GameplayUiCatalog();
+            result.ReadGuide(document);
             // eItemType + RustyFusion tabledata.rs: type and item number jointly identify an item.
             string[] tables = { "Weapon", "Shirts", "Pants", "Shoes", "Hat", "Glass", "Back", "General", "Quest", "Chest", "Vehicle" };
             string[] keys = { "weapon", "shirts", "pants", "shoes", "hat", "glass", "back", "general", "quest", "chest", "vehicle" };
             for (int type = 0; type < tables.Length; type++) result.ReadItems(document, type, "m_p" + tables[type] + "ItemTable", keys[type] + "_item", false);
             result.ReadItems(document, 19, "m_pNanoTable", "nano", true);
+            int nt = Child(document, 0, "m_pNanoTable");
+            int avatar=Child(document,0,"m_pAvatarTable");
+            foreach(int growth in Rows(document,Child(document,avatar,"m_pAvatarGrowData")))
+                result.tunePrices[Number(document,growth,"m_iLevel")]=Number(document,growth,"m_iReqBlob_NanoTune");
+            var tuning = Rows(document, Child(document, nt, "m_pNanoTuneData"));
+            var tuneStrings = Rows(document, Child(document, nt, "m_pNanoTuneStringData"));
+            foreach (int row in Rows(document, Child(document, nt, "m_pNanoData")))
+            {
+                var options = new List<NanoTune>(3);
+                foreach (int cell in Rows(document, Child(document, row, "m_iTune")))
+                {
+                    if (!int.TryParse(document.Nodes[cell].Value, out int id) || id <= 0 || id >= tuning.Length) continue;
+                    int tune = tuning[id], comment = Number(document, tune, "m_iComment");
+                    options.Add(new NanoTune { Id=id, Skill=Number(document,tune,"m_iSkillID"),
+                        Item=Number(document,tune,"m_iReqItemID"), Count=Number(document,tune,"m_iReqItemCount"), TextIndex=comment,
+                        Description=Text(document,At(tuneStrings,comment),"m_strComment") });
+                }
+                result.tunes[Number(document,row,"m_iNanoNumber")] = options;
+            }
             int npcTable = Child(document, 0, "m_pNpcTable");
             int[] npcIconRows = Rows(document, Child(document, npcTable, "m_pNpcIconData"));
             foreach (int row in Rows(document, Child(document, npcTable, "m_pNpcData")))
             {
                 int id = Number(document, row, "m_iNpcNumber"), iconReference = Number(document, row, "m_iIcon1");
+                if (id > 0) result.npcLevels[id] = Number(document, row, "m_iNpcLevel");
                 // Row zero is the unassigned NPC icon; the first real portrait may
                 // still have atlas number zero. Neither number is the NPC identity.
                 if (id <= 0 || iconReference <= 0) continue;
@@ -220,6 +269,7 @@ namespace FFOne.UI
                     iconRow < 0 ? -1 : Number(document, iconRow, "m_iIconNumber")) : null;
                 var value = new ItemRow { Type = type, Id = id,
                     GeneralKind = type == 7 ? Number(document, row, "m_iItemType") : 0,
+                    ChestKind = type == 9 && Child(document, row, "m_iChestCheck") >= 0 ? Number(document, row, "m_iChestCheck") : -1,
                     LinkedSkillId = type == 7 ? Number(document, row, "m_iLinkSkill") : 0, AttackRange = type == 0 ? Number(document, row, "m_iAtkRange") / 100f : (float?)null,
                     VehicleSpeed = type == 10 ? Number(document, row, "m_iUp_runSpeed") : 0,
                     VehicleEquipType = type == 10 ? Number(document, row, "m_iEquipType") : 0,
@@ -233,6 +283,8 @@ namespace FFOne.UI
                     NanoReadyIcon = nano ? "icons/entities/nanos/ready/nanoready_" + nanoIconSlug : null,
                     NanoSortOrder = nano ? Number(document, row, "m_iNanoSet") : 0,
                     NanoModel = string.IsNullOrEmpty(model) || model == "null" ? null : "characters/nanos/" + model + "/" + model,
+                    PointRating = Number(document, row, "m_iPointRat"), GroupRating = Number(document, row, "m_iGroupRat"),
+                    DefenseRating = Number(document, row, "m_iDefenseRat"), Gender = Number(document, row, "m_iReqSex"), Guide = Number(document, row, "m_iMentor"),
                     Level = Number(document, row, "m_iMinReqLev"), Stack = Number(document, row, "m_iStackNumber"),
                     NanoStyle = nano && Child(document, row, "m_iStyle") >= 0 ? Number(document, row, "m_iStyle") : (int?)null,
                     NanoMaxStamina = nano && Child(document, row, "m_iNanoBattery1") >= 0 ? Number(document, row, "m_iNanoBattery1") : (int?)null };
@@ -242,7 +294,9 @@ namespace FFOne.UI
                     // harmless; different links for one wire identity must remain an import error.
                     if (existing.NameKey == value.NameKey && existing.DescriptionKey == value.DescriptionKey &&
                         existing.Name == value.Name && existing.Description == value.Description && existing.Icon == value.Icon &&
-                        existing.Level == value.Level && existing.Stack == value.Stack && existing.NanoStyle == value.NanoStyle && existing.NanoMaxStamina == value.NanoMaxStamina && existing.NanoModel == value.NanoModel &&
+                        existing.PointRating == value.PointRating && existing.GroupRating == value.GroupRating && existing.DefenseRating == value.DefenseRating &&
+                        existing.Level == value.Level && existing.Gender == value.Gender && existing.Guide == value.Guide &&
+                        existing.Stack == value.Stack && existing.NanoStyle == value.NanoStyle && existing.NanoMaxStamina == value.NanoMaxStamina && existing.NanoModel == value.NanoModel &&
                         existing.NanoReadyIcon == value.NanoReadyIcon && existing.NanoSortOrder == value.NanoSortOrder) continue;
                     throw new InvalidDataException("Conflicting item ID: " + type + "/" + id);
                 }

@@ -76,6 +76,7 @@ namespace FFOne.Network
         public int Y { get; internal set; }
         public int Z { get; internal set; }
         public int Angle { get; internal set; }
+        public int UserLevel { get; internal set; } = 100;
         public int Level { get; internal set; }
         public int Hp { get; internal set; }
         public int FusionMatter { get; internal set; }

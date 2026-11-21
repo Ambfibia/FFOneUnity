@@ -20,10 +20,14 @@ namespace FFOne.UI
         TradeUpdate appliedTradeReceipt;
         public GameplayUiState Snapshot { get; private set; } = GameplayUiState.Empty;
         public event Action<GameplayUiState> Changed;
+        internal event Action<GameplayUiState, GameplayUiState> RewardReceived;
+        internal event Action<int, int, bool> QuestLootReceived;
 
         public GameplayUiSession() { levelLimits = ContentLevelLimits; }
         public GameplayUiSession(Func<int, GameplayLevelLimits?> levelLimits)
         { this.levelLimits = levelLimits ?? throw new ArgumentNullException(nameof(levelLimits)); }
+
+        internal int? MaxHpAtLevel(int level) => levelLimits(level)?.MaxHp;
 
         public void SetWorld(WorldEntry entry, CharacterInfo character = null)
         {
@@ -120,6 +124,7 @@ namespace FFOne.UI
             { if (!croc.Failed) Publish(Snapshot.WithCroc(croc)); return true; }
             if (ProtocolTravel.TryDecode(frame, out var travel))
             { if (!travel.Failed) Publish(Snapshot.WithTravel(travel)); return true; }
+            if (frame.PacketType == 0x310000c5) { Publish(Snapshot.WithOperatorValue(frame.Payload)); return true; }
             if (frame.PacketType == 0x31000061) { Publish(Snapshot.WithGivenItem(frame.Payload)); return true; }
             if (ProtocolMail.TryDecode(frame, out var mail))
             {
@@ -193,7 +198,7 @@ namespace FFOne.UI
                 entry.FusionMatter, limits, Protocol0104.Read32(load, 104), Protocol0104.Read32(load, 96), Protocol0104.Read32(load, 100),
                 entry.MapNumber, new Vector3(entry.X, entry.Z, entry.Y) / 100f,
                 Items(load, 136, 9), Items(load, 244, 50), Items(load, 844, 50), nanos.ToArray(), slots,
-                Protocol0104.Read16(load, 1672), complete, quests, Protocol0104.Read32(load, 2500), load[81] == 0);
+                Protocol0104.Read16(load, 1672), complete, quests, Protocol0104.Read32(load, 2500), load[81] == 0, Protocol0104.ReadStyle(load, 4, 80).Gender);
         }
 
         static GameplayItemState[] Items(byte[] bytes, int offset, int count)

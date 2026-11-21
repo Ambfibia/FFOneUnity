@@ -1,0 +1,40 @@
+{
+  "kind": "bug",
+  "status": "done",
+  "priority": "normal",
+  "verification": "passed",
+  "area": "UI — интерфейс",
+  "notes": "При потере login-соединения выбранная строка краснеет сразу. После восстановления выбранный сервер автоматически получает зелёный статус, пока форма входа ещё открыта. В проверенном сценарии используется прямое TCP-подключение. На снимке восстановления внизу ещё виден результат предыдущей попытки входа.",
+  "evidence": "Подтверждено при приёмке bugs-F5: после остановки RustyFusion форма показывала ошибку, а индикатор сохранял зелёный цвет. Logs/Studio/bugs-F5-final-20261119/Windows/Logs/FrontendRecovery/03-server-stopped.png.\n19.11.2026. Отдельный Windows Development player Unity 6000.4.0f1 из FFOneUnity f5b40dbc990f4dd42066d0bf9e32400bccff8ce9 с готовым кэшем Addressables. Изолированный RustyFusion hybrid, одна БД, остановка и запуск на том же адресе. Состояния индикатора подтверждены при возврате на форму после обрыва, во время повторных проверок и до повторного Log In. Зелёный кадр за 0,276 с после сигнала готовности в этом прогоне. Повторный вход загрузил прежнего персонажа в том же процессе. Проверены RGB на кадрах 01, 03, 04, 05. Оба прогона вышли с кодом 0, Unity EditMode 31/31. Протоколы Logs/Studio/server-indicator-20261119/acceptance.json, Logs/Studio/server-indicator-20261119/indicator-pixels.json и Logs/Studio/server-indicator-20261119/editmode.xml. Скриншоты в Logs/Studio/server-indicator-20261119/Windows/Logs/FrontendRecovery/.",
+  "source": "",
+  "historical": "",
+  "chat": "",
+  "triageChat": "",
+  "history": [
+    {
+      "time": "2026-11-19T07:21:08+00:00",
+      "changes": {
+        "area": "UI — интерфейс",
+        "evidence": "Подтверждено при приёмке bugs-F5: после остановки RustyFusion форма показывала ошибку, а индикатор сохранял зелёный цвет. Logs/Studio/bugs-F5-final-20261119/Windows/Logs/FrontendRecovery/03-server-stopped.png.",
+        "kind": "bug",
+        "notes": "Проверить немедленный офлайн после обрыва и автоматическое возвращение онлайн после запуска, до повторного входа.",
+        "status": "active",
+        "title": "Индикатор сервера остаётся онлайн после обрыва соединения",
+        "verification": "confirmed"
+      }
+    },
+    {
+      "time": "2026-11-19T07:35:35+00:00",
+      "changes": {
+        "evidence": "Подтверждено при приёмке bugs-F5: после остановки RustyFusion форма показывала ошибку, а индикатор сохранял зелёный цвет. Logs/Studio/bugs-F5-final-20261119/Windows/Logs/FrontendRecovery/03-server-stopped.png.\n19.11.2026. Отдельный Windows Development player Unity 6000.4.0f1 из FFOneUnity f5b40dbc990f4dd42066d0bf9e32400bccff8ce9 с готовым кэшем Addressables. Изолированный RustyFusion hybrid, одна БД, остановка и запуск на том же адресе. Состояния индикатора подтверждены при возврате на форму после обрыва, во время повторных проверок и до повторного Log In. Зелёный кадр за 0,276 с после сигнала готовности в этом прогоне. Повторный вход загрузил прежнего персонажа в том же процессе. Проверены RGB на кадрах 01, 03, 04, 05. Оба прогона вышли с кодом 0, Unity EditMode 31/31. Протоколы Logs/Studio/server-indicator-20261119/acceptance.json, Logs/Studio/server-indicator-20261119/indicator-pixels.json и Logs/Studio/server-indicator-20261119/editmode.xml. Скриншоты в Logs/Studio/server-indicator-20261119/Windows/Logs/FrontendRecovery/.",
+        "notes": "При потере login-соединения выбранная строка краснеет сразу. После восстановления выбранный сервер автоматически получает зелёный статус, пока форма входа ещё открыта. В проверенном сценарии используется прямое TCP-подключение. На снимке восстановления внизу ещё виден результат предыдущей попытки входа.",
+        "status": "done",
+        "verification": "passed"
+      }
+    }
+  ],
+  "updated": "2026-11-19T07:35:35+00:00",
+  "id": "studio-b9a120a02be6",
+  "original": "Индикатор сервера остаётся онлайн после обрыва соединения",
+  "title": "Индикатор сервера остаётся онлайн после обрыва соединения"
+}

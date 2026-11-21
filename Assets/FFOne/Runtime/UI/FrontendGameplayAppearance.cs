@@ -40,7 +40,7 @@ namespace FFOne.UI
         {
             var character = SelectedCharacter;
             if (!GameplayEquipmentAppearance.Apply(character, gameplayState?.Snapshot)) return;
-            var preview = GetComponent<PreviewStage>();
+            var preview = rosterPreview;
             preview?.RefreshGameplayAppearance(character);
             if (networkWorld && !networkWorld.RefreshAppearance(character, out var failure)) ShowError(failure);
         }

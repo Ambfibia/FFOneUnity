@@ -1,0 +1,116 @@
+.ff-account-controls, .ff-saved-account-frame, .ff-account-caption,
+.ff-remember-account, .ff-remember-caption, .ff-remember-check, .ff-account-scroll,
+.ff-account-scroll-track, .ff-account-scroll-thumb, .ff-account-back, .ff-account-new,
+.ff-account-select, .ff-account-edit, .ff-server-browser, .ff-server-browser-title,
+.ff-server-refresh, .ff-server-page-toggle, .ff-server-list, .ff-server-form, .ff-server-address,
+.ff-server-add, .ff-server-name, .ff-server-count, .ff-server-health, .ff-server-error { position:absolute; }
+
+.ff-profile-button {
+    padding-left:5px; padding-right:5px; color:white;
+    background-image:url('../Artwork/en/launcher/login/ff-textfield-normal.png');
+    -unity-background-scale-mode:stretch-to-fill;
+    -unity-slice-left:2; -unity-slice-right:2; -unity-slice-top:2; -unity-slice-bottom:2;
+}
+.ff-profile-button:hover, .ff-profile-button:focus, .ff-profile-button:active, .ff-profile-button--selected {
+    background-image:url('../Artwork/en/server-selection/ff-button-normal.png');
+    -unity-slice-left:5; -unity-slice-right:5; -unity-slice-top:5; -unity-slice-bottom:5;
+}
+.ff-profile-button--selected, .ff-profile-button--selected:hover, .ff-profile-button--selected:focus, .ff-profile-button--selected:active {
+    background-image:url('../Artwork/en/server-selection/ff-button-active.png');
+}
+.ff-account-controls { left:45px; top:15px; width:280px; height:138px; }
+.ff-login-username { width:280px; }
+.ff-login-panel--has-accounts .ff-login-username { width:249px; }
+.ff-login-panel--saved-account .ff-login-user-caption, .ff-login-panel--saved-account .ff-login-password-caption,
+.ff-login-panel--saved-account .ff-login-username, .ff-login-panel--saved-account .ff-login-password,
+.ff-login-panel--saved-account .ff-remember-account { display:none; }
+.ff-account-caption, .ff-account-new, .ff-saved-account-frame, .ff-account-back { display:none; }
+.ff-login-panel--saved-account .ff-account-caption, .ff-login-panel--saved-account .ff-account-new,
+.ff-login-panel--saved-account .ff-saved-account-frame, .ff-login-panel--has-accounts .ff-account-back { display:flex; }
+.ff-login-panel--saved-account .ff-account-back { display:none; }
+.ff-account-caption { left:0; top:0; width:200px; height:22px; color:white; -unity-text-align:middle-left; }
+.ff-account-new, .ff-account-back { left:255px; top:25px; width:25px; height:25px; }
+.ff-saved-account-frame {
+    left:0; top:25px; width:249px; height:85px;
+    background-image:url('../Artwork/en/launcher/login/ff-textfield-normal.png');
+    -unity-background-scale-mode:stretch-to-fill;
+    -unity-slice-left:2; -unity-slice-right:2; -unity-slice-top:2; -unity-slice-bottom:2;
+}
+.ff-account-scroll { left:3px; top:3px; width:222px; height:79px; }
+.ff-account-row { height:25px; flex-shrink:0; margin-bottom:3px; }
+.ff-account-select { left:0; top:0; width:193px; height:25px; }
+.ff-account-edit { left:197px; top:0; width:25px; height:25px; }
+.ff-account-scroll-track, .ff-account-scroll-thumb {
+    width:14px;
+    -unity-background-scale-mode:stretch-to-fill;
+    -unity-slice-left:2; -unity-slice-right:2; -unity-slice-top:4; -unity-slice-bottom:4;
+}
+.ff-account-scroll-track {
+    display:none; left:232px; top:3px; height:79px;
+    background-image:url('../Artwork/en/user-equip/scroll-track.png');
+}
+.ff-account-scroll-track--needed { display:flex; }
+.ff-account-scroll-thumb { left:0; top:0; height:20px; background-image:url('../Artwork/en/user-equip/scroll-thumb.png'); }
+.ff-remember-account { left:152px; top:118px; width:128px; height:20px; }
+.ff-remember-check {
+    left:0; top:1px; width:17px; height:17px;
+    background-image:url('../Artwork/en/option/radio-empty.png');
+    -unity-background-scale-mode:stretch-to-fill;
+}
+.ff-account-controls--remember .ff-remember-check { background-image:url('../Artwork/en/option/radio-checked.png'); }
+.ff-remember-caption { left:22px; top:0; width:106px; height:20px; color:white; -unity-text-align:middle-left; }
+
+.ff-server-browser {
+    width:280px; transform-origin:0 0;
+    background-image:url('../Artwork/en/launcher/login/login_screen_button_bg.png');
+    -unity-background-scale-mode:stretch-to-fill;
+    -unity-slice-left:8; -unity-slice-right:8; -unity-slice-top:18; -unity-slice-bottom:8;
+}
+.ff-server-browser-title { left:14px; top:14px; width:170px; height:26px; color:rgb(179,199,209); -unity-text-align:middle-left; }
+.ff-server-refresh, .ff-server-page-toggle { top:12px; width:30px; height:30px; }
+.ff-server-refresh { left:200px; }
+.ff-server-page-toggle { left:236px; }
+.ff-server-list, .ff-server-form { left:14px; top:46px; width:252px; }
+.ff-server-form, .ff-server-browser--adding .ff-server-list, .ff-server-browser--adding .ff-server-refresh { display:none; }
+.ff-server-browser--adding .ff-server-form { display:flex; }
+.ff-server-address { left:0; top:0; width:252px; height:25px; }
+.ff-server-add { left:0; top:31px; width:252px; height:35px; }
+.ff-server-row { width:252px; height:36px; margin-bottom:6px; flex-shrink:0; }
+.ff-server-more { display:none; width:252px; height:30px; flex-shrink:0; }
+.ff-server-more--visible { display:flex; }
+.ff-server-name, .ff-server-count {
+    top:0; height:36px;
+    -unity-font-definition:url('../Fonts/chaletbook-regular-sdf.asset');
+}
+.ff-server-name { left:25px; width:170px; color:rgb(179,199,209); -unity-text-align:middle-left; }
+.ff-server-row--selected .ff-server-name { color:white; }
+.ff-server-count { left:206px; width:36px; color:rgb(179,255,13); -unity-text-align:middle-center; }
+.ff-server-health { left:10px; top:10px; width:5px; height:16px; background-color:rgb(255,199,0); }
+.ff-server-health--online { background-color:rgb(179,255,13); }
+.ff-server-health--offline { background-color:rgb(255,64,107); }
+.ff-server-error {
+    display:none; left:14px; bottom:4px; width:252px; height:40px;
+    font-size:12px; color:rgb(255,153,128); -unity-text-align:middle-left;
+}
+.ff-server-error--visible { display:flex; }
+
+.ff-profile-icon {
+    position:absolute; left:50%; top:50%; margin-left:-9px; margin-top:-9px; width:18px; height:18px;
+}
+.ff-profile-icon-stroke { position:absolute; height:2px; background-color:white; }
+.ff-pencil-line { left:4px; top:7px; width:12px; height:4px; rotate:-45deg; }
+.ff-pencil-tip { left:2.5px; top:13px; width:3px; rotate:-45deg; }
+.ff-back-line { left:4px; top:8px; width:11px; }
+.ff-back-upper { left:2px; top:5.5px; width:7px; rotate:-45deg; }
+.ff-back-lower { left:2px; top:10.5px; width:7px; rotate:45deg; }
+.ff-refresh-line-1 { left:13.30px; top:9.55px; width:3.8px; rotate:105deg; }
+.ff-refresh-line-2 { left:11.74px; top:12.24px; width:3.8px; rotate:135deg; }
+.ff-refresh-line-3 { left:9.05px; top:13.80px; width:3.8px; rotate:165deg; }
+.ff-refresh-line-4 { left:5.95px; top:13.80px; width:3.8px; rotate:195deg; }
+.ff-refresh-line-5 { left:3.26px; top:12.24px; width:3.8px; rotate:225deg; }
+.ff-refresh-line-6 { left:1.70px; top:9.55px; width:3.8px; rotate:255deg; }
+.ff-refresh-line-7 { left:1.70px; top:6.45px; width:3.8px; rotate:285deg; }
+.ff-refresh-line-8 { left:3.26px; top:3.76px; width:3.8px; rotate:315deg; }
+.ff-refresh-line-9 { left:5.95px; top:2.20px; width:3.8px; rotate:345deg; }
+.ff-refresh-tip-top { left:12px; top:3px; width:5px; rotate:45deg; }
+.ff-refresh-tip-side { left:14px; top:4px; width:2px; height:5px; }

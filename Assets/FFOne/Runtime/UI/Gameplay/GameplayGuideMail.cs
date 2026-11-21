@@ -17,6 +17,14 @@ namespace FFOne.UI
         int guideMailPage;
         IReadOnlyList<GuideMailEntry> guideMails = Array.Empty<GuideMailEntry>();
 
+        void UpdateGuideMailNotices()
+        {
+            var next = BuildGuideMail();
+            if (next.Any(mail => !guideMails.Any(previous => previous.Index == mail.Index && previous.Npc == mail.Npc)))
+                SignalNewMail();
+            guideMails = next;
+        }
+
         IReadOnlyList<GuideMailEntry> BuildGuideMail()
         {
             var state = session.Snapshot; var rules = WorldMissionCatalog.Load(); var text = GameplayUiCatalog.Load();

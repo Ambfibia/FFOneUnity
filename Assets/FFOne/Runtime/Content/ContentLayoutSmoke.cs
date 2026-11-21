@@ -30,6 +30,11 @@ namespace FFOne.Content
                 Require(ContentAssets.Load<NativeContentCatalog>("NativeContent"),"native catalog");
                 Require(ContentAssets.Load<VisualTreeAsset>("ui/views/Login"),"login view");
                 Require(ContentAssets.Load<AudioClip>("audio/music/00_main_theme"),"music");
+                RequireSharedAsset<AudioClip>("audio/voice/ru/ben/ben_tut09", "audio/voice/ru/ben/tut09");
+                RequireSharedAsset<Texture2D>("ui/en/user-equip/colthback", "ui/en/user-equip/clothes-panel");
+                const string fusions = "NativeEditable/characters/fusions/";
+                RequireSharedAsset<Mesh>(fusions + "fusion_belladonnaphase1/fusion_butterdonnaPhase1/mesh_3248731750086532041",
+                    fusions + "fusion_belladonna/fusion_butterdonna/mesh_3248731750086532041");
                 var model=NativeModelAssets.Load("characters/mobs/mob_almonster/mob_almonster");
                 Require(model,"published mob");
                 if(model.GetComponentsInChildren<Renderer>(true).Length==0)throw new InvalidOperationException("Published mob has no renderers");
@@ -67,6 +72,13 @@ namespace FFOne.Content
         static void Require(UnityEngine.Object asset,string label)
         {
             if(!asset)throw new InvalidOperationException("Missing content: "+label);
+        }
+        static void RequireSharedAsset<T>(string alias, string primary) where T : UnityEngine.Object
+        {
+            var shared = ContentAssets.Load<T>(primary);
+            Require(shared, primary);
+            if (ContentAssets.Load<T>(alias) != shared)
+                throw new InvalidOperationException("Shared asset alias does not load its primary asset: " + alias);
         }
     }
 }

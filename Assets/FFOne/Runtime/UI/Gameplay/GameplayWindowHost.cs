@@ -4,12 +4,13 @@ using UnityEngine.UIElements;
 
 namespace FFOne.UI
 {
-    public enum GameplayWindow { NanoCom, Inventory, Journal, Map, Chat, Trade, Nanos, Contacts, Mail, Help, Service, Travel }
+    public enum GameplayWindow { NanoCom, Inventory, Journal, Map, Chat, Trade, Nanos, Contacts, Mail, Help, Service, Travel, Mentor, CashMall, Race, NpcServices, NpcMissions, Barber }
 
     /// <summary>Owns the lifetime and focus of the active gameplay window. Views own their layout.</summary>
     public sealed class GameplayWindowHost : IDisposable
     {
         readonly VisualElement parent;
+        readonly Func<GameplayWindow, bool> available;
         readonly Dictionary<GameplayWindow, Func<VisualElement>> factories = new();
         VisualElement previousFocus;
         bool disposed;
@@ -18,7 +19,11 @@ namespace FFOne.UI
         public bool IsOpen => View != null;
         public event Action Changed;
 
-        public GameplayWindowHost(VisualElement parent) => this.parent = parent ?? throw new ArgumentNullException(nameof(parent));
+        public GameplayWindowHost(VisualElement parent, Func<GameplayWindow, bool> available = null)
+        {
+            this.parent = parent ?? throw new ArgumentNullException(nameof(parent));
+            this.available = available;
+        }
 
         public void Register(GameplayWindow window, Func<VisualElement> factory)
         {
@@ -27,12 +32,22 @@ namespace FFOne.UI
             factories.Add(window, factory);
         }
 
-        public bool Supports(GameplayWindow window) => !disposed && factories.ContainsKey(window);
+        public bool Supports(GameplayWindow window) => !disposed && factories.ContainsKey(window) && (available?.Invoke(window) ?? true);
 
         public bool Open(GameplayWindow window)
         {
             if (!Supports(window)) return false;
             if (Current == window) return true;
+            return Show(window);
+        }
+
+        public void Refresh()
+        {
+            if (Current.HasValue) Show(Current.Value);
+        }
+
+        bool Show(GameplayWindow window)
+        {
             // Prepare first: a missing asset/binding must not destroy the window already open.
             var next = factories[window]();
             if (next == null) throw new InvalidOperationException("Gameplay view factory returned no view: " + window);

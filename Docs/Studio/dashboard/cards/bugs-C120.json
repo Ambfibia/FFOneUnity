@@ -1,0 +1,46 @@
+{
+  "status": "done",
+  "verification": "passed",
+  "notes": "Пройдено в видимом клиенте, включая штатный выход после повторного запуска на новой копии базы. В первом скрытом прогоне была задержка ожидания кадра после перехода. В первом видимом прогоне после всех кадров один раз оборвался сокет при выходе из игровой сессии; повтор не воспроизвёл.",
+  "evidence": "На карте 75 сохранился ПАРК ТАУНСВИЛЛЯ, подтверждены переход в данж и обратно. RU/EN offline smoke дополнительно проверил смену языка, вложенную карту и сброс сессии. Кадры: Logs/Studio/DashboardFive-20261119/validation-harness/foreground-recheck/minimap/. 19.11.2026. Unity 6000.4.0f1, свежая Windows-сборка со свежим каталогом, реальный изолированный RustyFusion. Протокол: Logs/Studio/DashboardFive-20261119/verification-20261119.json; сборка: Logs/Studio/DashboardFive-20261119/rebuild/unity-build.log; SHA-256: Logs/Studio/DashboardFive-20261119/rebuild/artifact-sha256.json.",
+  "history": [
+    {
+      "time": "2026-11-18T14:16:38+00:00",
+      "changes": {
+        "evidence": "18.11.2026. В GameplayUiController для MapNumber != 0 передаётся location=null. CharacterLocations.District возвращает пустую строку, последняя локация не сохраняется.",
+        "status": "ready",
+        "verification": "analyzed"
+      }
+    },
+    {
+      "time": "2026-11-19T10:13:46+00:00",
+      "changes": {
+        "status": "active"
+      }
+    },
+    {
+      "time": "2026-11-19T10:46:30+00:00",
+      "changes": {
+        "evidence": "GameplayUiSmoke содержит проверки входа, вложенной карты, смены языка, выхода и сброса после смены игрока/сессии. 19.11.2026. Unity 6000.4.0f1, EditMode 40/40: Logs/Studio/DashboardFive-20261119/tests.xml. Компиляция Runtime Editor и Player через Roslyn: Logs/Studio/DashboardFive-20261119/roslyn-runtime.log, Logs/Studio/DashboardFive-20261119/roslyn-player.log. Сборка Windows прервана при Generate Bundle Packing: Logs/Studio/DashboardFive-20261119/unity-build.log.",
+        "notes": "Мини-карта хранит последний именованный район открытого мира в текущей сессии. Если район ещё не определён, подпись пуста. Остались прогон данжа и скриншоты до входа, внутри и после выхода.",
+        "status": "review"
+      }
+    },
+    {
+      "time": "2026-11-19T11:10:54+00:00",
+      "changes": {
+        "status": "active"
+      }
+    },
+    {
+      "time": "2026-11-19T11:44:03+00:00",
+      "changes": {
+        "evidence": "На карте 75 сохранился ПАРК ТАУНСВИЛЛЯ, подтверждены переход в данж и обратно. RU/EN offline smoke дополнительно проверил смену языка, вложенную карту и сброс сессии. Кадры: Logs/Studio/DashboardFive-20261119/validation-harness/foreground-recheck/minimap/. 19.11.2026. Unity 6000.4.0f1, свежая Windows-сборка со свежим каталогом, реальный изолированный RustyFusion. Протокол: Logs/Studio/DashboardFive-20261119/verification-20261119.json; сборка: Logs/Studio/DashboardFive-20261119/rebuild/unity-build.log; SHA-256: Logs/Studio/DashboardFive-20261119/rebuild/artifact-sha256.json.",
+        "notes": "Пройдено в видимом клиенте, включая штатный выход после повторного запуска на новой копии базы. В первом скрытом прогоне была задержка ожидания кадра после перехода. В первом видимом прогоне после всех кадров один раз оборвался сокет при выходе из игровой сессии; повтор не воспроизвёл.",
+        "status": "done",
+        "verification": "passed"
+      }
+    }
+  ],
+  "updated": "2026-11-19T11:44:03+00:00"
+}

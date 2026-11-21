@@ -40,7 +40,9 @@ namespace FFOne.Editor
             if (!maps.Select(m => (int)m["m_iInstanceNameID"]).OrderBy(n => n).SequenceEqual(
                 acceptedMaps.Select(m => (int)m["m_iInstanceNameID"]).OrderBy(n => n)))
                 throw new InvalidDataException("Instance route repair cannot change accepted map identities.");
-            data.Import(json);
+            string merged = XdtModelRoutePublication.PreserveDirectRoutes(json, data.ToJson());
+            if (!ReferenceEquals(merged, json)) bytes = Encoding.UTF8.GetBytes(merged);
+            data.Import(merged);
             File.WriteAllBytes(Source, bytes);
             EditorUtility.SetDirty(data);
             AssetDatabase.SaveAssets();

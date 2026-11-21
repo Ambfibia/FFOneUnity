@@ -7,6 +7,35 @@ namespace FFOne.UI
 {
     internal static class FFWidgets
     {
+        internal static void BindTextEditing(TextField field)
+        {
+            field.RegisterCallback<KeyDownEvent>(evt => {
+                if (evt.altKey) return;
+                if (evt.ctrlKey || evt.commandKey)
+                {
+                    if (evt.keyCode != KeyCode.A) return;
+                    field.SelectRange(0, field.value.Length);
+                }
+                else
+                {
+                    if (evt.keyCode is not (KeyCode.LeftArrow or KeyCode.RightArrow)) return;
+                    bool left = evt.keyCode == KeyCode.LeftArrow;
+                    int cursor = field.cursorIndex, anchor = field.selectIndex;
+                    int next;
+                    if (!evt.shiftKey && cursor != anchor)
+                        next = left ? Math.Min(cursor, anchor) : Math.Max(cursor, anchor);
+                    else
+                    {
+                        var boundaries = System.Globalization.StringInfo.ParseCombiningCharacters(field.value);
+                        int index = Array.BinarySearch(boundaries, cursor);
+                        int step = index >= 0 ? index + (left ? -1 : 1) : ~index - (left ? 1 : 0);
+                        next = step < 0 ? 0 : step >= boundaries.Length ? field.value.Length : boundaries[step];
+                    }
+                    field.SelectRange(next, evt.shiftKey ? anchor : next);
+                }
+                evt.StopPropagation();
+            }, TrickleDown.TrickleDown);
+        }
         sealed class TextFit { public float BaseSize, Width; }
         static readonly ConditionalWeakTable<TextElement, TextFit> TextFits = new ConditionalWeakTable<TextElement, TextFit>();
         internal const string Controls = "ui/en/character/selection/controls/";
@@ -91,8 +120,7 @@ namespace FFOne.UI
             return button;
         }
 
-        // Mirror Rust UiTextAutoFit: fixed controls keep their geometry; short
-        // source rectangles permit vertical overflow and fit the shaped width.
+        // Authored controls keep their geometry. A wrapping label can use multiple lines.
         internal static void AutoFit(TextElement element, float width = 0)
         {
             if (TextFits.TryGetValue(element, out var existing)) { existing.Width = width; return; }
@@ -113,6 +141,25 @@ namespace FFOne.UI
             float width = fit.Width > 0 ? fit.Width : element.contentRect.width;
             var size = element.MeasureTextSize(element.text, 0, VisualElement.MeasureMode.Undefined, 0, VisualElement.MeasureMode.Undefined);
             float desired = Mathf.Max(6, Mathf.Min(fit.BaseSize, size.x > 0 ? style.fontSize * width / size.x : fit.BaseSize));
+            if (style.whiteSpace == WhiteSpace.Normal && desired < fit.BaseSize && element.contentRect.height > 0)
+            {
+                // Measure in the current font size and scale both axes to the candidate size.
+                float low = desired, high = fit.BaseSize;
+                for (int i = 0; i < 8; i++)
+                {
+                    float candidate = i == 0 ? high : (low + high) * .5f;
+                    float ratio = candidate / style.fontSize;
+                    var wrapped = element.MeasureTextSize(element.text, width / ratio, VisualElement.MeasureMode.AtMost,
+                        0, VisualElement.MeasureMode.Undefined);
+                    if (wrapped.y * ratio <= element.contentRect.height + .5f)
+                    {
+                        low = candidate;
+                        if (candidate == high) break;
+                    }
+                    else high = candidate;
+                }
+                desired = low;
+            }
             if (Mathf.Abs(style.fontSize - desired) > .05f) element.style.fontSize = desired;
         }
         internal static void Padding(VisualElement element, float left = 10, float right = 6, float top = 4, float bottom = 6)

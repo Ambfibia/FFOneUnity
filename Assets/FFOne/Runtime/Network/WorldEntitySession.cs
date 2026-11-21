@@ -60,6 +60,8 @@ namespace FFOne.Network
                 case WorldUpdateKind.Move:
                     if (value.ServerTime != 0 && old.ServerTime > value.ServerTime) return;
                     next.X = value.X; next.Y = value.Y; next.Z = value.Z; next.Speed = value.Speed; next.Jumping = value.Jumping;
+                    next.Ziplining = value.Ziplining;
+                    next.NpcRunning = value.NpcRunning;
                     next.TransportId = value.TransportId; next.LocalX = value.LocalX; next.LocalY = value.LocalY; next.LocalZ = value.LocalZ;
                     if (value.ServerTime != 0) next.ServerTime = value.ServerTime;
                     if (update.HasHeading) next.Angle = value.Angle;
@@ -69,6 +71,14 @@ namespace FFOne.Network
                 case WorldUpdateKind.Condition: next.ConditionFlags = value.ConditionFlags; break;
                 case WorldUpdateKind.Nano: next.NanoId = value.NanoId; next.NanoSkill = value.NanoSkill; next.NanoStamina = value.NanoStamina; break;
                 case WorldUpdateKind.Settings: next.Hidden = value.Hidden; next.Interactable = value.Interactable; next.MapIcon = value.MapIcon; next.Scale = value.Scale; break;
+                case WorldUpdateKind.Appearance:
+                    if (next.Character.Uid != value.Character.Uid) return;
+                    var style = value.Character.Style;
+                    style.AppearanceComplete = next.Character.Style.AppearanceComplete;
+                    style.TutorialComplete = next.Character.Style.TutorialComplete;
+                    style.Payzone = next.Character.Style.Payzone;
+                    next.Character.Style = style;
+                    break;
                 case WorldUpdateKind.Equipment:
                     // CharacterInfo belongs to this session, never the account roster or another shard.
                     var character = next.Character;

@@ -25,13 +25,23 @@ namespace FFOne.World
             if (actor && actor.Definition?.HiddenMarker != true && !(actor.Avatar && actor.Avatar.IsReady)
                 && !actor.GetComponentInChildren<Renderer>()) return;
             var avatar = GetComponent<NativeAvatarPreview>();
+            if (avatar && !avatar.IsReady) return;
             int immobilized = (1 << 9) | (1 << 10);
-            if ((desired & immobilized) != 0 && (!actor || actor.Entity.Hp > 0))
+            // NPC locomotion and conditions share one animation owner.
+            if ((!actor || !actor.IsNpc) && (desired & immobilized) != 0 && (!actor || actor.Entity.Hp > 0))
             {
-                if (avatar) avatar.PlayLocomotion((desired & (1 << 10)) != 0 ? "sleep" : "stun");
+                if (avatar)
+                {
+                    avatar.PlayLocomotion((desired & (1 << 10)) != 0 ? "sleep" : "stun");
+                    if ((desired & ~applied & (1 << 9)) != 0)
+                    {
+                        var world = GetComponentInParent<NetworkWorldController>();
+                        if (world) avatar.PlayStunVoice((string)world.Preferences["voice_locale"], FrontendController.AudioGain(world.Preferences, "voice"));
+                    }
+                }
                 else if (actor) actor.Animate("stand1");
             }
-            else if (actor && (applied & immobilized) != 0)
+            else if (actor && !actor.IsNpc && (applied & immobilized) != 0)
             { actor.LastClip = null; actor.Animate(actor.Entity.Hp == 0 ? "death" : actor.Entity.Speed > 0 ? "run" : "stand1"); }
             var catalog = GameplayUiCatalog.Load();
             for (int id = 1; id <= 25; id++)
@@ -49,8 +59,7 @@ namespace FFOne.World
         }
         GameObject Spawn(int buffId, int effect, bool instant, float lifetime)
         {
-            string route = "map/shared/effects/es" + effect + ".closure";
-            if (!NativeData.Load(route))
+            if (!ContentAssets.Load<NativeEffectDefinition>(NativeEffectDefinition.Resource(effect)))
             {
                 if (attemptedMissing.Add(effect)) Debug.LogWarning("Accepted buff effect closure is not published: ES" + effect);
                 return null;

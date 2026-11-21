@@ -1,0 +1,62 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+  <ui:VisualElement name="social-root" class="social-root" picking-mode="Ignore">
+    <ui:VisualElement name="social-window" class="social-window">
+      <ui:Label name="social-title" class="social-title social-copy social-copy--body" picking-mode="Ignore" enable-rich-text="false" />
+      <ui:Button name="social-close" class="social-close ff-button social-button" />
+      <ui:Label name="social-status" class="social-status social-copy social-copy--body" picking-mode="Ignore" enable-rich-text="false" />
+      <ui:TextField name="friend-first" class="friend-first social-field" max-length="8" />
+      <ui:TextField name="friend-last" class="friend-last social-field" max-length="16" />
+      <ui:Button name="friend-add-name" class="friend-add-name ff-button social-button" />
+      <ui:Button name="social-refresh" class="social-refresh ff-button social-button" />
+      <ui:ScrollView name="friend-list" class="friend-list" horizontal-scroller-visibility="Hidden" />
+      <ui:Label name="group-heading" class="group-heading social-copy social-copy--body" picking-mode="Ignore" enable-rich-text="false" />
+      <ui:ScrollView name="group-list" class="group-list" horizontal-scroller-visibility="Hidden" />
+      <ui:Button name="group-leave" class="group-leave ff-button social-button" />
+      <ui:Label name="social-channel" class="social-channel social-copy social-copy--body" picking-mode="Ignore" enable-rich-text="false" />
+      <ui:ScrollView name="social-history" class="social-history" horizontal-scroller-visibility="Hidden" />
+      <ui:TextField name="social-input" class="social-input social-field" max-length="127" />
+      <ui:Button name="social-send" class="social-send ff-button social-button" />
+      <ui:Button name="social-group-channel" class="social-group-channel ff-button social-button" />
+    </ui:VisualElement>
+  </ui:VisualElement>
+  <ui:VisualElement name="buddy-list-window" class="buddy-list-window" picking-mode="Ignore">
+    <ui:VisualElement name="buddy-list-frame" class="buddy-list-frame" picking-mode="Ignore" />
+    <ui:Label name="buddy-heading" class="buddy-heading social-copy social-copy--headline" picking-mode="Ignore" enable-rich-text="false" />
+    <ui:VisualElement name="buddy-list-background" class="buddy-list-background" picking-mode="Ignore" />
+    <ui:ScrollView name="buddy-rows" class="buddy-rows ff-guide-scroller" horizontal-scroller-visibility="Hidden" />
+    <ui:Button name="buddy-delete" class="buddy-delete ff-button social-buddy-button" />
+    <ui:Button name="buddy-warp" class="buddy-warp ff-button social-buddy-button" />
+    <ui:Button name="buddy-add" class="buddy-add ff-button social-buddy-button" />
+  </ui:VisualElement>
+  <ui:VisualElement name="buddy-add-dialog" class="buddy-add-dialog">
+    <ui:VisualElement name="buddy-add-window" class="buddy-add-window" picking-mode="Ignore">
+      <ui:Label name="buddy-add-title" class="buddy-add-title social-copy social-copy--headline" picking-mode="Ignore" enable-rich-text="false" />
+      <ui:Label name="buddy-add-instruction" class="buddy-add-instruction social-copy social-copy--body" picking-mode="Ignore" enable-rich-text="false" />
+      <ui:TextField name="buddy-full-name" class="buddy-full-name social-field" max-length="25" />
+      <ui:Button name="buddy-add-cancel" class="buddy-add-cancel ff-button social-cancel" />
+      <ui:Button name="buddy-add-submit" class="buddy-add-submit ff-button social-button" />
+    </ui:VisualElement>
+  </ui:VisualElement>
+  <ui:VisualElement name="player-interaction" class="player-interaction" picking-mode="Ignore">
+    <ui:VisualElement name="player-menu" class="player-menu" picking-mode="Ignore">
+      <ui:Label name="player-name" class="player-name social-copy social-copy--headline" picking-mode="Ignore" enable-rich-text="false" />
+      <ui:Button name="player-dismiss" class="player-dismiss ff-button player-menu-dismiss" />
+      <ui:Button name="player-trade" class="player-trade ff-button social-buddy-button player-menu-action">
+        <ui:VisualElement name="player-action-icon" class="player-action-icon player-action-icon--trade" picking-mode="Ignore" />
+      </ui:Button>
+      <ui:Button name="player-group" class="player-group ff-button social-buddy-button player-menu-action">
+        <ui:VisualElement name="player-action-icon" class="player-action-icon player-action-icon--group" picking-mode="Ignore" />
+      </ui:Button>
+      <ui:Button name="player-buddy" class="player-buddy ff-button social-buddy-button player-menu-action">
+        <ui:VisualElement name="player-action-icon" class="player-action-icon player-action-icon--buddy" picking-mode="Ignore" />
+      </ui:Button>
+      <ui:Button name="player-ignore" class="player-ignore ff-button social-buddy-button player-menu-action">
+        <ui:VisualElement name="player-action-icon" class="player-action-icon player-action-icon--ignore" picking-mode="Ignore" />
+      </ui:Button>
+      <ui:Button name="player-close" class="player-close ff-button social-buddy-button player-menu-action">
+        <ui:VisualElement name="player-action-icon" class="player-action-icon player-action-icon--close" picking-mode="Ignore" />
+      </ui:Button>
+    </ui:VisualElement>
+  </ui:VisualElement>
+  <ui:VisualElement name="party-hud" class="party-hud" picking-mode="Ignore" />
+</ui:UXML>

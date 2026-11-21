@@ -119,6 +119,20 @@ namespace FFOne.UI
             Tile(512, 512, "Tech Square", "The Future"),
         };
         public static Location Resolve(int serverX, int serverY) => Areas.FirstOrDefault(a => a.Bounds.Contains(new Vector2(serverX * .01f, serverY * .01f)));
+        internal static Location RosterLocation(CharacterInfo character)
+        {
+            if (character.Style.AppearanceComplete && !character.Style.TutorialComplete &&
+                character.X == 0 && character.Y == 0 && character.Z == 0)
+                return ResolveWorld(FFOne.Tutorial.TutorialController.StartPosition);
+            return Resolve(character.X, character.Y);
+        }
+        internal static Location ResolveWorld(Vector3 position)
+        {
+            var point = new Vector2(position.x, position.z);
+            foreach (var area in Areas) if (area.Bounds.Contains(point)) return area;
+            return null;
+        }
+        internal static string District(Location place, string language) => place == null ? "" : Localize(place.District, language);
         static string Localize(string text, string language)
         {
             string key = "content.location.world." + Regex.Replace(text.ToLowerInvariant(), "[^a-z0-9]+", "_").Trim('_');
@@ -128,7 +142,7 @@ namespace FFOne.UI
         public static string Describe(CharacterInfo character, string language, bool selected)
         {
             if (!character.Style.AppearanceComplete) return LocalizationCatalog.Lookup("ui.character_select.location.character_creation", language);
-            var location = Resolve(character.X, character.Y);
+            var location = RosterLocation(character);
             if (location == null) return LocalizationCatalog.Lookup("ui.character_select.location.unknown", language);
             string key = selected ? "ui.character_select.location.spaced" : "ui.character_select.location.hyphen";
             return LocalizationCatalog.Lookup(key, language).Replace("{district}", Localize(location.District, language)).Replace("{zone}", Localize(location.Zone, language));

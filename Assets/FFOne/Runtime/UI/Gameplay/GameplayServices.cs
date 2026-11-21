@@ -37,7 +37,7 @@ namespace FFOne.UI
             nearbyServiceNpc = npc; nearbyServiceDefinition = definition;
             if (nearbyServiceButton == null && npc != null)
             {
-                nearbyServiceButton = ServiceButton(parent, "nearby-bank", "", 0, 0, 260,
+                nearbyServiceButton = ServiceButton(layers.Host(UiLayer.Hud), "nearby-bank", "", 0, 0, 260,
                     () => OpenNpcService(nearbyServiceNpc, nearbyServiceDefinition));
                 nearbyServiceButton.style.left = new Length(50, LengthUnit.Percent); nearbyServiceButton.style.marginLeft = -130;
                 nearbyServiceButton.style.top = StyleKeyword.Auto; nearbyServiceButton.style.bottom = 140;
@@ -137,37 +137,53 @@ namespace FFOne.UI
 
         VisualElement BuildServiceView()
         {
-            var root = FFView.Instantiate("ui/views/Retrobution/Inventory", "inventory-root");
+            var root = FFView.InstantiateClass("ui/views/Retrobution/Inventory", "inventory-screen");
             BindInventory(root, false, () => _ = CloseService());
-            root.Q("inventory-character")?.RemoveFromHierarchy();
-            root.Q<Button>("tab-nanos")?.SetEnabled(false);
-            var panel = new VisualElement { name = "service-panel" }; FFWidgets.Rect(panel, 0, 0, 498, 638);
+            FFView.RequireClass<VisualElement>(root, "inventory-character").RemoveFromHierarchy();
+            FFView.RequireClass<Button>(root, "inventory-nanos-tab").SetEnabled(false);
+            var panel = new VisualElement { name = "service-panel" };
             if (serviceBank)
             {
-                panel.style.backgroundColor = new Color(.01f, .06f, .1f, .98f);
-                var info = new VisualElement { pickingMode = PickingMode.Ignore }; FFWidgets.Rect(info, 3, 9, 481, 87);
-                FFStyle.Background(info, "ui/en/bank-mode/bank-info"); panel.Add(info);
-                var frame = new VisualElement { pickingMode = PickingMode.Ignore }; FFWidgets.Rect(frame, 11, 105, 482, 490);
-                // Exact Panel_BankScript source insets, converted to Unity left/bottom/right/top.
-                FFStyle.Background(frame, "ui/en/bank-mode/bank-panel", new Vector4(136, 51, 10, 33)); panel.Add(frame);
+                panel.AddToClassList("ff-bank-panel");
+                var info = new VisualElement { pickingMode = PickingMode.Ignore };
+                info.AddToClassList("ff-bank-info"); panel.Add(info);
+                var frame = new VisualElement { pickingMode = PickingMode.Ignore };
+                frame.AddToClassList("ff-bank-dialog"); panel.Add(frame);
+                var search = FFView.OptionalClass("ui/views/Retrobution/Inventory", "ff-bank-search");
+                if (search != null)
+                {
+                    panel.Add(search);
+                    var tab = search.Q<Label>(className: "ff-bank-tab");
+                    if (tab != null) tab.text = LocalizationCatalog.Lookup("ui.bank.tab.vault", language);
+                    var query = FFView.RequireClass<TextField>(search, "ff-bank-query");
+                    query.textEdition.placeholder = LocalizationCatalog.Lookup("ui.bank.search.placeholder", language);
+                    query.RegisterValueChangedCallback(_ => {
+                        RefreshService();
+                        var viewport = panel.Q<ScrollView>(className: "ff-bank-viewport");
+                        if (viewport != null) viewport.scrollOffset = Vector2.zero;
+                    });
+                }
             }
-            else FFStyle.Background(panel, "ui/en/vendor/vendor-panel");
-            root.Q("inventory-window").Add(panel);
-            FFWidgets.Label(panel, "service-title", serviceDefinition?.Name ?? "", 18, 12, 420, 24, true, 16, false);
+            else { FFWidgets.Rect(panel, 0, 0, 498, 638); FFStyle.Background(panel, "ui/en/vendor/vendor-panel"); }
+            FFView.RequireClass<VisualElement>(root, "inventory-window").Add(panel);
+            string title = serviceBank ? LocalizationCatalog.Lookup("ui.bank.title", language) : serviceDefinition?.Name ?? "";
+            FFWidgets.Label(panel, "service-title", title, serviceBank ? 17 : 18, serviceBank ? 19 : 12, 420, 24, true, 16, false);
             FFWidgets.Label(panel, "service-status", "", 18, 42, 450, 44, true, 12, false);
             var list = new ScrollView { name = "service-list", horizontalScrollerVisibility = ScrollerVisibility.Hidden };
-            FFWidgets.Rect(list, 28, serviceBank ? 139 : 110, 450, serviceBank ? 406 : 438); panel.Add(list);
-            FFWidgets.Label(panel, "service-balance", "", 18, 554, 460, 25, true, 14, false);
+            if (serviceBank) list.AddToClassList("ff-bank-viewport");
+            else FFWidgets.Rect(list, 28, 110, 450, 438);
+            panel.Add(list);
+            if (!serviceBank) FFWidgets.Label(panel, "service-balance", "", 18, 554, 460, 25, true, 14, false);
             if (!serviceBank)
             {
-                ServiceButton(panel, "service-tab-buy", language == "ru" ? "КУПИТЬ" : "BUY", 20, 85, 210, () => { serviceBuyback = false; RefreshService(); });
-                ServiceButton(panel, "service-tab-restore", language == "ru" ? "ВЫКУПИТЬ" : "BUY BACK", 246, 85, 210, () => { serviceBuyback = true; RefreshService(); });
+                ServiceButton(panel, "service-tab-buy", language == "ru" ? "КУПИТЬ" : "BUY", 20, 85, 210, () => { if (serviceBuyback) playSound?.Invoke("tab_click01"); serviceBuyback = false; RefreshService(); });
+                ServiceButton(panel, "service-tab-restore", language == "ru" ? "ВЫКУПИТЬ" : "BUY BACK", 246, 85, 210, () => { if (!serviceBuyback) playSound?.Invoke("tab_click01"); serviceBuyback = true; RefreshService(); });
                 ServiceButton(panel, "service-weapon-battery", language == "ru" ? "БОЕВАЯ БАТАРЕЯ +100" : "WEAPON BATTERY +100", 18, 588, 218, () => PromptBattery(false));
                 ServiceButton(panel, "service-nano-battery", language == "ru" ? "НАНО-БАТАРЕЯ +100" : "NANO BATTERY +100", 250, 588, 218, () => PromptBattery(true));
             }
             for (int i = 0; i < 50; i++)
             {
-                int slot = i; root.Q<Button>("inventory-slot-" + slot).clicked += () => ServiceInventoryClick(slot);
+                int slot = i; InventoryBagSlot(root, slot).clicked += () => ServiceInventoryClick(slot);
             }
             root.RegisterCallback<AttachToPanelEvent>(_ => RefreshService());
             root.RegisterCallback<GeometryChangedEvent>(_ => PlaceWindow());
@@ -185,7 +201,7 @@ namespace FFOne.UI
                 ? language == "ru" ? "Ожидание сервера…" : "Waiting for server…" : serviceBank
                 ? language == "ru" ? "Щелчок переносит предмет. Можно перетаскивать." : "Click an item to transfer it, or drag between slots."
                 : language == "ru" ? "Выберите товар или предмет для продажи." : "Choose goods or an inventory item to sell.";
-            root.Q<Label>("service-balance").text = $"Taros: {session.Snapshot.Taros:N0}   {session.Snapshot.WeaponBattery} / {session.Snapshot.NanoBattery}";
+            if (!serviceBank) root.Q<Label>("service-balance").text = $"Taros: {session.Snapshot.Taros:N0}   {session.Snapshot.WeaponBattery} / {session.Snapshot.NanoBattery}";
             foreach (var button in root.Query<Button>().ToList())
                 if (button.name.StartsWith("service-")) button.SetEnabled(ready);
             // Remove previous bank button bindings as their visual lifetime ends on refresh.
@@ -194,13 +210,20 @@ namespace FFOne.UI
             if (serviceBank)
             {
                 if (session.Snapshot.BankNumber < 0) return;
-                var grid = new VisualElement { name = "bank-slots" }; grid.style.height = 40 * 57; list.Add(grid);
+                var grid = new VisualElement { name = "bank-slots" }; grid.AddToClassList("ff-bank-grid"); list.Add(grid);
+                string query = root.Q<TextField>(className: "ff-bank-query")?.value ?? "";
+                grid.EnableInClassList("ff-bank-grid--filtered", query.Length > 0);
                 foreach (var item in session.Snapshot.Bank)
                 {
+                    if (query.Length > 0)
+                    {
+                        if (item.IsEmpty) continue;
+                        int variant = item.ItemType is >= 0 and <= 3 ? item.Option >> 16 : 0;
+                        string itemName = GameplayUiCatalog.Load().Item(item.ItemType, variant > 0 ? variant : item.ItemId, language)?.Name;
+                        if (itemName == null || itemName.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) < 0) continue;
+                    }
                     int slot = item.Slot; var button = new Button(() => _ = WithdrawBank(slot)) { name = "bank-slot-" + slot };
-                    FFWidgets.Rect(button, slot % 5 * 79, slot / 5 * 57, 75, 54);
-                    button.style.backgroundColor = new Color(.01f, .08f, .14f, .95f); button.style.borderBottomWidth = button.style.borderTopWidth = button.style.borderLeftWidth = button.style.borderRightWidth = 1;
-                    button.style.borderBottomColor = button.style.borderTopColor = button.style.borderLeftColor = button.style.borderRightColor = Color.cyan;
+                    button.AddToClassList("ff-bank-slot");
                     PaintServiceItem(button, item); BindItemDrag(button, ItemContainer.Bank, slot); button.SetEnabled(ready); grid.Add(button);
                 }
             }
@@ -227,10 +250,16 @@ namespace FFOne.UI
         }
         void AddVendorRow(ScrollView list, string name, EquipmentItem item, float price, Action action, bool ready)
         {
-            var button = new Button(action) { name = name }; button.style.height = 75; button.style.flexShrink = 0;
+            var button = new Button(() => { playSound?.Invoke("button"); action(); }) { name = name }; button.style.height = 75; button.style.flexShrink = 0;
             FFStyle.Background(button, "ui/en/vendor/item-row");
-            PaintServiceItem(button, new GameplayItemState(0, item.ItemType, item.ItemId, item.Option, item.TimeLimit));
             var content = GameplayUiCatalog.Load().Item(item.ItemType, item.ItemId, language);
+            if (content?.UnavailableTo(session.Snapshot) == true)
+            {
+                var frame = new VisualElement { pickingMode = PickingMode.Ignore };
+                frame.AddToClassList("vendor-item-restricted");
+                button.Add(frame);
+            }
+            PaintServiceItem(button, new GameplayItemState(0, item.ItemType, item.ItemId, item.Option, item.TimeLimit));
             FFWidgets.Label(button, "name", content?.Name ?? $"{item.ItemType}:{item.ItemId}", 76, 7, 310, 34, true, 14, false);
             FFWidgets.Label(button, "price", price.ToString("N0", CultureInfo.CurrentCulture) + " Taros", 76, 43, 310, 24, true, 12, false);
             button.SetEnabled(ready); list.Add(button);
@@ -277,6 +306,7 @@ namespace FFOne.UI
             if (!ServiceCanAct) return;
             ShowPrompt(language == "ru" ? "БАТАРЕЯ" : "BATTERY", "100 Taros / +100", "1",
                 text => { int packs = Quantity(text, 100); return BeginService(ProtocolServices.BatteryBought, () => serviceClient.BuyBatteryAsync(serviceNpc.Id, serviceNpc.NpcType, nano, packs, serviceToken)); }, null);
+            prompt?.EnableQuantityInput(100);
         }
         static int Quantity(string text, int maximum)
         { if (!int.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out int n) || n < 1 || n > maximum) throw new ArgumentException("Quantity must be between 1 and " + maximum); return n; }

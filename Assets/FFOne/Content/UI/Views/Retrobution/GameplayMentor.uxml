@@ -1,0 +1,60 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+  <ui:Template name="MentorCard" src="GameplayMentorCard.uxml" />
+  <ui:VisualElement name="mentor-root" class="mentor-root">
+    <ui:VisualElement name="mentor-background" class="mentor-background" picking-mode="Ignore" />
+    <ui:VisualElement name="mentor-window" class="mentor-window" picking-mode="Ignore">
+      <ui:VisualElement name="mentor-selection" class="mentor-selection" picking-mode="Ignore">
+        <ui:VisualElement name="mentor-computress-frame" class="mentor-computress-frame" picking-mode="Ignore" />
+        <ui:VisualElement name="mentor-computress-icon-back" class="mentor-computress-icon-back" picking-mode="Ignore" />
+        <ui:VisualElement name="computress-icon" class="computress-icon" picking-mode="Ignore" />
+        <ui:Label name="computress-name" class="computress-name social-copy social-copy--headline" picking-mode="Ignore" enable-rich-text="false" />
+        <ui:Label name="mentor-heading" class="mentor-heading social-copy social-copy--headline" picking-mode="Ignore" enable-rich-text="false" />
+        <ui:Label name="mentor-intro" class="mentor-intro social-copy social-copy--body" picking-mode="Ignore" enable-rich-text="false" />
+        <ui:VisualElement name="mentor-card-ben" class="mentor-card-ben mentor-card" picking-mode="Ignore">
+          <ui:VisualElement name="mentor-light-ben" class="mentor-light-ben mentor-card-light" picking-mode="Ignore" />
+          <ui:Instance template="MentorCard" class="mentor-card-frame" picking-mode="Ignore" />
+          <ui:VisualElement name="mentor-card-icon-ben" class="mentor-card-icon-ben" picking-mode="Ignore" />
+          <ui:VisualElement name="ben-portrait" class="ben-portrait" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement name="mentor-card-dexter" class="mentor-card-dexter mentor-card" picking-mode="Ignore">
+          <ui:VisualElement name="mentor-light-dexter" class="mentor-light-dexter mentor-card-light" picking-mode="Ignore" />
+          <ui:Instance template="MentorCard" class="mentor-card-frame" picking-mode="Ignore" />
+          <ui:VisualElement name="mentor-card-icon-dexter" class="mentor-card-icon-dexter" picking-mode="Ignore" />
+          <ui:VisualElement name="dexter-portrait" class="dexter-portrait" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement name="mentor-card-mojo" class="mentor-card-mojo mentor-card" picking-mode="Ignore">
+          <ui:VisualElement name="mentor-light-mojo" class="mentor-light-mojo mentor-card-light" picking-mode="Ignore" />
+          <ui:Instance template="MentorCard" class="mentor-card-frame" picking-mode="Ignore" />
+          <ui:VisualElement name="mentor-card-icon-mojo" class="mentor-card-icon-mojo" picking-mode="Ignore" />
+          <ui:VisualElement name="mojo-portrait" class="mojo-portrait" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement name="mentor-card-edd" class="mentor-card-edd mentor-card" picking-mode="Ignore">
+          <ui:VisualElement name="mentor-light-edd" class="mentor-light-edd mentor-card-light" picking-mode="Ignore" />
+          <ui:Instance template="MentorCard" class="mentor-card-frame" picking-mode="Ignore" />
+          <ui:VisualElement name="mentor-card-icon-edd" class="mentor-card-icon-edd" picking-mode="Ignore" />
+          <ui:VisualElement name="edd-portrait" class="edd-portrait" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement name="mentor-cost-bar" class="mentor-cost-bar" picking-mode="Ignore" />
+        <ui:VisualElement name="mentor-cost-group" class="mentor-cost-group" picking-mode="Ignore">
+          <ui:Label name="mentor-cost" class="mentor-cost social-copy social-copy--headline" picking-mode="Ignore" enable-rich-text="false" />
+          <ui:VisualElement name="mentor-cost-icon" class="mentor-cost-icon" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:Button name="mentor-primary" class="mentor-primary ff-button social-buddy-button" />
+        <ui:Button name="mentor-cancel" class="mentor-cancel ff-button social-cancel" />
+        <ui:Button name="mentor-close" class="mentor-close ff-button social-art-close" />
+        <ui:Button name="mentor-help" class="mentor-help ff-button social-mentor-help" />
+      </ui:VisualElement>
+      <ui:VisualElement name="mentor-dialog" class="mentor-dialog social-hidden" picking-mode="Ignore">
+        <ui:VisualElement name="mentor-shade" class="mentor-shade" picking-mode="Ignore" />
+        <ui:VisualElement name="mentor-time-machine" class="mentor-time-machine" picking-mode="Ignore" />
+        <ui:VisualElement name="mentor-confirm-art" class="mentor-confirm-art" picking-mode="Ignore" />
+        <ui:VisualElement name="mentor-dialog-frame" class="mentor-dialog-frame" picking-mode="Ignore" />
+        <ui:VisualElement name="mentor-dialog-icon" class="mentor-dialog-icon" picking-mode="Ignore" />
+        <ui:Label name="mentor-dialog-title" class="mentor-dialog-title social-copy social-copy--headline" picking-mode="Ignore" enable-rich-text="false" />
+        <ui:Label name="mentor-dialog-body" class="mentor-dialog-body social-copy social-copy--body" picking-mode="Ignore" enable-rich-text="false" />
+        <ui:Button name="mentor-no" class="mentor-no ff-button social-cancel" />
+        <ui:Button name="mentor-yes" class="mentor-yes ff-button social-buddy-button" />
+      </ui:VisualElement>
+    </ui:VisualElement>
+  </ui:VisualElement>
+</ui:UXML>

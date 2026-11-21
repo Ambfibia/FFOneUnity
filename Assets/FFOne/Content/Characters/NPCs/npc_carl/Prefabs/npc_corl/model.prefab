@@ -994,7 +994,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7813254386599297423}
-  - component: {fileID: 6969258988072367104}
+  - component: {fileID: 5872259588551635234}
+  - component: {fileID: 1556298802417733800}
   m_Layer: 0
   m_Name: model
   m_TagString: Untagged
@@ -1018,25 +1019,43 @@ Transform:
   - {fileID: 8817166906357503401}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!111 &6969258988072367104
-Animation:
+--- !u!95 &5872259588551635234
+Animator:
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3247662043348530261}
   m_Enabled: 1
-  serializedVersion: 4
-  m_Animation: {fileID: 7400000, guid: 6aa4d6a9cbb226a49aec5738a252f1f2, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: 6aa4d6a9cbb226a49aec5738a252f1f2, type: 2}
-  - {fileID: 7400000, guid: bdd19743052855c47879727cb2b6fc20, type: 2}
-  - {fileID: 7400000, guid: b0cb79994ea098f41b6a324fb2b5d469, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 3fbe8f03fee07cc4d944e2a1696e5f2e, type: 2}
+  m_CullingMode: 0
   m_UpdateMode: 0
-  m_CullingType: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 1
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1556298802417733800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3247662043348530261}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b7ac68c382befc4d9fc82662c17e418, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.Content.NativeNpcAnimator
+  animator: {fileID: 5872259588551635234}
+  AnimationSounds: []
+  Faces: []
 --- !u!1 &3383509377500699761
 GameObject:
   m_ObjectHideFlags: 0

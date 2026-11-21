@@ -68,5 +68,10 @@ namespace FFOne.Tutorial
             var direction = target - origin;
             return direction.sqrMagnitude > .000001f ? Quaternion.LookRotation(direction) : Quaternion.identity;
         }
+        public static Quaternion Heading(Vector3 origin, Vector3 target, Quaternion fallback)
+        {
+            var direction = Vector3.ProjectOnPlane(target - origin, Vector3.up);
+            return direction.sqrMagnitude > .000001f ? Quaternion.LookRotation(direction) : fallback;
+        }
     }
 }

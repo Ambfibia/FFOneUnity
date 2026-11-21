@@ -2385,7 +2385,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3846370841170832919}
-  - component: {fileID: 4715727583721294492}
+  - component: {fileID: 4737225672012796430}
+  - component: {fileID: 7662557580190362167}
   m_Layer: 0
   m_Name: model
   m_TagString: Untagged
@@ -2409,27 +2410,73 @@ Transform:
   - {fileID: 128673089989420337}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!111 &4715727583721294492
-Animation:
+--- !u!95 &4737225672012796430
+Animator:
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6311544422717130324}
   m_Enabled: 1
-  serializedVersion: 4
-  m_Animation: {fileID: 7400000, guid: 40d291908c86a26469a3fd6f5e4bb0d8, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: 00292728e4aa9ab4e9e2b8a8961bcbda, type: 2}
-  - {fileID: 7400000, guid: bcc0b411e15f6a54eb84af4dd17b522b, type: 2}
-  - {fileID: 7400000, guid: a43d3716053fd9943ab896e79e6a27da, type: 2}
-  - {fileID: 7400000, guid: 40d291908c86a26469a3fd6f5e4bb0d8, type: 2}
-  - {fileID: 7400000, guid: cd0d3a550369ee848a3a033764126e52, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: a2885f5daf89db043840fee8520238d2, type: 2}
+  m_CullingMode: 0
   m_UpdateMode: 0
-  m_CullingType: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 1
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7662557580190362167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6311544422717130324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b7ac68c382befc4d9fc82662c17e418, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.Content.NativeNpcAnimator
+  animator: {fileID: 4737225672012796430}
+  AnimationSounds:
+  - Cue: Blossom_AttackWhoosh_1.wav
+    Variants:
+    - {fileID: 8300000, guid: 9aabddc980231b349b399851faf42c0c, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: Blossom_AttackGrunt_1.wav
+    Variants:
+    - {fileID: 8300000, guid: 065428fc3c473aa46a211b8b90a383d9, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: Blossom_AttackGrunt_2.wav
+    Variants:
+    - {fileID: 8300000, guid: 1dda4485a3e235a45b4dab07faa2067b, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: Blossom_AttackWhoosh_2.wav
+    Variants:
+    - {fileID: 8300000, guid: 996ef43ca8b502d40b7e766206bfe33f, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: Blossom_AttackGrunt_3.wav
+    Variants:
+    - {fileID: 8300000, guid: 43124d5d97abed6498c6ae07e0a040c2, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  - Cue: Blossom_AttackGrunt_4.wav
+    Variants:
+    - {fileID: 8300000, guid: d1998e1700b227d4f815ef726676a8df, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+  Faces: []
 --- !u!1 &6358067563270420569
 GameObject:
   m_ObjectHideFlags: 0

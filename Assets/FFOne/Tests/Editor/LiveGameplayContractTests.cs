@@ -1,7 +1,9 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using FFOne.Network;
 using FFOne.UI;
+using FFOne.World;
 using NUnit.Framework;
 using UnityEngine;
 using CharacterInfo = FFOne.Network.CharacterInfo;
@@ -34,6 +36,59 @@ namespace FFOne.Tests
         {
             var s = new WorldEntitySession(1); s.Apply(new ProtocolFrame(ProtocolWorld.NpcMove, Bytes(24, (0, 99), (4, 500)))); Assert.AreEqual(0, s.Count);
         }
+        [Test] public void NpcMotionRestoresTheCurrentPoseThenProtectsActionsAndDeath()
+        {
+            var root = new GameObject("NPC animation test");
+            using var rig = new NpcAnimatorTestRig(root, ("stand1", true, 0), ("walk", true, 0), ("run", true, 0), ("melee1", false, .9f),
+                ("ready", true, 0), ("wound", false, 0), ("stun", true, 0), ("death", false, 0));
+            try
+            {
+                var view = root.AddComponent<NetworkEntityView>();
+                var session = new WorldEntitySession(1);
+                session.Apply(new ProtocolFrame(ProtocolWorld.NpcEnter, Bytes(36, (0, 77), (4, 2669), (8, 100))));
+                const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
+                session.Changed += update => typeof(NetworkEntityView).GetProperty(nameof(NetworkEntityView.Entity)).SetValue(view, update.Entity);
+                session.SetHealth(WorldEntityKind.Npc, 77, 100);
+
+                typeof(NetworkEntityView).GetField("Speed", flags).SetValue(view, 1f);
+                typeof(NetworkEntityView).GetField("Destination", flags).SetValue(view, Vector3.right);
+                var refresh = typeof(NetworkEntityView).GetMethod("RefreshNpcAnimation", flags);
+                var action = typeof(NetworkEntityView).GetMethod("PlayNpcAction", flags);
+                refresh.Invoke(view, new object[] { 0f });
+                typeof(NetworkEntityView).GetField("NpcAnimator", flags).SetValue(view, rig.Animation);
+
+                refresh.Invoke(view, new object[] { 0f });
+                Assert.That(rig.Animation.CurrentClip, Is.EqualTo("walk"));
+                var path = Bytes(24, (0, 77), (4, 100), (16, 100));
+                Protocol0104.Write16(path, 20, 1);
+                session.Apply(new ProtocolFrame(ProtocolWorld.NpcMove, path));
+                refresh.Invoke(view, new object[] { 0f });
+                Assert.That(rig.Animation.CurrentClip, Is.EqualTo("run"));
+                action.Invoke(view, new object[] { true, 0f });
+                Assert.That(rig.Animation.CurrentMotion.isLooping, Is.False);
+                rig.Animator.Update(.5f);
+                action.Invoke(view, new object[] { true, .5f });
+                Assert.That(rig.Animation.MotionTime, Is.Zero.Within(.001f));
+                root.transform.position = Vector3.right;
+                rig.Animator.Update(.6f);
+                refresh.Invoke(view, new object[] { 1.1f });
+                Assert.That(rig.Animation.CurrentClip, Is.EqualTo("melee1"), "Arrival cannot interrupt a restarted attack.");
+                rig.Animator.Update(.4f);
+                refresh.Invoke(view, new object[] { 1.5f });
+                Assert.That(rig.Animation.CurrentClip, Is.EqualTo("ready"));
+
+                session.SetCondition(WorldEntityKind.Npc, 77, 1 << 9);
+                refresh.Invoke(view, new object[] { 2f });
+                Assert.That(rig.Animation.CurrentClip, Is.EqualTo("stun"));
+                session.SetHealth(WorldEntityKind.Npc, 77, 0);
+                refresh.Invoke(view, new object[] { 2f });
+                action.Invoke(view, new object[] { true, 3f });
+                Assert.That(rig.Animation.CurrentClip, Is.EqualTo("death"), "Death overrides conditions and combat requests.");
+                Assert.That(rig.Animation.CurrentMotion.isLooping, Is.False);
+            }
+            finally { UnityEngine.Object.DestroyImmediate(root); }
+        }
+
         [Test] public void PlayerAndNpcNamespacesCanShareIds()
         {
             var s = new WorldEntitySession(1); s.Apply(new ProtocolFrame(ProtocolWorld.NpcEnter, Bytes(36, (0, 7), (4, 3))));
@@ -167,9 +222,136 @@ namespace FFOne.Tests
                     var avatar = root.AddComponent<FFOne.Content.NativeAvatarPreview>(); avatar.ApplyHnpc(index);
                     Assert.True(avatar.IsReady, "HNPC appearance " + index + ": " + avatar.LastError);
                     Assert.IsNull(avatar.LastError, "HNPC appearance " + index);
+                    var actor = avatar.PlayerAnimation.transform;
+                    avatar.PlayerAnimation.Animator.Update(.1f);
+                    avatar.FinishPose();
+                    foreach (var group in appearance["parts"].Where(p => p["actorSkinCombinerClothesIndex"] == null ||
+                        p["actorSkinCombinerClothesIndex"].Type == Newtonsoft.Json.Linq.JTokenType.Null)
+                        .GroupBy(p => (string)p["kind"]))
+                    {
+                        var socket = AttachmentSocket(actor, group.Key);
+                        Assert.AreEqual(group.Count(), socket.childCount, $"{index}: {group.Key}");
+                        foreach (Transform part in socket) AssertAttachmentTransform(part);
+                    }
                 }
                 finally { UnityEngine.Object.DestroyImmediate(root); }
             }
+        }
+
+        [TestCase(1, 1, 1, "m")]
+        [TestCase(2, 6, 25, "w")]
+        public void RigidBackpackAndGlassesKeepTheirOwnSkinTextureAndActorPivot(int gender, int face, int hair, string rig)
+        {
+            var root = new GameObject("Cosmetic pivot contract");
+            root.transform.SetPositionAndRotation(new Vector3(21, 4, -17), Quaternion.Euler(0, 36, 0));
+            try
+            {
+                var character = new CharacterInfo();
+                character.Style.Gender = gender; character.Style.FaceStyle = face; character.Style.HairStyle = hair;
+                var avatar = root.AddComponent<FFOne.Content.NativeAvatarPreview>();
+                avatar.Apply(character);
+                Assert.IsNull(avatar.LastError);
+                var actor = avatar.PlayerAnimation.transform;
+                Assert.NotNull(actor.Find(rig));
+                var rootMatrix = root.transform.localToWorldMatrix;
+                var actorMatrix = actor.localToWorldMatrix;
+
+                character.Equipment[6] = new EquipmentItem { ItemType = 6, ItemId = 31, Option = 1 };
+                character.Equipment[5] = new EquipmentItem { ItemType = 5, ItemId = 110, Option = 1 };
+                avatar.Apply(character);
+                Assert.IsNull(avatar.LastError);
+                Assert.AreSame(actor, avatar.PlayerAnimation.transform);
+                avatar.PlayerAnimation.Animator.Update(.1f);
+                avatar.FinishPose();
+                Assert.AreEqual(rootMatrix, root.transform.localToWorldMatrix);
+                Assert.AreEqual(actorMatrix, actor.localToWorldMatrix);
+                var backpack = AttachmentSocket(actor, "back").GetChild(0);
+                AssertAttachmentTransform(backpack);
+                var skin = backpack.GetComponentsInChildren<SkinnedMeshRenderer>(true).Single();
+                Assert.AreEqual(21, skin.bones.Length);
+                Assert.True(skin.bones.All(bone => bone.IsChildOf(backpack)));
+                Assert.True(backpack.GetComponentInChildren<Animation>().IsPlaying("nif-default"));
+                var glasses = AttachmentSocket(actor, "glasses").GetChild(0);
+                AssertAttachmentTransform(glasses);
+                var lens = glasses.GetComponentsInChildren<Renderer>(true).SelectMany(r => r.sharedMaterials)
+                    .Single(m => m.name.Contains("sub"));
+                var options = FFOne.Content.NativeData.Object("data/character_creation/avatar_items")["items"]
+                    .Single(i => (string)i["category"] == "glasses" && (int)i["itemNumber"] == 110);
+                var lensPath = (string)options[gender == 1 ? "male" : "female"]["secondaryTexture"]["candidates"][0]["path"];
+                Assert.AreSame(FFOne.Content.ContentAssets.Load<Texture2D>(lensPath.Substring(0, lensPath.LastIndexOf('.'))),
+                    lens.GetTexture("_MainTex"));
+
+                character.Equipment[6] = new EquipmentItem { ItemType = 6, ItemId = 4, Option = 1 };
+                avatar.Apply(character);
+                Assert.IsNull(avatar.LastError);
+                Assert.AreEqual(0, AttachmentSocket(actor, "back").childCount);
+                string model = gender == 1 ? "m_back_b10galacticenforcer" : "f_back_b10galacticenforcer";
+                var source = FFOne.Content.NativeModelAssets.Load(
+                    $"characters/player/items/back/back_b10galacticenforcer/models/{model}/model.glb");
+                var meshes = source.GetComponentsInChildren<SkinnedMeshRenderer>(true).Select(r => r.sharedMesh).ToHashSet();
+                var cape = actor.GetComponentsInChildren<SkinnedMeshRenderer>(true).Where(r => meshes.Contains(r.sharedMesh)).ToArray();
+                Assert.IsNotEmpty(cape);
+                Assert.That(cape.SelectMany(r => r.bones).All(bone => bone.IsChildOf(actor.Find(rig))), Is.True);
+                Assert.AreEqual(actorMatrix, actor.localToWorldMatrix);
+            }
+            finally { UnityEngine.Object.DestroyImmediate(root); }
+        }
+
+        [Test] public async System.Threading.Tasks.Task HelmetHidesHairAndGlassesAndCombinedShirtUsesItsPublishedTexture()
+        {
+            var root = new GameObject("Helmet and shirt contract");
+            try
+            {
+                var avatar = root.AddComponent<FFOne.Content.NativeAvatarPreview>();
+                var character = new CharacterInfo();
+                character.Equipment[1] = new EquipmentItem { ItemType = 1, ItemId = 193 };
+                character.Equipment[5] = new EquipmentItem { ItemType = 5, ItemId = 110 };
+                await FFOne.Content.NativeAvatarPreview.PreloadAsync(character);
+                character.Equipment[1].Option = 736 << 16;
+                await FFOne.Content.NativeAvatarPreview.PreloadAsync(character);
+                avatar.Apply(character);
+                Assert.IsNull(avatar.LastError);
+                Assert.AreEqual(193, character.Equipment[1].ItemId);
+                var actor = avatar.PlayerAnimation.transform;
+                int count = actor.GetComponentsInChildren<SkinnedMeshRenderer>(true).Length;
+                Assert.AreEqual(1, AttachmentSocket(actor, "glasses").childCount);
+                Assert.True(actor.GetComponentsInChildren<Renderer>(true).SelectMany(r => r.sharedMaterials)
+                    .Any(m => m.GetTexture("_MainTex")?.name.IndexOf("TDWT", StringComparison.OrdinalIgnoreCase) >= 0));
+
+                character.Equipment[4] = new EquipmentItem { ItemType = 4, ItemId = 44 };
+                avatar.Apply(character);
+                Assert.IsNull(avatar.LastError);
+                Assert.AreSame(actor, avatar.PlayerAnimation.transform);
+                Assert.AreEqual(0, AttachmentSocket(actor, "glasses").childCount);
+                Assert.That(actor.GetComponentsInChildren<SkinnedMeshRenderer>(true).Length, Is.LessThan(count));
+                AssertAttachmentTransform(AttachmentSocket(actor, "hat").GetChild(0));
+
+                character.Equipment[4] = default;
+                avatar.Apply(character);
+                Assert.IsNull(avatar.LastError);
+                Assert.AreEqual(count, actor.GetComponentsInChildren<SkinnedMeshRenderer>(true).Length);
+                Assert.AreEqual(1, AttachmentSocket(actor, "glasses").childCount);
+            }
+            finally { UnityEngine.Object.DestroyImmediate(root); }
+        }
+
+        static Transform AttachmentSocket(Transform actor, string kind)
+        {
+            string suffix = kind switch {
+                "hat" => "Bip01 helmet01", "glasses" => "Bip01 glass01", "back" => "Bip01 back01",
+                "rightWeapon" => "Bip01 Rweapon01", "leftWeapon" => "Bip01 Lweapon01",
+                _ => throw new ArgumentException(kind)
+            };
+            var rig = actor.Find("m") ?? actor.Find("w");
+            return rig.GetComponentsInChildren<Transform>(true).First(t => t.name == suffix);
+        }
+
+        static void AssertAttachmentTransform(Transform part)
+        {
+            Assert.AreEqual(Vector3.zero, part.localPosition, part.name);
+            Assert.AreEqual(Vector3.one, part.localScale, part.name);
+            Assert.That(Quaternion.Angle(Quaternion.Euler(90, 0, 0), part.localRotation), Is.LessThan(.01f), part.name);
+            Assert.AreEqual(Vector3.one, part.parent.localScale, part.name);
         }
         [Test] public void HnpcPaletteUsesZeroBasedExtendedSelectorsIndependentlyOfPlayerCreatorCodes()
         {

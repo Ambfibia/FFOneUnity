@@ -16,6 +16,7 @@ namespace FFOne.Content
         readonly List<Material> ownedMaterials = new();
         readonly List<GameObject> displayedParts = new();
         GameObject actor;
+        SkirtPose skirtPose;
         string actorGender;
         NativePlayerAnimator playerAnimation;
         Dictionary<string, Transform> actorBones;
@@ -47,19 +48,29 @@ namespace FFOne.Content
                     .ToDictionary(t => RelativePath(t, candidate.transform), StringComparer.Ordinal);
                 var parts = new[] {
                     ("face", style.FaceStyle), ("hair", style.HairStyle),
-                    ("shirt", Item(character, 1)), ("pants", Item(character, 2)), ("shoes", Item(character, 3))
+                    ("shirt", AppearanceItem(character, 1)), ("pants", AppearanceItem(character, 2)), ("shoes", AppearanceItem(character, 3))
                 };
+                var (faceVariant, hairVariant, showGlasses) = PlayerHatPolicy(character);
                 var skin = ResolveTexture(gender == "male" ? "m_skin" : "f_skin");
                 var skinColor = ColorAt("skin", style.SkinColor);
                 var hairColor = ColorAt("hair", style.HairColor);
                 foreach (var (category, itemId) in parts)
                 {
+                    if (category == "hair" && hairVariant == 0) continue;
                     var choice = rig["creatorChoices"]!.FirstOrDefault(c => (string)c["appearanceCategory"] == category && (int)c["itemNumber"]! == itemId);
                     var item = items["items"]!.SingleOrDefault(x => (string)x["category"] == (category == "hair" ? "head" : category) && (int)x["itemNumber"]! == itemId);
                     var visual = item?[gender];
-                    if (visual == null) throw new InvalidDataException($"Missing accepted {gender} {category} item {itemId}.");
-                    string path = (string)choice?["glb"], exactRoute = (string)choice?["exactRoute"];
-                    if (choice == null && (category == "shirt" || category == "pants" || category == "shoes"))
+                    bool emptyApparel = itemId == 0 && category is "shirt" or "pants" or "shoes";
+                    if (visual == null && !emptyApparel) throw new InvalidDataException($"Missing accepted {gender} {category} item {itemId}.");
+                    string path = emptyApparel ? EmptyApparelModel(gender, category) : (string)choice?["glb"];
+                    string exactRoute = (string)choice?["exactRoute"];
+                    var variant = HatBodyModel(visual, category, faceVariant, hairVariant);
+                    if (variant != null)
+                    {
+                        path = (string)variant["nativeAsset"]["path"];
+                        exactRoute = (string)variant["exactRoute"];
+                    }
+                    if (!emptyApparel && choice == null && (category == "shirt" || category == "pants" || category == "shoes"))
                     {
                         // Many gameplay items reuse a creator mesh with a different texture. Resolve
                         // the complete item table, retaining its explicit source route.
@@ -74,14 +85,15 @@ namespace FFOne.Content
                     var part = Instantiate(prefab, candidate.transform, false);
                     part.SetActive(false);
                     pendingParts.Add(part);
-                    var textureName = (string)visual["primaryTexture"]?["trueName"];
+                    var textureName = emptyApparel ? EmptyApparelTexture(gender) : (string)visual["primaryTexture"]?["trueName"];
                     if (category == "face")
                     {
                         if (style.EyeColor < 1 || style.EyeColor > ((JArray)customization["eye"]!).Count) throw new InvalidDataException("Invalid eye color code.");
                         textureName += "_" + (char)('a' + style.EyeColor - 1);
                     }
                     if (category == "hair") textureName += "_a";
-                    Texture2D primary = !string.IsNullOrEmpty(textureName) ? ResolveTexture(textureName) : null;
+                    string texturePath = BodyTexturePath(category, emptyApparel ? null : visual, textureName);
+                    Texture2D primary = texturePath == null ? null : Load<Texture2D>(texturePath);
                     if (partContract == null) BindSharedRig(part, bones, actorRootPath);
                     else foreach (var renderer in part.GetComponentsInChildren<SkinnedMeshRenderer>(true))
                     {
@@ -109,17 +121,14 @@ namespace FFOne.Content
                         var replacements = renderer.sharedMaterials.Select(source => {
                             var material = new Material(source);
                             pendingMaterials.Add(material);
-                            bool isSkin = source.name.Contains("sub", StringComparison.OrdinalIgnoreCase);
-                            if (isSkin) { material.SetTexture("_MainTex", skin); Tint(material, skinColor); }
-                            else if (primary) material.SetTexture("_MainTex", primary);
-                            if (source.name.Contains("hair", StringComparison.OrdinalIgnoreCase)) Tint(material, hairColor);
-                            NativeAvatarMaterials.Configure(material, category);
+                            NativeAvatarMaterials.Bind(material, category, primary, null, skin, skinColor, hairColor);
                             return material;
                         }).ToArray();
                         renderer.sharedMaterials = replacements;
                     }
                 }
-                AddEquippedParts(character, gender, candidate, bones, actorRootPath, pendingParts, pendingMaterials);
+                AddEquippedParts(character, gender, candidate, bones, actorRootPath, pendingParts, pendingMaterials, hairColor, showGlasses);
+                var nextSkirt = reuse ? skirtPose : SkirtPose.FromRig(bones);
                 NativePlayerAnimator nextAnimation;
                 if (reuse) nextAnimation = playerAnimation;
                 else
@@ -136,12 +145,19 @@ namespace FFOne.Content
                 foreach (var material in ownedMaterials) if (material) Release(material);
                 displayedParts.Clear(); displayedParts.AddRange(pendingParts);
                 ownedMaterials.Clear(); ownedMaterials.AddRange(pendingMaterials);
-                actor = candidate; actorGender = gender; playerAnimation = nextAnimation; actorBones = bones;
-                foreach (var part in displayedParts) part.SetActive(true);
+                if (skirtPose != nextSkirt) skirtPose?.Dispose();
+                actor = candidate; actorGender = gender; playerAnimation = nextAnimation; actorBones = bones; skirtPose = nextSkirt;
+                skirtPose?.BindGarment(displayedParts);
+                foreach (var part in displayedParts)
+                {
+                    part.SetActive(true);
+                    if (part.transform.parent != actor.transform) PlayAttachmentLoops(part);
+                }
                 FinishPose();
                 ready = actor.GetComponentsInChildren<Renderer>(true).Length > 0;
                 LastError = null;
                 RestorePersonalVehicle();
+                if (ziplinePresentation) SetWeaponVisible(false);
             }
             catch (Exception exception)
             {
@@ -152,15 +168,47 @@ namespace FFOne.Content
                 Debug.LogWarning("FFOne avatar preview: " + LastError, this);
             }
         }
-        static int Item(CharacterInfo character, int slot)
+
+        static (int face, int hair, bool glasses) PlayerHatPolicy(CharacterInfo character)
+        {
+            int id = AppearanceItem(character, 4);
+            int type = id == 0 ? 0 : (int)items["items"]
+                .Single(i => (string)i["category"] == "hat" && (int)i["itemNumber"] == id)["equipType"];
+            return type switch {
+                0 => (1, 1, true),
+                1 => (1, 2, true),
+                2 => (2, 0, true),
+                3 => (2, 0, false),
+                4 => (1, 1, false),
+                5 => (1, 2, false),
+                _ => throw new InvalidDataException($"Unknown hat equipType {type} for item {id}.")
+            };
+        }
+
+        static JToken HatBodyModel(JToken visual, string category, int faceVariant, int hairVariant)
+        {
+            if (!(category == "face" && faceVariant == 2 || category == "hair" && hairVariant == 2)) return null;
+            return visual["models"].Single(m => ((string)m["trueName"]).EndsWith("_type02", StringComparison.OrdinalIgnoreCase));
+        }
+        // FFOneClient resolves zero slots to wear/{m,f}_{shirt,pants,shoes}_naked.nif.
+        // The two shoes are stored in different collections in the accepted player-items catalog.
+        static string EmptyApparelModel(string gender, string category)
+        {
+            string model = (gender == "male" ? "m_" : "f_") + category + "_naked";
+            string collection = category == "shoes"
+                ? "collections/" + (gender == "male" ? "m_shoes_naked" : "f_pants_trandyset")
+                : category + "/" + model;
+            return "characters/player/items/" + collection + "/models/" + model + "/model.glb";
+        }
+        static string EmptyApparelTexture(string gender) => gender == "male" ? "m_naked" : "f_naked";
+
+        static int AppearanceItem(CharacterInfo character, int slot)
         {
             if (character.Equipment == null || character.Equipment.Length <= slot) throw new InvalidDataException("Character equipment is incomplete.");
-            return character.Equipment[slot].ItemId;
-        }
-        static void Tint(Material material, Color tint)
-        {
-            material.SetColor("_Color", new Color(tint.r * .5f, tint.g * .5f, tint.b * .5f, 1));
-            material.SetColor("_Emission", material.GetColor("_Emission") * tint);
+            var item = character.Equipment[slot];
+            // The high word of iOpt carries the appearance of combined equipment.
+            int appearance = item.Option >> 16;
+            return item.ItemId > 0 && item.ItemType is >= 0 and <= 6 && appearance > 0 ? appearance : item.ItemId;
         }
         static Color ColorAt(string field, int code)
         {
@@ -170,12 +218,26 @@ namespace FFOne.Content
             return new Color((float)row[0], (float)row[1], (float)row[2], (float)row[3]);
         }
         static Texture2D ResolveTexture(string trueName)
+            => Load<Texture2D>(TexturePath(trueName));
+        static string BodyTexturePath(string category, JToken visual, string trueName)
+        {
+            if (string.IsNullOrEmpty(trueName)) return null;
+            var replacement = customization["textures"]?.SingleOrDefault(t => (string)t["trueName"] == trueName);
+            if (replacement != null) return (string)replacement["image"]["path"];
+            if (category is "shirt" or "pants" or "shoes")
+            {
+                string path = EquippedTexturePath(visual, "primaryTexture");
+                if (path != null) return path;
+            }
+            return TexturePath(trueName);
+        }
+        static string TexturePath(string trueName)
         {
             var replacement = customization["textures"]?.SingleOrDefault(t => (string)t["trueName"] == trueName);
-            if (replacement != null) return Load<Texture2D>((string)replacement["image"]!["path"]);
+            if (replacement != null) return (string)replacement["image"]!["path"];
             var row = textureCatalog["textures"]!.SingleOrDefault(t => (string)t["trueName"] == trueName);
             if (row == null) throw new InvalidDataException("Missing accepted texture identity: " + trueName);
-            return Load<Texture2D>((string)row["nativeAsset"]!["path"]);
+            return (string)row["nativeAsset"]!["path"];
         }
         static T Load<T>(string relative) where T : UnityEngine.Object
         {
@@ -205,14 +267,19 @@ namespace FFOne.Content
             foreach (var part in displayedParts)
                 if (part && part.transform.parent && part.transform.parent != actor.transform)
                     part.transform.parent.localScale = Vector3.one;
+            if (HasActiveEmote) skirtPose?.FollowThighs();
+            FinishZiplinePose();
         }
-        void LateUpdate() => FinishPose();
+        void LateUpdate() { TickEmote(); FinishPose(); }
         public void Clear()
         {
+            SetSkywayPresentation(false);
+            SetZiplinePresentation(false);
+            CancelEmote();
             ClearPersonalVehicle();
             if (actor) { actor.SetActive(false); Release(actor); }
             actor = null;
-            actorGender = null; playerAnimation = null; actorBones = null; displayedParts.Clear();
+            actorGender = null; playerAnimation = null; actorBones = null; skirtPose?.Dispose(); skirtPose = null; displayedParts.Clear();
             ready = false;
             foreach (var material in ownedMaterials) if (material) Release(material);
             ownedMaterials.Clear();

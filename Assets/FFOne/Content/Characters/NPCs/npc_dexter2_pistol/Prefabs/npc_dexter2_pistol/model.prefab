@@ -1988,7 +1988,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8508997411465526685}
-  - component: {fileID: 7198852174613375980}
+  - component: {fileID: 3040672465791073468}
+  - component: {fileID: 4508598950522550217}
   m_Layer: 0
   m_Name: model
   m_TagString: Untagged
@@ -2012,27 +2013,50 @@ Transform:
   - {fileID: 2471544504395894927}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!111 &7198852174613375980
-Animation:
+--- !u!95 &3040672465791073468
+Animator:
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5260334558823677037}
   m_Enabled: 1
-  serializedVersion: 4
-  m_Animation: {fileID: 7400000, guid: afe4bd7af0c493a4fa762494738433be, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: 25ddfa515d83ba54bac35ad0073d512a, type: 2}
-  - {fileID: 7400000, guid: 8c1db5a1e4cacd144a93ae5aecefc6da, type: 2}
-  - {fileID: 7400000, guid: bd82e1fd7171f1c439813ca803820f69, type: 2}
-  - {fileID: 7400000, guid: afe4bd7af0c493a4fa762494738433be, type: 2}
-  - {fileID: 7400000, guid: 652b1dc3a0b8fab4baf95cb71a6d66ac, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 21e5616e8bb0bfa4e921350733f7e6b4, type: 2}
+  m_CullingMode: 0
   m_UpdateMode: 0
-  m_CullingType: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 1
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &4508598950522550217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5260334558823677037}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b7ac68c382befc4d9fc82662c17e418, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.Content.NativeNpcAnimator
+  animator: {fileID: 3040672465791073468}
+  AnimationSounds:
+  - Cue: Dexter_WeaponSFX_(RAND:1-2).wav
+    Variants:
+    - {fileID: 8300000, guid: daa9d269cfbca444788b97391b8f5ab6, type: 3}
+    - {fileID: 8300000, guid: ef007189215a1f64e9599d383f18b751, type: 3}
+    RussianVariants:
+    - {fileID: 0}
+    - {fileID: 0}
+  Faces: []
 --- !u!1 &5344844386133396166
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,6 +10,8 @@ using FFOne.Network;
 using FFOne.World;
 using Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UIElements;
@@ -21,15 +23,15 @@ namespace FFOne.UI
         internal async Task LiveWeaponLogin(int port, string account = "unityweapa")
         {
             await Session.LoginAsync("127.0.0.1", port, account, "test-only-password", lifetime.Token);
-            ShowSelection(); SelectRosterSlot(1); await EnterSelectedWorldAsync();
+            await EnterLiveFixtureWorld();
         }
-        internal bool LiveFireWeapon(NetworkEntityView target) => TryFireWeapon(target);
-        internal bool LiveWeaponCooldownReady => Time.unscaledTime >= nextWeaponAttack && !CombatIncapacitated;
+        internal bool LiveFireWeapon(NetworkEntityView target) => TryFireWeapon(target, directProjectile: true);
+        internal bool LiveWeaponCooldownReady => Time.unscaledTime >= nextWeaponAttack && !CombatUnavailable;
         internal bool LiveWeaponIntentReady(NetworkEntityView target)
         {
             var weapon = WorldWeaponCatalog.Load().Find(gameplayState.Snapshot.Equipment[0].ItemId);
             float extent = Mathf.Max(target.Definition?.Radius ?? .5f, (target.Definition?.Height ?? 2) * .5f);
-            return characterAttackPermission && Time.unscaledTime >= nextWeaponAttack && !CombatIncapacitated &&
+            return characterAttackPermission && LiveWeaponCooldownReady &&
                 Vector3.Distance(networkWorld.Player.position, target.transform.position) <= (weapon?.Range ?? 2) + extent;
         }
         internal string LiveWeaponIntentDiagnostics(NetworkEntityView target)
@@ -39,7 +41,8 @@ namespace FFOne.UI
             return "player=" + WorldCoordinates.ToServer(networkWorld.Player.position) + " targetRendered=" + WorldCoordinates.ToServer(target.transform.position) +
                 " targetServer=" + new Vector3Int(target.Entity.X, target.Entity.Y, target.Entity.Z) + " item=" + gameplayState.Snapshot.Equipment[0].ItemId +
                 " range=" + (weapon?.Range ?? 2) + " extent=" + extent + " actualDistance=" + Vector3.Distance(networkWorld.Player.position, target.transform.position) +
-                " permission=" + characterAttackPermission + " now=" + Time.unscaledTime + " nextAttack=" + nextWeaponAttack + " incapacitated=" + CombatIncapacitated;
+                " permission=" + characterAttackPermission + " now=" + Time.unscaledTime + " nextAttack=" + nextWeaponAttack +
+                " combatUnavailable=" + CombatUnavailable + " worldReady=" + networkWorld.IsReady;
         }
     }
 
@@ -86,7 +89,9 @@ namespace FFOne.UI
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Run()
         {
-            if (DevelopmentConnection.Enabled && Environment.GetCommandLineArgs().Contains("--live-weapon-smoke"))
+            var args = Environment.GetCommandLineArgs();
+            if (DevelopmentConnection.Enabled && (args.Contains("--live-weapon-smoke") ||
+                args.Contains("--live-weapon-change-smoke") || args.Contains("--live-grenade-smoke")))
                 new GameObject("Native weapon acceptance").AddComponent<LiveGameplayWeaponSmoke>();
         }
         async void Start()
@@ -97,10 +102,12 @@ namespace FFOne.UI
                 Directory.CreateDirectory(directory);
                 var endpoint = LoginServer.Parse(Environment.GetEnvironmentVariable(DevelopmentConnection.ServerVariable)).Endpoint;
                 if (!endpoint.IsLoopback) throw new InvalidOperationException("Weapon acceptance requires loopback.");
-                await Wait(() => (frontend = FindFirstObjectByType<FrontendController>()) && frontend.Root?.panel != null, "weapon frontend ready");
+                await Wait(() => (frontend = FindFirstObjectByType<FrontendController>()) && frontend.LiveFrontendReady, "weapon frontend ready");
                 await frontend.LiveWeaponLogin(endpoint.Port); frontend.NetworkEventReceived += Observe;
                 await Wait(() => frontend.LiveWorld && frontend.LiveWorld.IsReady, "native weapon world completes content admission");
-                frontend.LiveWorld.MovementEnabled = false;
+                bool weaponChange = Environment.GetCommandLineArgs().Contains("--live-weapon-change-smoke");
+                bool grenadeOnly = Environment.GetCommandLineArgs().Contains("--live-grenade-smoke");
+                if (!weaponChange) frontend.LiveWorld.MovementEnabled = false;
                 Check(Protocol0104.Read16(frontend.Session.World.RawLoadData, 0) == 99, "native combat keeps normal account privilege 99");
                 frontend.LiveWorld.Replicas.ContentError += failures.Add;
                 frontend.LiveWorld.ProjectileImpacted += RecordProjectileImpact;
@@ -112,6 +119,13 @@ namespace FFOne.UI
                 foreach (var packet in entry.BootstrapPackets ?? Array.Empty<ProtocolFrame>()) peerWorld.Apply(packet);
                 await Wait(() => frontend.LiveWorld.Replicas.Actors.Any(a => a.Entity.Kind == WorldEntityKind.Player && a.Entity.Id == entry.PlayerId), "native weapon observer enters interest");
                 image = new RenderTexture(1280, 720, 24); image.Create(); frontend.LiveWorld.View.targetTexture = image;
+                if (weaponChange)
+                {
+                    await ExerciseWeaponChange();
+                    await frontend.LiveExit();
+                    await observer.LeaveWorldAsync();
+                    Write(true, null); Application.Quit(0); return;
+                }
                 var document = frontend.GetComponent<UIDocument>();
                 uiImage = new RenderTexture(1280, 720, 0, RenderTextureFormat.ARGB32); uiImage.Create();
                 uiPanel = Instantiate(document.panelSettings); uiPanel.targetTexture = uiImage; uiPanel.scaleMode = PanelScaleMode.ConstantPixelSize;
@@ -122,7 +136,7 @@ namespace FFOne.UI
                 await frontend.Session.AttackCharactersAsync(new[] { (WorldEntityKind.Player, peerId) }); await Pause(.5f);
                 Check(peerHp == normalHp && !frames.Any(f => f.PacketType == 0x31000102) && !peerFrames.Any(f => f.PacketType == 0x31000103), "normal99 server independently denies forged PvP without damage or success");
                 var weapons = new[] { (mode: 1, id: 706), (mode: 2, id: 621), (mode: 3, id: 612), (mode: 4, id: 625), (mode: 5, id: 781), (mode: 6, id: 22) };
-                for (int i = 0; i < weapons.Length; i++)
+                for (int i = grenadeOnly ? weapons.Length - 1 : 0; i < weapons.Length; i++)
                 {
                     await FollowWeaponCaster("native weapon family " + weapons[i].mode + " restores mutual observer interest before equip");
                     var weapon = weapons[i]; frames.Clear(); peerFrames.Clear();
@@ -151,6 +165,13 @@ namespace FFOne.UI
                     Check(string.IsNullOrEmpty(frontend.LiveWorld.LastError), "native weapon family " + weapon.mode + " has no content failure");
                 }
                 failures.AddRange(frontend.LiveWorld.Replicas.ContentFailures);
+                if (grenadeOnly)
+                {
+                    await ExerciseGrenadeFloor();
+                    await observer.LeaveWorldAsync();
+                    await frontend.LiveExit();
+                    Write(true, null); Application.Quit(0); return;
+                }
                 await observer.SendMovementAsync(entry.X, entry.Y, entry.Z, 0, 0, 0, 0, 0, 0, true);
                 await Wait(() => frontend.LiveWorld.Replicas.Actors.Any(a => a.Entity.Kind == WorldEntityKind.Player && a.Entity.Id == peerId &&
                     a.Entity.X == entry.X && a.Entity.Y == entry.Y && a.Entity.Z == entry.Z), "observer spawn return is confirmed by the real interest stream before GM admission");
@@ -207,6 +228,109 @@ namespace FFOne.UI
             }
             finally { observer?.Dispose(); }
         }
+        async Task ExerciseWeaponChange()
+        {
+            const int first = 706, second = 621, hand = 0, reserve = 7;
+            var state = frontend.LiveState;
+            bool Slots(int active, int spare) =>
+                state.Snapshot.Equipment[hand].ItemId == active && state.Snapshot.Equipment[reserve].ItemId == spare;
+
+            Check(Slots(0, 0) && state.Snapshot.Inventory[20].ItemId == first && state.Snapshot.Inventory[21].ItemId == second,
+                "weapon change starts with two fixture weapons in the backpack and empty hands");
+            await frontend.Session.SendItemMoveAsync(ItemContainer.Inventory, 20, ItemContainer.Equipment, hand);
+            await Wait(() => Slots(first, 0), "fixture equips first weapon in the active hand");
+            await frontend.Session.SendItemMoveAsync(ItemContainer.Inventory, 21, ItemContainer.Equipment, reserve);
+            await Wait(() => Slots(first, second), "fixture equips second weapon in the reserve hand");
+
+            var keyboard = InputSystem.AddDevice<Keyboard>();
+            try
+            {
+                await PressAndVerify("weapon-swap", reserve, hand, second, first);
+                await PressAndVerify("weapon-swap-back", reserve, hand, first, second);
+                await frontend.Session.SendItemMoveAsync(ItemContainer.Equipment, reserve, ItemContainer.Inventory, 21);
+                await Wait(() => Slots(first, 0) && state.Snapshot.Inventory[21].ItemId == second,
+                    "fixture returns second weapon to backpack for single-weapon input");
+                await PressAndVerify("weapon-holster", hand, reserve, 0, first);
+                await PressAndVerify("weapon-restore", reserve, hand, first, 0);
+                Check(state.Snapshot.Inventory[20].IsEmpty && state.Snapshot.Inventory[21].ItemId == second,
+                    "single weapon change leaves backpack slots untouched");
+            }
+            finally { InputSystem.RemoveDevice(keyboard); }
+
+            async Task PressAndVerify(string name, int from, int to, int active, int spare)
+            {
+                float ready = Time.time + 1.1f;
+                await Wait(() => Time.time >= ready && Application.isFocused && !frontend.LiveUi.InputBlocked,
+                    name + " gameplay input is focused after cooldown", 30);
+                frames.Clear(); peerFrames.Clear();
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.Tab));
+                await Frames(2);
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+                int Expected(int slot) => slot == hand ? active : spare;
+                bool OwnerAck(ProtocolFrame packet) => ProtocolInventory.TryDecode(packet, out var update) &&
+                    update.Kind == InventoryUpdateKind.Move && update.FromContainer == ItemContainer.Equipment &&
+                    update.ToContainer == ItemContainer.Equipment && update.FromSlot == from && update.ToSlot == to &&
+                    update.FromItem.ItemId == Expected(from) && update.ToItem.ItemId == Expected(to);
+                bool Observed(int slot) => peerFrames.Any(packet => ProtocolInventory.TryDecode(packet, out var update) &&
+                    update.Kind == InventoryUpdateKind.EquipmentChanged && update.PlayerId == state.Snapshot.PlayerId &&
+                    update.FromSlot == slot && update.FromItem.ItemId == Expected(slot));
+                await Wait(() => Slots(active, spare) && frames.Any(OwnerAck) && Observed(hand) && Observed(reserve),
+                    $"{name}: Tab confirms hand={active} reserve={spare} on owner and observer", 15);
+                Check(frames.Count(OwnerAck) == 1, name + " sends one confirmed slot exchange");
+                if (active > 0)
+                {
+                    var animator = frontend.LiveWorld.Player.GetComponentInChildren<FFOne.Content.NativePlayerAnimator>().Animator;
+                    string prefix = WorldWeaponCatalog.AnimationPrefix(WorldWeaponCatalog.Load().Find(active).EquipType);
+                    string readyState = FFOne.Content.NativePlayerAnimator.BaseLayer + "." + prefix + "ready";
+                    await Wait(() => animator.GetCurrentAnimatorStateInfo(0).IsName(readyState),
+                        name + " enters " + prefix + "ready on the rendered rig", 2);
+                    Capture(name + "-ready");
+                    await Wait(() => animator.GetCurrentAnimatorStateInfo(0).IsName(FFOne.Content.NativePlayerAnimator.BaseLayer + "." + prefix + "stand1"),
+                        name + " completes the weapon change and returns to its armed idle", 8);
+                }
+                await Frames(3);
+                Capture(name);
+            }
+        }
+
+        async Task ExerciseGrenadeFloor()
+        {
+            await frontend.LiveMoveTo(631632, 187177, -5500);
+            var world = frontend.LiveWorld;
+            await Wait(() => world.IsReady && frontend.LiveWeaponCooldownReady, "ground grenade has its original cooldown and a loaded tile");
+            await Pause(WorldWeaponCatalog.Load().Find(frontend.LiveState.Snapshot.Equipment[0].ItemId).Delay + .2f);
+            var hits = Physics.RaycastAll(world.Player.position + Vector3.up * 15, Vector3.down, 35, ~(1 << 31), QueryTriggerInteraction.Ignore);
+            var floor = hits.Where(h => world.Stream.Owns(h.collider) && h.normal.y > .9f)
+                .OrderBy(h => Mathf.Abs(h.point.y - world.Player.position.y)).First();
+            var launch = WorldCoordinates.ToServer(floor.point + Vector3.up * 2);
+            await frontend.LiveMoveTo(launch.x, launch.y, launch.z);
+            var muzzle = world.Player.position + Vector3.up * .8f;
+            world.View.transform.SetPositionAndRotation(muzzle, Quaternion.LookRotation(Vector3.down, Vector3.forward));
+            frames.Clear();
+            Check(frontend.LiveFireWeapon(null), "ground-directed grenade uses the normal fire path");
+            NetworkProjectileMotor motor = null;
+            await Wait(() => frames.Any(f => f.PacketType == ProtocolProjectiles.GrenadeSuccess) &&
+                (motor = world.GetComponentInChildren<NetworkProjectileMotor>()), "server accepts the ground-directed grenade", 10);
+            bool bounced = false;
+            float upward = 0, clearance = 0;
+            void Record(RaycastHit hit, Vector3 velocity)
+            {
+                if (bounced || hit.collider != floor.collider || hit.normal.y < .9f) return;
+                clearance = Vector3.Dot(motor.transform.position - hit.point, hit.normal);
+                upward = Vector3.Dot(velocity, hit.normal);
+                bounced = true;
+            }
+            motor.Bounced += Record;
+            try
+            {
+                await Wait(() => bounced, "grenade collides with the authored " + floor.collider.name + " floor before expiry", 6);
+                Check(upward > 0 && clearance >= NetworkProjectileMotor.GrenadeCollisionRadius - .02f,
+                    $"ground collision sends grenade upward ({upward:F2} m/s), with {clearance:F3} m center clearance");
+                await Wait(() => !motor, "ground grenade expires and releases its projectile motor", 6);
+            }
+            finally { if (motor) motor.Bounced -= Record; }
+        }
+
         void Observe(NetworkEvent e) { if (e.IsShard && e.Frame != null) { frames.Add(e.Frame); RecordPvpReceipt("frontend", e.Frame); RecordProjectilePacket("frontend", e.Frame); } }
         void Update()
         {
@@ -499,6 +623,7 @@ namespace FFOne.UI
             {
                 await frontend.LiveMoveTo(target.Entity.X - 100, target.Entity.Y, target.Entity.Z);
                 await FollowWeaponCaster("native weapon family " + mode + " moves real observer into mutual attack interest");
+                await Wait(() => frontend.LiveWeaponCooldownReady, "native hitscan weapon world and cooldown are ready");
                 frontend.LiveWorld.View.transform.LookAt(target.transform.position + Vector3.up * .8f);
                 return;
             }
@@ -517,6 +642,7 @@ namespace FFOne.UI
                 await frontend.LiveMoveTo(position.x, position.y, position.z);
                 await FollowWeaponCaster("native weapon family " + mode + " moves real observer into mutual attack interest");
                 await Pause(.1f);
+                await Wait(() => frontend.LiveWeaponCooldownReady, "native projectile weapon destination and cooldown are ready");
                 aim = target.GetComponent<Collider>().bounds.center;
                 frontend.LiveWorld.View.transform.LookAt(aim);
                 if (!WeaponSightClear(frontend.LiveWorld.Player.position + Vector3.up * .8f, aim, target, out var muzzleBlock))

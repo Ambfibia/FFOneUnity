@@ -17,6 +17,7 @@ Shader "FFOne/WorldTerrain"
         TEXTURE2D_ARRAY(_Layers);
         TEXTURE2D_ARRAY(_Weights);
         TEXTURE2D(_Lightmap); SAMPLER(sampler_Lightmap);
+        float _FFOneDisableTerrainAnisotropy;
         CBUFFER_START(UnityPerMaterial)
         float4 _LayerScaleMode[17], _LayerSourceSize[17], _LayerTint[17], _WeightSampler[5];
         float4 _Metadata;
@@ -59,7 +60,7 @@ Shader "FFOne/WorldTerrain"
             float2 dx = ddx(uv), dy = ddy(uv);
             float lx = length(dx * source.xy), ly = length(dy * source.xy);
             float2 axis = lx >= ly ? dx : dy;
-            float maxTaps = max(_AnisotropicTaps, 1);
+            float maxTaps = _FFOneDisableTerrainAnisotropy > .5 ? 1 : max(_AnisotropicTaps, 1);
             uint taps = (uint)clamp(round(clamp(max(lx,ly) / max(min(lx,ly),.000001), 1, maxTaps)), 1, maxTaps);
             uint mip = (uint)floor(clamp(log2(max(max(lx,ly) / taps, 1)) + source.w, 0, source.z) + .5);
             LayerFootprint result; result.uv=uv; result.tapStep=axis/taps; result.taps=taps; result.mip=mip;

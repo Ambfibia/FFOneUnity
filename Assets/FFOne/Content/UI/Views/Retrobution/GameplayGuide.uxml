@@ -1,0 +1,22 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+  <ui:Template name="GuideTopicButton" src="GameplayGuideTopicButton.uxml" />
+  <ui:Template name="GuideIllustration" src="GameplayGuideIllustration.uxml" />
+  <ui:VisualElement name="game-guide" class="game-guide" focusable="true">
+    <ui:Instance template="GuideTopicButton" class="guide-template guide-topic-template" />
+    <ui:Instance template="GuideIllustration" class="guide-template guide-illustration-template" />
+    <ui:VisualElement class="guide-canvas" picking-mode="Ignore">
+      <ui:VisualElement class="guide-backdrop ff-artwork" picking-mode="Ignore" />
+      <ui:VisualElement name="guide-window" class="guide-window" picking-mode="Ignore">
+        <ui:Label name="guide-title" class="ff-label guide-title" picking-mode="Ignore" enable-rich-text="false" />
+        <ui:Label name="choose-topic" class="ff-label guide-choose-topic" picking-mode="Ignore" enable-rich-text="false" />
+        <ui:VisualElement name="guide-topics" class="guide-topics" picking-mode="Ignore" />
+        <ui:VisualElement name="guide-sections" class="guide-sections" picking-mode="Ignore" />
+        <ui:Label name="guide-heading" class="ff-label guide-heading" picking-mode="Ignore" enable-rich-text="false" />
+        <ui:ScrollView name="guide-content" class="guide-content ff-guide-scroller" mode="Vertical" horizontal-scroller-visibility="Hidden" mouse-wheel-scroll-size="200" />
+        <ui:Button name="guide-previous" class="ff-button guide-navigation guide-previous" enable-rich-text="false" />
+        <ui:Button name="guide-next" class="ff-button guide-navigation guide-next" enable-rich-text="false" />
+        <ui:Button name="guide-close" class="ff-button guide-close" />
+      </ui:VisualElement>
+    </ui:VisualElement>
+  </ui:VisualElement>
+</ui:UXML>

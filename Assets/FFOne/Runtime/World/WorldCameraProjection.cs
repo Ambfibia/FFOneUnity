@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace FFOne.World
 {
@@ -10,6 +11,14 @@ namespace FFOne.World
     {
         Camera view;
         void Awake() => view = GetComponent<Camera>();
+        void OnEnable() => RenderPipelineManager.beginCameraRendering += BeforeRender;
+
+        // Portals, reward shots and manual camera renders can change pose after LateUpdate.
+        // Build the frustum from the same view matrix that will draw this frame.
+        void BeforeRender(ScriptableRenderContext context, Camera camera)
+        {
+            if (camera == view) Apply(view);
+        }
         void LateUpdate() => Apply(view);
 
         public static void Apply(Camera camera)
@@ -27,6 +36,7 @@ namespace FFOne.World
 
         void OnDisable()
         {
+            RenderPipelineManager.beginCameraRendering -= BeforeRender;
             if (!view) return;
             view.ResetProjectionMatrix();
             view.ResetCullingMatrix();

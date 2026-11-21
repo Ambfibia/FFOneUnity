@@ -55,28 +55,46 @@ namespace FFOne.Content
         public void Import(string json) { var parsed = new Parser(json).Parse(); Nodes = parsed; TextEncodingVersion = 1; }
         public string ToJson()
         {
-            if (Nodes.Length == 0) throw new InvalidDataException("Empty native document: " + Identity);
-            var output = new StringBuilder(); Write(0, output); return output.ToString();
+            return ToJson(Nodes, Identity);
+        }
+        static string ToJson(Node[] nodes, string identity)
+        {
+            if (nodes.Length == 0) throw new InvalidDataException("Empty native document: " + identity);
+            var output = new StringBuilder(); Write(nodes, identity, 0, output); return output.ToString();
         }
         public JToken ToToken() => JToken.Parse(ToJson(), new JsonLoadSettings { DuplicatePropertyNameHandling = DuplicatePropertyNameHandling.Error });
+        public System.Threading.Tasks.Task<JToken> ToTokenAsync(System.Threading.CancellationToken cancellation = default)
+        {
+            // Snapshot managed fields on the Unity thread. Parsing the immutable
+            // tree touches no Unity objects and need not stall rendering/input.
+            var nodes = Nodes; string identity = Identity;
+            return System.Threading.Tasks.Task.Run(() => {
+                cancellation.ThrowIfCancellationRequested();
+                string json = ToJson(nodes, identity);
+                cancellation.ThrowIfCancellationRequested();
+                var result = JToken.Parse(json, new JsonLoadSettings { DuplicatePropertyNameHandling = DuplicatePropertyNameHandling.Error });
+                cancellation.ThrowIfCancellationRequested();
+                return result;
+            }, cancellation);
+        }
         public IEnumerable<int> Children(int index)
         {
             for (int i = index + 1; i <= Nodes[index].End; i = Nodes[i].End + 1) yield return i;
         }
-        void Write(int index, StringBuilder output)
+        static void Write(Node[] nodes, string identity, int index, StringBuilder output)
         {
-            var node = Nodes[index];
-            if (node.End < index || node.End >= Nodes.Length) throw new InvalidDataException("Invalid tree span: " + Identity);
+            var node = nodes[index];
+            if (node.End < index || node.End >= nodes.Length) throw new InvalidDataException("Invalid tree span: " + identity);
             if (node.Kind == ValueKind.String) { output.Append(JsonConvert.ToString(node.Value)); return; }
             if (node.Kind != ValueKind.Object && node.Kind != ValueKind.Array)
             { output.Append(node.Kind == ValueKind.Null ? "null" : node.Value); return; }
             bool obj = node.Kind == ValueKind.Object, first = true;
             output.Append(obj ? '{' : '[');
-            foreach (int child in Children(index))
+            for (int child = index + 1; child <= node.End; child = nodes[child].End + 1)
             {
                 if (!first) output.Append(','); first = false;
-                if (obj) output.Append(JsonConvert.ToString(Nodes[child].Key)).Append(':');
-                Write(child, output);
+                if (obj) output.Append(JsonConvert.ToString(nodes[child].Key)).Append(':');
+                Write(nodes, identity, child, output);
             }
             output.Append(obj ? '}' : ']');
         }
@@ -168,5 +186,28 @@ namespace FFOne.Content
             return fallback ? fallback.text : throw new FileNotFoundException("Missing native data document", identity);
         }
         public static JObject Object(string identity) => JObject.Parse(Read(identity));
+        public static async System.Threading.Tasks.Task<JObject> ObjectAsync(string identity, System.Threading.CancellationToken cancellation = default)
+        {
+            await ContentAssets.InitializeAsync(cancellation);
+            // The managed token tree owns its data. Keep the source document alive
+            // while parsing, then release its lease instead of retaining both copies
+            // for the whole session. Concurrent callers own independent references.
+            using (var request = ContentAssets.AcquireAsync<NativeDataDocument>(Resource(identity)))
+            {
+                await request.WaitAsync(cancellation);
+                var document = request.asset as NativeDataDocument;
+                if (document) return (JObject)await document.ToTokenAsync(cancellation);
+            }
+            string path = identity.EndsWith(".json", StringComparison.Ordinal) ? identity.Substring(0, identity.Length - 5) : identity;
+            string text;
+            using (var request = ContentAssets.AcquireAsync<TextAsset>(path))
+            {
+                await request.WaitAsync(cancellation);
+                var fallback = request.asset as TextAsset;
+                if (!fallback) throw new FileNotFoundException("Missing native data document", identity);
+                text = fallback.text;
+            }
+            return await System.Threading.Tasks.Task.Run(() => JObject.Parse(text), cancellation);
+        }
     }
 }

@@ -43,9 +43,21 @@ namespace FFOne.World
         GameObject ownedRoot;
         CharacterController motor;
         NativeAvatarPreview avatar;
+        internal WorldNanoCompanion LocalNano { get; private set; }
         long characterUid;
+        int weaponEquipType, equippedWeaponId;
+        string weaponChangeClip;
+        float lastPlayerCombatResult = float.NegativeInfinity;
+        float playerAttackUntil;
         string error;
-        float yaw, pitch = 12, vertical, jumpCooldown;
+        float yaw, pitch = 12, vertical, jumpCooldown, jumpAge;
+        readonly LegacyGameplayCameraInput cameraInput = new();
+        bool freeCamera;
+        float cameraDistance = 6;
+        bool autoRun, playerDead;
+        internal bool InventoryOpen { get; set; }
+        internal bool MenuAutoRun { get; set; }
+        float MovementYaw => freeCamera && Player ? Player.eulerAngles.y : yaw;
         Color oldFogColor;
         bool oldFog, captured;
         float oldFogDensity;
@@ -84,10 +96,17 @@ namespace FFOne.World
                 avatar = playerObject.AddComponent<NativeAvatarPreview>(); avatar.Apply(character);
                 if (!avatar.IsReady) throw new InvalidOperationException(avatar.LastError);
                 characterUid = character.Uid;
+                weaponEquipType = WorldWeaponCatalog.AnimationEquipType(character);
+                equippedWeaponId = character.Equipment[0].ItemId;
+                weaponChangeClip = null;
+                if (weaponEquipType != 0)
+                    avatar.PlayerAnimation?.Play(WorldWeaponCatalog.AnimationPrefix(weaponEquipType) + "stand1", true);
+                lastPlayerCombatResult = float.NegativeInfinity;
+                playerAttackUntil = 0;
                 motor = playerObject.AddComponent<CharacterController>();
                 playerObject.AddComponent<SliderGroundContact>().Owner = this;
-                motor.height = 1.8f; motor.radius = .45f; motor.center = Vector3.up * .9f;
-                motor.stepOffset = .4f; motor.slopeLimit = 50; motor.minMoveDistance = 0;
+                playerObject.AddComponent<FFOne.Characters.PlayerContactShadow>();
+                NativePlayerMotor.Configure(motor);
                 UpdateCamera();
                 MapNumber = entry.MapNumber;
                 Stream = ownedRoot.AddComponent<WorldStreamer>(); Stream.View = View; Stream.Anchor = spawn; Stream.MapNumber = MapNumber;
@@ -98,6 +117,9 @@ namespace FFOne.World
 
         void Update()
         {
+            UpdateComputer();
+            UpdatePoisonContact();
+            bool readMouse = cameraInput.Capture(Stream && Player && MovementEnabled && IsReady && !InputBlocked && string.IsNullOrEmpty(LastError));
             if (Riding && Player && Stream)
             {
                 Player.position = Vector3.Lerp(flightFrom, flightTo, Mathf.Clamp01(Time.unscaledTime - flightAt));
@@ -105,57 +127,149 @@ namespace FFOne.World
             }
             if (!Stream || !Player || !MovementEnabled || !string.IsNullOrEmpty(LastError)) return;
             var keys = Keyboard.current;
-            if (keys?.escapeKey.wasPressedThisFrame == true || SettingsInputReader.Pressed("Escape", Preferences)) MenuRequested?.Invoke();
-            if (keys?.f10Key.wasPressedThisFrame == true || SettingsInputReader.Pressed("Option", Preferences)) SettingsRequested?.Invoke();
+            if (TickLauncher()) return;
+            if (keys?.escapeKey.wasPressedThisFrame == true || GameplayInput.Pressed(GameplayAction.Escape)) MenuRequested?.Invoke();
+            if (keys?.f10Key.wasPressedThisFrame == true || GameplayInput.Pressed(GameplayAction.Option)) SettingsRequested?.Invoke();
+            if (TickZipline()) return;
             // Never step into a tile before its authored colliders have arrived.
             CarrySlider();
             if (!IsReady) return;
             float delta = Mathf.Min(Time.deltaTime, .1f);
-            bool canInput = !InputBlocked && !BuffMovementBlocked && Application.isFocused;
-            float forward = canInput ? (SettingsInputReader.Held("Up", Preferences) ? 1 : 0) - (SettingsInputReader.Held("Down", Preferences) ? 1 : 0) : 0;
-            float side = canInput ? (SettingsInputReader.Held("Right", Preferences) ? 1 : 0) - (SettingsInputReader.Held("Left", Preferences) ? 1 : 0) : 0;
+            bool canMove = !playerDead && !BuffMovementBlocked && Application.isFocused;
+            bool canInput = canMove && !InputBlocked;
+            if (canInput)
+            {
+                int zoom = (GameplayInput.Held(GameplayAction.ZoomOut) ? 1 : 0) -
+                    (GameplayInput.Held(GameplayAction.ZoomIn) ? 1 : 0);
+                cameraDistance = Mathf.Clamp(cameraDistance + zoom * 3 * delta, 4, 12);
+            }
+            freeCamera = canInput && GameplayInput.Held(GameplayAction.FreeCamera) &&
+                !GameplayInput.Held(GameplayAction.RightTurn) && !GameplayInput.Held(GameplayAction.LeftTurn);
+            float forward = canInput ? (GameplayInput.Held(GameplayAction.Up) ? 1 : 0) - (GameplayInput.Held(GameplayAction.Down) ? 1 : 0) : 0;
+            float side = canInput ? (GameplayInput.Held(GameplayAction.Right) ? 1 : 0) - (GameplayInput.Held(GameplayAction.Left) ? 1 : 0) : 0;
+            if (!canMove || InputBlocked && !MenuAutoRun || forward != 0 || side != 0) autoRun = false;
+            if (autoRun) forward = 1;
+            if (canInput && GameplayInput.Pressed(GameplayAction.AutoRun)) autoRun = !autoRun;
             var mouse = Mouse.current;
-            if (canInput && mouse?.rightButton.isPressed == true)
-            { yaw += mouse.delta.ReadValue().x * .13f * MouseSensitivity; pitch = Mathf.Clamp(pitch + mouse.delta.ReadValue().y * .1f * MouseSensitivity * (InvertMouseY ? 1 : -1), -65, 70); }
+            if (canInput && readMouse && mouse != null)
+            {
+                var look = LegacyGameplayCameraInput.Look(mouse.delta.ReadValue(), MouseSensitivity, InvertMouseY);
+                yaw += look.x; pitch = Mathf.Clamp(pitch + look.y, -30, 70);
+            }
+            if (canInput && Gamepad.current != null)
+            {
+                var pad = GameplayInput.PadLook(delta, (float?)Preferences?["input"]?["pad_sensitivity"] ?? 5,
+                    (bool?)Preferences?["input"]?["pad_invert_y"] ?? false);
+                yaw += pad.x;
+                pitch = Mathf.Clamp(pitch + pad.y, -30, 70);
+            }
             if (canInput && keys != null)
-                yaw += ((SettingsInputReader.Held("RightTurn", Preferences) ? 1 : 0) - (SettingsInputReader.Held("LeftTurn", Preferences) ? 1 : 0)) * 100 * delta;
+                yaw += ((GameplayInput.Held(GameplayAction.RightTurn) ? 1 : 0) - (GameplayInput.Held(GameplayAction.LeftTurn) ? 1 : 0)) * 100 * delta;
             jumpCooldown = Mathf.Max(0, jumpCooldown - delta);
-            if (canInput && SettingsInputReader.Pressed("Jump", Preferences) && motor.isGrounded && jumpCooldown <= 0)
-                LaunchJump();
-            if (!motor.isGrounded) vertical = Mathf.Max(-10, vertical - 10 * delta);
-            else if (vertical < 0) vertical = 0;
-            Vector3 horizontal = HorizontalMovement(side, forward, delta);
+            bool grounded = slider || NativePlayerMotor.IsGrounded(motor, vertical);
+            bool launched = canInput && GameplayInput.Pressed(GameplayAction.Jump) && grounded && jumpCooldown <= 0;
+            if (launched) { nanoJump = false; LaunchJump(); }
+            launched |= nanoJumpFresh;
+            nanoJumpFresh = false;
+            Vector3 horizontal = playerDead ? Vector3.zero : HorizontalMovement(side, forward, delta);
             var before = Player.position;
-            var flags = motor.Move((horizontal + Vector3.up * vertical) * delta - Vector3.one * .000001f);
+            bool dashing = nanoDashTime > 0 && !playerDead && !BuffMovementBlocked;
+            if (dashing)
+            {
+                Player.rotation = Quaternion.Euler(0, yaw, 0);
+                horizontal = Player.forward * nanoDashSpeed;
+                nanoDashTime -= delta;
+                nanoDashSpeed = Mathf.Max(0, nanoDashSpeed - 60 * delta);
+            }
+            else nanoDashTime = 0;
+            bool restingOnSlider = slider && !launched && side == 0 && forward == 0;
+            var flags = restingOnSlider ? CollisionFlags.Below : NativePlayerMotor.Step(motor, horizontal, ref vertical, ref jumpAge, delta,
+                canInput && GameplayInput.Held(GameplayAction.Jump), launched, !PersonalVehicleMounted && !nanoJump);
+            if (slider && !restingOnSlider) UpdatePassengerFooting();
             Velocity = delta > 0 ? (Player.position - before) / delta : Vector3.zero;
             MoveDirection = WorldCoordinates.Direction(side, forward);
-            if (MoveDirection != 0) Player.rotation = Quaternion.Euler(0, yaw, 0);
+            if (MoveDirection != 0) Player.rotation = Quaternion.Euler(0, MovementYaw, 0);
             if ((flags & CollisionFlags.Below) != 0 && vertical <= 0)
-            { vertical = 0; Jumping = false; avatar.PlayLocomotion(horizontal.sqrMagnitude < .01f ? "stand1" : forward < 0 ? "runback" : "run"); }
+            {
+                vertical = 0; Jumping = false; nanoJump = false;
+                if (PersonalVehicleMounted)
+                    avatar.PlayLocomotion(InventoryOpen ? "inven" : horizontal.sqrMagnitude < .01f ? "stand1" : forward < 0 ? "runback" : "run");
+            }
             if ((flags & CollisionFlags.Above) != 0 && vertical > 0) vertical = 0;
+            if (!dashing && !PersonalVehicleMounted && !Buffs.Has(10) && !Buffs.Has(11))
+            {
+                if (MoveDirection != 0 || launched) avatar.CancelEmote();
+                if (InventoryOpen && !Jumping && !playerDead)
+                    avatar.PlayLocomotion("inven");
+                else if (!avatar.HasActiveEmote)
+                {
+                    if (weaponChangeClip != null)
+                    {
+                        var pose = avatar.PlayerAnimation.Animator.GetCurrentAnimatorStateInfo(0);
+                        if (MoveDirection != 0 || Jumping || !pose.IsName(NativePlayerAnimator.BaseLayer + "." + weaponChangeClip) || pose.normalizedTime >= 1)
+                            weaponChangeClip = null;
+                    }
+                    bool ready = weaponChangeClip != null || Time.time < playerAttackUntil || GameplayHudStatus.CombatActive(lastPlayerCombatResult, Time.realtimeSinceStartup);
+                    avatar.PlayerAnimation?.UpdateLocomotion(side, forward, !launched && NativePlayerMotor.IsGrounded(motor, vertical), launched,
+                        WorldWeaponCatalog.AnimationPrefix(weaponEquipType), ready, delta, vertical);
+                }
+            }
             if (MoveDirection != 0 || Jumping || (Player.position - before).sqrMagnitude > .000001f)
-                Moved?.Invoke(Player.position, yaw);
+                Moved?.Invoke(Player.position, Player.eulerAngles.y);
             Stream.Anchor = Player.position;
             UpdateCamera();
         }
 
-        void LaunchJump()
+        float nanoDashTime, nanoDashSpeed;
+        bool nanoJump, nanoJumpFresh;
+        internal bool LaunchNanoMovement(WorldSkillDefinition skill, int slot)
         {
-            vertical = JumpLaunchVelocity = BuffJumpVelocity; Jumping = true; jumpCooldown = .5f;
-            LeaveSlider(); JumpKey = JumpKey == uint.MaxValue ? 1073741823 : JumpKey + 1;
-            avatar.PlayLocomotion("jumpstart", true);
+            if (!IsReady || !motor || playerDead || BuffMovementBlocked || PersonalVehicleMounted || Riding || slot < 0 || slot > 2) return false;
+            int tier = Buffs.Value(21 + slot);
+            if (skill.MovementPower == null || tier < 0 || tier >= skill.MovementPower.Length) return false;
+            bool airborne = !NativePlayerMotor.IsGrounded(motor, vertical);
+            LaunchJump();
+            nanoJump = nanoJumpFresh = true;
+            vertical = JumpLaunchVelocity = 5.68f + skill.MovementPower[tier] * .01f;
+            if (skill.Type != 40) return true;
+            nanoDashTime = .5555555f;
+            nanoDashSpeed = 35;
+            string profile = WorldWeaponCatalog.AnimationPrefix(weaponEquipType);
+            string clip = airborne ? "rocketsomersault" : profile == "rifle" ? "rifledash" : profile == "pistol" ? "rifletumbling" : "stickdash";
+            avatar.PlayerAnimation?.Play(clip, true);
+            if (airborne && profile != "bomb")
+                avatar.PlayerAnimation?.Play(profile == "rifle" ? "rifledodgeupper" : "stickdodgeupper", true);
+            return true;
         }
 
+        void LaunchJump()
+        {
+            vertical = JumpLaunchVelocity = BuffJumpVelocity * (PersonalVehicleMounted ? 1 : NativePlayerMotor.JumpMultiplier);
+            Jumping = true; jumpCooldown = .5f; jumpAge = 0;
+            LeaveSlider(); JumpKey = JumpKey == uint.MaxValue ? 1073741823 : JumpKey + 1;
+            if (PersonalVehicleMounted) avatar.PlayLocomotion("jumpstart", true);
+        }
+
+        public void SetPlayerDead(bool dead)
+        {
+            if (playerDead == dead) return;
+            playerDead = dead;
+            if (!dead) return;
+            StopZipline(detached: true);
+            autoRun = false;
+            MoveDirection = 0;
+            Velocity = Vector3.up * Velocity.y;
+            vehicleMotion.Reset();
+        }
+
+        internal bool RewardCamera { get; set; }
         void UpdateCamera()
         {
+            if (RewardCamera) return;
             var focus = Player.position + Vector3.up * 1.6f;
             var rotation = Quaternion.Euler(pitch, yaw, 0);
-            var offset = rotation * new Vector3(0, .2f, -6);
-            foreach (var hit in Physics.RaycastAll(focus, offset.normalized, offset.magnitude, ~(1 << 31), QueryTriggerInteraction.Ignore).OrderBy(h => h.distance))
-            {
-                if (hit.collider.transform.IsChildOf(Player)) continue;
-                offset = offset.normalized * Mathf.Max(.6f, hit.distance - .15f); break;
-            }
+            var offset = rotation * new Vector3(0, .2f, -cameraDistance);
+            offset = NativePlayerCamera.ResolveOffset(View, Player, focus, offset);
             View.transform.SetPositionAndRotation(focus + offset, rotation);
         }
 
@@ -168,18 +282,41 @@ namespace FFOne.World
             // playback, motor, movement state, camera, and any socket attachments.
             avatar.Apply(character);
             failure = avatar.LastError;
-            return avatar.IsReady && string.IsNullOrEmpty(failure);
+            bool ready = avatar.IsReady && string.IsNullOrEmpty(failure);
+            if (ready)
+            {
+                weaponEquipType = WorldWeaponCatalog.AnimationEquipType(character);
+                int hand = character.Equipment[0].ItemId;
+                if (hand != equippedWeaponId)
+                {
+                    equippedWeaponId = hand;
+                    weaponChangeClip = null;
+                    var animation = avatar.PlayerAnimation;
+                    animation?.CancelUpperMotion();
+                    playerAttackUntil = 0;
+                    string clip = WorldWeaponCatalog.AnimationPrefix(weaponEquipType) + "ready";
+                    if (animation && !playerDead && !Riding && !Ziplining && !PersonalVehicleMounted && !avatar.HasActiveEmote &&
+                        !BuffMovementBlocked && MoveDirection == 0 && NativePlayerMotor.IsGrounded(motor, vertical) && animation.Play(clip, true))
+                        weaponChangeClip = clip;
+                }
+            }
+            return ready;
         }
 
         public void SetServerPosition(int x, int y, int z)
         {
+            StopLauncher();
             if (!Player || !motor) return;
+            StopZipline();
+            autoRun = false;
             LeaveSlider();
             var destination = WorldCoordinates.FromServer(x, y, z);
             if (!HasCoverage(Stream.Catalog, MapNumber, destination))
             { error = $"Server destination has no imported world at {x}, {y}, {z}."; MovementEnabled = false; return; }
-            motor.enabled = false; Player.position = destination; motor.enabled = true;
+            NativePlayerMotor.Teleport(motor, destination);
             vertical = 0; Jumping = false; Velocity = Vector3.zero; MoveDirection = 0;
+            nanoDashTime = 0; nanoJump = nanoJumpFresh = false;
+            avatar?.PlayerAnimation?.ResetLocomotion();
             Stream.Anchor = Player.position; UpdateCamera();
         }
 
@@ -188,8 +325,17 @@ namespace FFOne.World
         public void SetRiding(bool active)
         {
             if (active == Riding) return;
-            if (active) { LeaveSlider(); SetPersonalVehicle(0); }
+            if (active)
+            {
+                StopZipline();
+                autoRun = false;
+                LeaveSlider();
+                SetPersonalVehicle(0);
+                LocalNano?.SetNano(0);
+            }
             Riding = active; motor.enabled = !active; vertical = 0; Velocity = Vector3.zero;
+            avatar?.PlayerAnimation?.ResetLocomotion();
+            avatar?.SetSkywayPresentation(active);
             if (active) { flightFrom = flightTo = Player.position; flightAt = Time.unscaledTime; }
             else { Player.position = flightTo; Stream.Anchor = Player.position; UpdateCamera(); }
         }
@@ -207,9 +353,13 @@ namespace FFOne.World
             var owner = new GameObject("Server entities"); owner.transform.SetParent(ownedRoot.transform, false);
             Replicas = owner.AddComponent<NetworkWorldEntities>();
             Replicas.ContentError += message => Debug.LogWarning("FFOne replicated content: " + message);
+            LocalNano = Player.gameObject.AddComponent<WorldNanoCompanion>();
+            LocalNano.Initialize(Replicas, View, false);
             projectilePlayerId = entry.PlayerId;
             Replicas.Begin(entry.PlayerId, entry.BootstrapPackets);
         }
+
+        internal Func<int, bool> CanInteractWithMissionMarker;
 
         public NetworkEntityView Target(float range = 50)
         {
@@ -220,17 +370,59 @@ namespace FFOne.World
                 if (hit.collider.transform.IsChildOf(Player)) continue;
                 var actor = hit.collider.GetComponentInParent<NetworkEntityView>();
                 if (actor && actor.Entity.Kind != WorldEntityKind.Transportation && !actor.Entity.Hidden && (actor.Hostile || actor.Entity.Interactable) &&
-                    (actor.Definition?.HiddenMarker != true || actor.Definition.IsBank)) return actor;
+                    (actor.Definition?.HiddenMarker != true || actor.Definition.IsBank || CanInteractWithMissionMarker?.Invoke(actor.Entity.NpcType) == true)) return actor;
                 if (!hit.collider.isTrigger) return null;
             }
             return null;
         }
 
-        public void PlayAttack(int weaponMode = 3) => avatar?.PlayerAnimation?.Play(WorldWeaponCatalog.AttackClip(weaponMode), true);
+        public void PlayAttack(int equipType = -1)
+        {
+            avatar?.CancelEmote();
+            string clip = WorldWeaponCatalog.AttackClip(equipType < 0 ? weaponEquipType : equipType);
+            var animation = avatar?.PlayerAnimation;
+            if (animation && animation.Play(clip, true)) playerAttackUntil = Time.time + animation.Duration(clip);
+        }
+
+        internal void RecordPlayerCombatResult(CombatUpdate combat, int playerId)
+        {
+            if (combat.WeaponBattery.HasValue || combat.AttackerKind == WorldEntityKind.Player && combat.AttackerId == playerId ||
+                combat.Hits.Any(hit => hit.Kind == WorldEntityKind.Player && hit.Id == playerId))
+                lastPlayerCombatResult = Time.realtimeSinceStartup;
+        }
+        internal void PlayPlayerDamageReaction(bool dead, bool critical)
+        {
+            if (!avatar) return;
+            if (!dead && !Ziplining && !Riding && !PersonalVehicleMounted) avatar.PlayerAnimation?.Play("woundupper", true);
+            avatar.PlayDamageVoice(dead, critical, (string)Preferences["voice_locale"], FrontendController.AudioGain(Preferences, "voice"));
+        }
+
+        float danceMusicGain = .5f;
+        internal void SetDanceMusicGain(float gain)
+        {
+            danceMusicGain = gain;
+            if (avatar) avatar.SetDanceMusicGain(gain);
+            if (Replicas)
+                foreach (var replica in Replicas.Actors)
+                    if (replica.Avatar) replica.Avatar.SetDanceMusicGain(gain);
+        }
+
+        public void PlayAvatarEmote(int id, int localId, int code, Action<int> continuation)
+        {
+            bool local = id == localId;
+            var actor = local ? avatar : Replicas?.Actors.FirstOrDefault(view => view.Entity.Kind == WorldEntityKind.Player && view.Entity.Id == id)?.Avatar;
+            if (!actor) return;
+            actor.SetDanceMusicGain(danceMusicGain);
+            actor.PlayEmote(code, (string)Preferences["voice_locale"], FrontendController.AudioGain(Preferences, "voice"), local ? continuation : null);
+        }
 
         public void Stop()
         {
+            ClearComputer();
+            cameraInput.Release();
+            StopZipline();
             ClearProjectiles();
+            ClearEruptions();
             LeaveSlider();
             SetPersonalVehicle(0);
             MovementEnabled = false;
@@ -238,7 +430,7 @@ namespace FFOne.World
             if (ownedRoot) { ownedRoot.SetActive(false); Destroy(ownedRoot); ownedRoot = null; }
             foreach (var camera in previousCameras) if (camera) camera.enabled = true;
             foreach (var listener in previousListeners) if (listener) listener.enabled = true;
-            previousCameras.Clear(); previousListeners.Clear(); Player = null; Stream = null; View = null; Replicas = null;
+            previousCameras.Clear(); previousListeners.Clear(); Player = null; Stream = null; View = null; Replicas = null; LocalNano = null;
             if (captured)
             {
                 RenderSettings.fog = oldFog; RenderSettings.fogMode = oldFogMode;

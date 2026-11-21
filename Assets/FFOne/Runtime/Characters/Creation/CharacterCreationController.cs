@@ -2,9 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using FFOne.Content;
 using FFOne.Integration;
 using FFOne.Network;
 using FFOne.UI;
+using FFOne.Tutorial;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -14,17 +17,16 @@ namespace FFOne.Creation
     [RequireComponent(typeof(FrontendController), typeof(PreviewStage))]
     public sealed class CharacterCreationController : MonoBehaviour
     {
-        const string Art = "ui/en/character/creation/";
-        FrontendController frontend;
-        PreviewStage preview;
+        const string BindingPrefix = "creator-bind-";
+        [SerializeField] FrontendController frontend;
+        [SerializeField] PreviewStage preview;
+        DexterShipCutscene cutscene;
         CreationCatalog catalog;
         CharacterCreation draft;
-        VisualElement overlay, body;
+        VisualElement overlay, panelHost, body, background;
         VisualTreeAsset view;
         Label error;
-        Image avatarImage, background;
         Button fullscreen;
-        TextField customName;
         Label generatedName;
         readonly VisualElement[] nameWheels = new VisualElement[3];
         readonly Label[][] nameRows = new Label[3][];
@@ -36,39 +38,45 @@ namespace FFOne.Creation
         readonly Dictionary<string, int> colorPages = new Dictionary<string, int>();
         bool custom, busy, appearanceOpen;
         string customNameText = "";
-        AudioSource creationMusic, sounds;
         CancellationTokenSource lifetime, creationLifetime;
         public bool IsOpen => overlay != null;
+        internal VisualElement GamepadView => overlay;
+        internal bool LookWithGamepad(Vector2 stick, float elapsed, bool barberOpen = false)
+        {
+            if ((!appearanceOpen || !IsOpen) && !barberOpen || !preview) return false;
+            if (stick.x != 0) preview.Rotate(stick.x * 100 * elapsed);
+            if (stick.y != 0) preview.Zoom(-stick.y * .4f * elapsed);
+            return true;
+        }
+
 
         void Start()
         {
-            frontend = GetComponent<FrontendController>();
-            preview = GetComponent<PreviewStage>();
+            if (!frontend) TryGetComponent(out frontend);
+            if (!preview) TryGetComponent(out preview);
+            TryGetComponent(out cutscene);
             frontend.CreateCharacterRequested += Open;
             frontend.NetworkEventReceived += OnNetworkEvent;
             frontend.Root.RegisterCallback<GeometryChangedEvent>(ViewportChanged);
             lifetime = new CancellationTokenSource();
-            creationMusic = gameObject.AddComponent<AudioSource>();
-            creationMusic.playOnAwake = false; creationMusic.loop = true; creationMusic.volume = .7f;
-            creationMusic.clip = FFOne.Content.ContentAssets.Load<AudioClip>("audio/music/charactercreation_loop");
-            sounds = gameObject.AddComponent<AudioSource>();
-            sounds.playOnAwake = false; sounds.volume = .7f;
         }
         string T(string key, string fallback) => frontend.Text(key, fallback);
         void OnNetworkEvent(NetworkEvent value)
         {
-            if (value.Kind != NetworkEventKind.Disconnected || !IsOpen) return;
+            if (value.Kind != NetworkEventKind.Disconnected || creationLifetime == null) return;
             busy = false;
             Close();
         }
-        void Open(int slot)
+        async void Open(int slot)
         {
             if (IsOpen || busy) return;
+            busy = true;
+            creationLifetime = CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token);
+            var operation = creationLifetime;
             try
             {
-                catalog ??= new CreationCatalog();
+                await frontend.ShowLoadingAsync(FrontendLoadingStage.CharacterCreation);
                 custom = false; customNameText = ""; appearanceOpen = false;
-                creationLifetime = CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token);
                 draft = new CharacterCreation { Slot = slot, Style = new CharacterStyle { Height = 2, Body = 1 } };
                 foreach (var character in frontend.Session.Characters)
                     if (character.Slot == slot && !character.Style.AppearanceComplete)
@@ -77,6 +85,26 @@ namespace FFOne.Creation
                         draft.FirstName = character.FirstName;
                         draft.LastName = character.LastName;
                     }
+                if (draft.ExistingUid == 0)
+                {
+                    if (!cutscene) cutscene = gameObject.AddComponent<DexterShipCutscene>();
+                    cutscene.VoiceLanguage = frontend.VoiceLanguage;
+                    await cutscene.PreloadBeforeCreationAsync(frontend.Language, operation.Token);
+                    if (this == null || operation.IsCancellationRequested || operation != creationLifetime) return;
+                    frontend.SetCreationPresentationActive(true);
+                    frontend.HideLoading();
+                    var performance = cutscene.PlayBeforeCreationAsync(frontend.Root, frontend.Language, operation.Token);
+                    var creatorResources = PreloadCreatorAsync(operation.Token);
+                    await Task.WhenAll(creatorResources, CompleteIntroAsync());
+                    async Task CompleteIntroAsync()
+                    {
+                        await performance;
+                        if (!creatorResources.IsCompleted && this != null && operation == creationLifetime && !operation.IsCancellationRequested)
+                            await frontend.ShowLoadingAsync(FrontendLoadingStage.CharacterCreation);
+                    }
+                }
+                else await PreloadCreatorAsync(operation.Token);
+                if (this == null || operation.IsCancellationRequested || operation != creationLifetime) return;
                 choiceIndices.Clear(); colorPages.Clear();
                 SetChoices();
                 RandomName();
@@ -84,29 +112,79 @@ namespace FFOne.Creation
                 if (!view) throw new InvalidOperationException("Missing CharacterCreation.uxml.");
                 var shell = view.CloneTree();
                 overlay = Required<VisualElement>(shell, "character-creation");
+                for (int i = 0; i < shell.styleSheets.count; i++)
+                    if (!overlay.styleSheets.Contains(shell.styleSheets[i])) overlay.styleSheets.Add(shell.styleSheets[i]);
                 overlay.RemoveFromHierarchy();
-                overlay.styleSheets.Add(FFOne.Content.ContentAssets.Load<StyleSheet>("ui/styles/FFTheme"));
-                var styles = FFOne.Content.ContentAssets.Load<StyleSheet>("ui/styles/CharacterCreation");
-                if (!styles) throw new InvalidOperationException("Missing CharacterCreation.uss.");
-                overlay.styleSheets.Add(styles);
                 overlay.RegisterCallback<KeyDownEvent>(OnKey, TrickleDown.TrickleDown);
-                frontend.Root.Add(overlay);
+                frontend.Root.Insert(0, overlay);
                 frontend.SetCreationPresentationActive(true);
-                if (PlayerPrefs.GetInt("ffone.music", 1) != 0 && creationMusic.clip) creationMusic.Play();
-                background = Required<Image>(overlay, "creation-background");
-                background.image = FFWidgets.Texture(Art + "background/CharCreationBG");
-                background.scaleMode = ScaleMode.StretchToFill;
+                frontend.PlayCreationMusic();
+                background = Required<VisualElement>(overlay, "creation-background");
+                panelHost = Required<VisualElement>(overlay, "creation-panel-host");
                 fullscreen = Required<Button>(overlay, "creator-fullscreen");
-                fullscreen.clicked += () => { frontend.ToggleFullscreen(); UpdateViewport(); };
-                FFWidgets.Font(fullscreen, false, 12);
-                FFStyle.Button(fullscreen, FFWidgets.Controls + "CSFullScreenButton", FFWidgets.Controls + "FullscreenModeButton_Over");
-                if (draft.ExistingUid != 0) { RollAppearance(true); Appearance(); } else NameScreen();
+                fullscreen.clicked += () => { if (appearanceOpen) PlayButtonSound(); frontend.ToggleFullscreen(); UpdateViewport(); };
+                if (draft.ExistingUid != 0)
+                {
+                    RollAppearance(true);
+                    await NativeAvatarPreview.PreloadAsync(NativeAvatarPreview.Snapshot(CreationCatalog.Preview(draft)), operation.Token);
+                    if (this == null || operation.IsCancellationRequested || operation != creationLifetime) return;
+                    Appearance();
+                    body.SetEnabled(false);
+                    frontend.SetLoadingResourceProgressVisible(false);
+                    await WaitForDraftAsync(operation.Token);
+                }
+                else NameScreen();
+                _ = WarmTutorialIntroAsync(operation.Token);
             }
-            catch (Exception ex) { Close(); frontend.ShowError(ex.Message); }
+            catch (OperationCanceledException) { }
+            catch (Exception ex) { if (this && operation == creationLifetime) { busy = false; Close(); frontend.ShowError(ex.Message); } }
+            finally
+            {
+                if (this && operation == creationLifetime) { busy = false; body?.SetEnabled(true); frontend.HideLoading(); }
+            }
+        }
+        async Task PreloadCreatorAsync(CancellationToken cancellation)
+        {
+            var requests = new List<Task> {
+                LoadCatalog(), ContentAssets.GetAsync<VisualTreeAsset>("ui/views/CharacterCreation", cancellation)
+            };
+            foreach (string gender in new[] { "male", "female" })
+                requests.Add(ContentAssets.GetAsync<NativePlayerAnimationProfile>("characters/player/shared/animation/" + gender + "-profile", cancellation));
+            foreach (string sound in new[] { "randomize", "continue_01", "select_color", "height_down", "height_up", "girth_narrow", "girth_wide", "mouse_click01", "mouse_click02", "mouse_click03", "mouse_click04", "mouse_click05" })
+                requests.Add(ContentAssets.GetAsync<AudioClip>("audio/sfx/ui/" + sound, cancellation));
+            int completed = 0, total = requests.Count;
+            await Task.WhenAll(requests.Select(async request => {
+                await request; frontend.SetLoadingProgress(.65f * ++completed / total, 1);
+            }));
+            var icons = new[] { 1, 2 }.SelectMany(gender => new[] { "shirt", "pants", "shoes" }
+                .SelectMany(category => catalog.Choices(category, gender))).Select(CreationCatalog.Icon)
+                .Where(path => path != null).Distinct().ToArray();
+            for (int offset = 0; offset < icons.Length; offset += 16)
+            {
+                await Task.WhenAll(icons.Skip(offset).Take(16).Select(icon => ContentAssets.GetAsync<Texture2D>(icon, cancellation)));
+                frontend.SetLoadingProgress(.65f + .35f * Mathf.Min(offset + 16, icons.Length) / Mathf.Max(1, icons.Length), 1);
+            }
+            async Task LoadCatalog() { if (catalog == null) catalog = await CreationCatalog.LoadAsync(cancellation); }
+        }
+        async Task WarmTutorialIntroAsync(CancellationToken cancellation)
+        {
+            try
+            {
+                // The next scene's effect must not compete with the first ship
+                // frame. Prepare it while the player edits their character.
+                await Task.Yield();
+                cancellation.ThrowIfCancellationRequested();
+                if (!cutscene) cutscene = gameObject.AddComponent<DexterShipCutscene>();
+                cutscene.VoiceLanguage = frontend.VoiceLanguage;
+                await cutscene.PreloadBeforeTutorialAsync(frontend.Language, cancellation);
+            }
+            catch (OperationCanceledException) { }
+            catch (Exception ex) { Debug.LogWarning("Dexter ship background preload: " + ex.Message, this); }
         }
         void ClearBody(string panel)
         {
-            string focusedName = (frontend.Root.panel?.focusController.focusedElement as VisualElement)?.name;
+            var focusedControl = frontend.Root.panel?.focusController.focusedElement as VisualElement;
+            string focusedBinding = focusedControl?.GetClasses().FirstOrDefault(role => role.StartsWith(BindingPrefix, StringComparison.Ordinal));
             Array.Clear(nameDirections, 0, nameDirections.Length);
             Array.Clear(nameHeld, 0, nameHeld.Length);
             Array.Clear(nameOffsets, 0, nameOffsets.Length);
@@ -114,15 +192,13 @@ namespace FFOne.Creation
             var tree = view.CloneTree();
             body = Required<VisualElement>(tree, panel);
             body.RemoveFromHierarchy();
-            body.name = "creation-panel";
-            overlay.Add(body);
-            fullscreen.BringToFront();
+            panelHost.Add(body);
             UpdateViewport();
             FFWidgets.FitTree(body);
             body.schedule.Execute(() => {
                 var focused = frontend.Root.panel?.focusController.focusedElement as VisualElement;
                 if (focused != null && overlay.Contains(focused)) return;
-                var replacement = string.IsNullOrEmpty(focusedName) ? null : body.Q<VisualElement>(focusedName);
+                var replacement = focusedBinding == null ? null : body.Q(className: focusedBinding);
                 if (replacement != null && replacement.focusable && replacement.enabledInHierarchy) replacement.Focus();
                 else overlay.Focus();
             });
@@ -130,7 +206,8 @@ namespace FFOne.Creation
         void OnKey(KeyDownEvent evt)
         {
             if (evt.keyCode == KeyCode.Escape) { if (!busy) Close(); evt.StopImmediatePropagation(); }
-            else if (!appearanceOpen && (evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter))
+            else if (!appearanceOpen && (evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter) &&
+                (evt.target is not VisualElement target || target.GetFirstAncestorOfType<Button>() == null && target is not Button))
             { if (!busy) ContinueName(); evt.StopImmediatePropagation(); }
         }
         void ViewportChanged(GeometryChangedEvent _) => UpdateViewport();
@@ -144,88 +221,66 @@ namespace FFOne.Creation
             // UXML inline dimensions are resolved after the first layout pass.
             // Keep its percentage anchor and negative half-size margins rather than
             // reading style.width here, which can still be Auto immediately after CloneTree.
-            body.style.transformOrigin = new TransformOrigin(Length.Percent(50), Length.Percent(50));
-            FFWidgets.ScaledRect(fullscreen, new Rect(width - 45, height - 35, 35, 31), scale, new Vector2(width, height));
-            FFWidgets.Skin(fullscreen, FFWidgets.Controls + (Screen.fullScreen ? "CSFullScreenButton" : "CSFullToWindow"),
-                FFWidgets.Controls + (Screen.fullScreen ? "FullscreenModeButton_Over" : "WindowModeButton_Over"));
+            fullscreen.style.translate = new Translate(-45 * scale, -35 * scale);
+            fullscreen.style.scale = new Scale(new Vector3(scale, scale, 1));
+            fullscreen.EnableInClassList("creation-windowed", !Screen.fullScreen);
         }
-        static TElement Required<TElement>(VisualElement parent, string name) where TElement : VisualElement
+        static TElement Required<TElement>(VisualElement parent, string role) where TElement : VisualElement =>
+            FFView.RequireClass<TElement>(parent, BindingPrefix + role);
+
+        Label Label(string role, string text)
         {
-            return parent.Q<TElement>(name) ?? throw new InvalidOperationException("Character creation UXML is missing " + name + " (" + typeof(TElement).Name + ").");
-        }
-        VisualElement Picture(string name, string path)
-        {
-            var picture = Required<VisualElement>(body, name);
-            FFStyle.Background(picture, Art + path);
-            return picture;
-        }
-        Label Label(string name, string text, bool cyan = false)
-        {
-            var label = Required<Label>(body, name);
+            var label = Required<Label>(body, role);
             label.text = FFStyle.Caption(text);
-            FFWidgets.Font(label, false, cyan ? 12 : 14);
             FFWidgets.AutoFit(label);
             return label;
         }
-        Button Action(string name, string label, System.Action action, bool red = false)
+
+        void Action(string role, string caption, System.Action action)
         {
-            var button = Required<Button>(body, name);
-            button.text = FFStyle.Caption(label); button.clicked += action;
-            FFWidgets.Font(button, false, 14); FFWidgets.AutoFit(button);
-            if (red) button.AddToClassList("creation-exit");
-            FFStyle.Button(button, FFWidgets.Controls + (red ? "red_button_normal" : "blue_button_normal"),
-                FFWidgets.Controls + (red ? "red_button_over" : "blue_button_over"),
-                FFWidgets.Controls + (red ? "red_button_normal" : "blue_button_normal"));
-            return button;
+            var button = Required<Button>(body, role);
+            button.text = FFStyle.Caption(caption);
+            button.clicked += action;
+            FFWidgets.AutoFit(button);
         }
-        Button ArtButton(string name, string path, System.Action action)
+
+        void BindButton(string role, System.Action action)
         {
-            string normal = path + "Normal", over = path + "Over";
-            if (path == "camera/CCRotateRight") over = "camera/CCRoatateRightOver";
-            if (path == "name/CCScrollDown") normal = "name/CCScrollDownUp";
-            if (path.EndsWith("TopButton", StringComparison.Ordinal)) over = path.Replace("TopButton", "TopOver");
-            if (path == "clothes/CCClothesRightBottomButton") over = "clothes/CCClothesRightBottomOver";
-            var button = Required<Button>(body, name); button.clicked += action;
-            FFWidgets.Font(button, false, 14);
-            FFStyle.Button(button, Art + normal, Art + over, Art + normal);
-            return button;
+            var button = Required<Button>(body, role);
+            if (role.EndsWith("-previous", StringComparison.Ordinal) || role.EndsWith("-next", StringComparison.Ordinal))
+                button.AddToClassList("ff-pad-repeat");
+            button.clicked += action;
         }
+
         void NameTab(string name, string title, bool ownName)
         {
             var tab = Required<Button>(body, name); tab.text = FFStyle.Caption(title);
-            FFWidgets.Font(tab, false, 12); FFWidgets.AutoFit(tab);
+            FFWidgets.AutoFit(tab);
             tab.clicked += () => {
                 if (custom == ownName) return;
                 PlaySound("tab_click01"); custom = ownName; NameScreen();
             };
-            FFStyle.Button(tab, Art + "name/CCNameTabButtonNormal", Art + "name/CCNameTabButtonOver", Art + "name/CCNameTabButtonNormal");
         }
 
         void NameScreen()
         {
             appearanceOpen = false;
             ClearBody(custom ? "custom-name-panel" : "generated-name-panel");
-            Picture("name-background", "name/CCNameBG");
+
             Label("creation-title", T("ui.character_create.title", "CHARACTER CREATION"));
             NameTab("generated-name", T("ui.character_create.generate_name", "GENERATE A NAME"), false);
             NameTab("custom-name", T("ui.character_create.custom_name", "CREATE YOUR OWN"), true);
-            var or = Label("name-or", T("ui.common.or", "-OR-"), true);
-            or.style.paddingTop = 4; or.style.paddingBottom = 7;
-            Picture("name-tab", custom ? "name/CCNameTab2" : "name/CCNameTab1");
-            var selectedTab = Label("selected-name-tab", T(custom ? "ui.character_create.custom_name" : "ui.character_create.generate_name", custom ? "CREATE YOUR OWN" : "GENERATE A NAME"));
-            selectedTab.style.fontSize = 12; selectedTab.style.paddingTop = 4; selectedTab.style.paddingBottom = 7;
+            Label("name-or", T("ui.common.or", "-OR-"));
+
+            Label("selected-name-tab", T(custom ? "ui.character_create.custom_name" : "ui.character_create.generate_name", custom ? "CREATE YOUR OWN" : "GENERATE A NAME"));
+
             if (custom)
             {
-                var question = Label("name-question", T("ui.character_create.custom_name_question", "WANT TO CREATE YOUR OWN NAME?"));
-                question.style.fontSize = 12; question.style.color = Color.white;
-                var help = Required<Label>(body, "name-help");
-                help.text = T("ui.character_create.custom_name_help", "Type in the name you wish to use and\nclick 'CONTINUE'. Your custom name\nwill be submitted for review.");
-                FFWidgets.Font(help, true, 14); FFWidgets.AutoFit(help);
-                customName = Required<TextField>(body, "custom-character-name");
-                FFStyle.Background(customName, "ui/en/launcher/login/ff-textfield-normal", new Vector4(4, 4, 4, 4));
-                customName.maxLength = 25;
-                FFWidgets.Font(customName, false, 14);
-                customName.Q<VisualElement>("unity-text-input")?.AddToClassList("creation-name-input");
+                Label("name-question", T("ui.character_create.custom_name_question", "WANT TO CREATE YOUR OWN NAME?"));
+
+                Required<Label>(body, "name-help").text = T("ui.character_create.custom_name_help",
+                    "Type in the name you wish to use and\nclick 'CONTINUE'. Your custom name\nwill be submitted for review.");
+                var customName = Required<TextField>(body, "custom-character-name");
                 customName.value = customNameText;
                 customName.RegisterValueChangedCallback(e => { customNameText = e.newValue; SaveCustomName(e.newValue); });
                 customName.Focus();
@@ -233,46 +288,44 @@ namespace FFOne.Creation
             else
             {
                 UpdateGeneratedName();
-                Picture("name-display-background", "name/CCNameDisplay");
+
                 generatedName = Label("name-display", draft.FirstName + " " + draft.LastName);
-                generatedName.style.color = Color.yellow; FFWidgets.Font(generatedName, false, 12);
-                FFWidgets.Padding(generatedName);
-                Picture("name-scroll-background", "name/CCScrollBG");
+
+                var columns = body.Query<TemplateContainer>(className: "creation-wheel").ToList();
+                if (columns.Count != nameWheels.Length) throw new InvalidOperationException("Character creation UXML requires three name wheels.");
                 for (int part = 0; part < 3; part++)
                 {
-                    NameScrollButton(part, -1, "name/CCScrollUp");
-                    var wheel = nameWheels[part] = Required<VisualElement>(body, "name-wheel-" + part);
-                    nameRows[part] = new Label[7];
-                    for (int row = 0; row < 7; row++)
-                    {
-                        var label = nameRows[part][row] = Required<Label>(wheel, "name-" + part + "-" + row);
-                        FFWidgets.Font(label); FFWidgets.AutoFit(label);
-                        label.style.color = new Color(.8f, 1, 1);
-                        FFWidgets.Padding(label);
-                    }
+                    var column = columns[part];
+                    NameScrollButton(column, part, -1);
+                    var wheel = nameWheels[part] = column.Q(className: "creation-wheel-rows");
+                    nameRows[part] = wheel.Query<Label>(className: "creation-label").ToList().ToArray();
+                    if (nameRows[part].Length != 7) throw new InvalidOperationException("A name wheel requires seven rows.");
+                    foreach (var label in nameRows[part]) FFWidgets.AutoFit(label);
                     RefreshNameWheel(part);
-                    NameScrollButton(part, 1, "name/CCScrollDown");
+                    NameScrollButton(column, part, 1);
                 }
                 body.schedule.Execute(TickNameWheels).Every(16);
-                Picture("name-wheel-shade", "name/CCNameShade");
-                var random = Action("random-name", T("ui.character_create.random", "RANDOM"), () => {
+
+                Action("random-name", T("ui.character_create.random", "RANDOM"), () => {
                     PlaySound("randomize"); RandomName();
-                    NameScreen();
+                    for (int part = 0; part < 3; part++)
+                    {
+                        nameDirections[part] = 0; nameHeld[part] = false; nameOffsets[part] = 0;
+                        RefreshNameWheel(part);
+                        foreach (var row in nameRows[part]) row.style.translate = StyleKeyword.Null;
+                    }
                 });
-                random.style.fontSize = 12;
             }
-            error = Label("creation-error", custom ? T("ui.character_create.custom_name_rules", "Names must have at least two parts.\nFirst name: up to 8 characters. Last name: up to 16.") :
-                T("ui.character_create.generated_name_rules", "Names must have at least two parts.\nSingle-word names will not be accepted."));
+            error = Required<Label>(body, "creation-error");
             error.text = custom ? T("ui.character_create.custom_name_rules", "Names must have at least two parts.\nFirst name: up to 8 characters. Last name: up to 16.") :
                 T("ui.character_create.generated_name_rules", "Names must have at least two parts.\nSingle-word names will not be accepted.");
-            FFWidgets.Font(error, true, 12); error.style.whiteSpace = WhiteSpace.Normal;
-            Action("creation-exit", T("ui.common.exit", "EXIT"), Close, true);
+            Action("creation-exit", T("ui.common.exit", "EXIT"), Close);
             Action("name-continue", T("ui.common.continue", "CONTINUE"), ContinueName);
             FFWidgets.FitTree(body);
         }
-        void NameScrollButton(int part, int direction, string art)
+        void NameScrollButton(VisualElement column, int part, int direction)
         {
-            var button = ArtButton("name-" + (direction < 0 ? "up-" : "down-") + part, art, () => {});
+            var button = column.Q<Button>(className: direction < 0 ? "creation-wheel-up" : "creation-wheel-down");
             button.RegisterCallback<PointerDownEvent>(evt => {
                 if (evt.button != 0 || !button.enabledInHierarchy) return;
                 if (!StartNameScroll(part, direction)) return;
@@ -280,6 +333,7 @@ namespace FFOne.Creation
             }, TrickleDown.TrickleDown);
             button.RegisterCallback<PointerUpEvent>(evt => { nameHeld[part] = false; button.ReleasePointer(evt.pointerId); }, TrickleDown.TrickleDown);
             button.RegisterCallback<PointerCaptureOutEvent>(_ => nameHeld[part] = false);
+            button.AddToClassList("ff-pad-repeat");
             button.RegisterCallback<NavigationSubmitEvent>(_ => StartNameScroll(part, direction), TrickleDown.TrickleDown);
         }
         bool StartNameScroll(int part, int direction)
@@ -315,7 +369,8 @@ namespace FFOne.Creation
                     nameOffsets[part] -= 30; RefreshNameWheel(part);
                     if (!nameHeld[part]) { nameDirections[part] = 0; nameOffsets[part] = 0; }
                 }
-                for (int row = 0; row < 7; row++) nameRows[part][row].style.top = (row - 1) * 30 - direction * nameOffsets[part];
+                var offset = new Translate(0, -direction * nameOffsets[part]);
+                foreach (var row in nameRows[part]) row.style.translate = offset;
             }
         }
         static int Cycle(int index, int delta, int count) => CharacterCreationRules.CycleName(index, delta, count);
@@ -371,45 +426,39 @@ namespace FFOne.Creation
         {
             appearanceOpen = true;
             ClearBody("appearance-panel");
-            Picture("appearance-background", "layout/CCBG");
-            Picture("character-display", "layout/CCCharacterDisplayArea");
-            Picture("right-background", "layout/CCRightBG");
+
             Label("creation-title", T("ui.character_create.title", "CHARACTER CREATION"));
-            Label("choose-body", T("ui.character_create.step.body", "1. CHOOSE BODY"), true);
-            Picture("body-section", "layout/CCLeftIn12BG");
+            Label("choose-body", T("ui.character_create.step.body", "1. CHOOSE BODY"));
+
             GenderButton("gender-boy", T("ui.character_create.boy", "BOY"), 1);
             GenderButton("gender-girl", T("ui.character_create.girl", "GIRL"), 2);
             Stepper("height", SizeLabel(draft.Style.Height, true), delta => { PlaySound(delta < 0 ? "height_down" : "height_up"); draft.Style.Height = (draft.Style.Height + delta + 5) % 5; Appearance(); });
             Stepper("body", SizeLabel(draft.Style.Body, false), delta => { PlaySound(delta < 0 ? "girth_narrow" : "girth_wide"); draft.Style.Body = (draft.Style.Body + delta + 3) % 3; Appearance(); });
-            Label("skin-label", T("ui.character_create.skin", "SKIN"), true);
-            Picture("skin-background", "name/CCNameDisplay");
+            Label("skin-label", T("ui.character_create.skin", "SKIN"));
+
             Palette("skin", 12);
-            Label("choose-features", T("ui.character_create.step.features", "2. CHOOSE FEATURES"), true);
-            Picture("features-section", "layout/CCLeftIn12BG");
+            Label("choose-features", T("ui.character_create.step.features", "2. CHOOSE FEATURES"));
+
             Stepper("hair", ChoiceLabel("hair"), delta => Step("hair", delta));
-            Label("face-label", T("ui.character_create.face_label", "FACE"), true);
+            Label("face-label", T("ui.character_create.face_label", "FACE"));
             Stepper("face", ChoiceLabel("face"), delta => Step("face", delta));
-            Picture("hair-colors-background", "name/CCNameDisplay");
+
             Palette("hair", 18);
-            Label("eye-label", T("ui.character_create.eye_color", "EYE COLOR"), true);
-            Picture("eye-colors-background", "name/CCNameDisplay");
+            Label("eye-label", T("ui.character_create.eye_color", "EYE COLOR"));
+
             Palette("eye", 5);
-            Label("choose-clothes", T("ui.character_create.step.clothes", "3. CHOOSE CLOTHES"), true);
-            Picture("clothes-section", "layout/CCLeftIn3BG");
-            Picture("clothes-background", "clothes/CCClothesBG");
-            Clothes("shirt", 0); Clothes("pants", 1); Clothes("shoes", 2);
-            avatarImage = Required<Image>(body, "creation-avatar");
-            avatarImage.scaleMode = ScaleMode.ScaleToFit;
-            FFWidgets.Hold(ArtButton("rotate-left", "camera/CCRotateLeft", () => {}), dt => preview.Rotate(-100 * dt));
-            FFWidgets.Hold(ArtButton("rotate-right", "camera/CCRotateRight", () => {}), dt => preview.Rotate(100 * dt));
-            FFWidgets.Hold(ArtButton("zoom-in", "camera/CCZoomIn", () => {}), dt => preview.Zoom(-.4f * dt));
-            FFWidgets.Hold(ArtButton("zoom-out", "camera/CCZoomOut", () => {}), dt => preview.Zoom(.4f * dt));
-            var random = Action("random-appearance", T("ui.character_create.random", "RANDOM"), Randomize);
-            FFWidgets.Font(random, false, 12);
+            Label("choose-clothes", T("ui.character_create.step.clothes", "3. CHOOSE CLOTHES"));
+
+            Clothes("shirt"); Clothes("pants"); Clothes("shoes");
+            var avatarImage = Required<Image>(body, "creation-avatar");
+            FFWidgets.Hold(Required<Button>(body, "rotate-left"), dt => preview.Rotate(-100 * dt));
+            FFWidgets.Hold(Required<Button>(body, "rotate-right"), dt => preview.Rotate(100 * dt));
+            FFWidgets.Hold(Required<Button>(body, "zoom-in"), dt => preview.Zoom(-.4f * dt));
+            FFWidgets.Hold(Required<Button>(body, "zoom-out"), dt => preview.Zoom(.4f * dt));
+            Action("random-appearance", T("ui.character_create.random", "RANDOM"), Randomize);
             Action("save-character", T("ui.common.continue", "CONTINUE"), Submit);
-            Action("appearance-exit", T("ui.common.exit", "EXIT"), () => { PlayButtonSound(); Close(); }, true);
-            error = Label("creation-error", "");
-            error.style.fontSize = 11; error.style.whiteSpace = WhiteSpace.Normal;
+            Action("appearance-exit", T("ui.common.exit", "EXIT"), () => { PlayButtonSound(); Close(); });
+            error = Required<Label>(body, "creation-error");
             preview.ShowDraft(CreationCatalog.Preview(draft), avatarImage);
             FFWidgets.FitTree(body);
         }
@@ -439,49 +488,40 @@ namespace FFOne.Creation
         }
         void GenderButton(string name, string text, int gender)
         {
-            bool selected = draft.Style.Gender == gender;
-            string normal = selected ? "CCCheckboxChecked" : "CCCheckboxNormal";
-            string over = selected ? "CCCheckboxCkeckedOver" : "CCCheckboxOver";
-            var button = Required<Button>(body, name); button.clicked += () => Gender(gender);
-            FFStyle.Button(button, Art + "body/checkbox/" + normal, Art + "body/checkbox/" + over);
-            button.style.backgroundSize = new BackgroundSize(22, 22);
-            button.style.backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Left);
-            button.style.backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center);
-            button.style.backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat);
-            var label = Required<Label>(button, name + "-label"); label.text = FFStyle.Caption(text);
-            label.style.left = 30; label.style.width = 50;
-            FFWidgets.Font(label); FFWidgets.AutoFit(label);
+            var button = Required<Button>(body, name);
+            button.clicked += () => Gender(gender);
+            button.EnableInClassList("creation-gender-selected", draft.Style.Gender == gender);
+            var label = FFView.RequireClass<Label>(button, "creation-gender-caption");
+            label.text = FFStyle.Caption(text);
+            FFWidgets.AutoFit(label);
         }
         void Stepper(string name, string value, Action<int> action)
         {
-            Picture(name + "-display", "body/CCBodyshapeDisplay");
-            ArtButton(name + "-previous", "body/CCBodyshapeRight", () => action(-1));
-            ArtButton(name + "-next", "body/CCBodyshapeLeft", () => action(1));
-            var label = Label(name + "-value", value);
-            FFWidgets.Font(label, false, 12);
-            FFWidgets.Padding(label);
+            BindButton(name + "-previous", () => action(-1));
+            BindButton(name + "-next", () => action(1));
+            Label(name + "-value", value);
         }
         void Palette(string category, int count)
         {
             var colors = catalog.Palette(category);
             if (!colorPages.TryGetValue(category, out var page)) page = 0;
+            var swatches = body.Query<TemplateContainer>(className: "creation-swatch-" + category).ToList();
+            if (swatches.Count != count) throw new InvalidOperationException($"Character creation UXML requires {count} {category} swatches.");
             for (int i = 0; i < count; i++)
             {
                 int selected = page * count + i;
-                var outline = Required<VisualElement>(body, category + "-outline-slot-" + i);
-                var marker = Required<VisualElement>(body, category + "-selected-slot-" + i);
-                var button = Required<Button>(body, category + "-color-slot-" + i);
+                var swatch = swatches[i];
                 bool available = selected < colors.Length;
-                outline.style.display = button.style.display = available ? DisplayStyle.Flex : DisplayStyle.None;
                 int current = category == "skin" ? draft.Style.SkinColor : category == "hair" ? draft.Style.HairColor : draft.Style.EyeColor;
-                marker.style.display = available && current == selected + 1 ? DisplayStyle.Flex : DisplayStyle.None;
+                swatch.EnableInClassList("creation-swatch-unavailable", !available);
+                swatch.EnableInClassList("creation-swatch-active", available && current == selected + 1);
                 if (!available) continue;
+                var outline = FFView.RequireClass<VisualElement>(swatch, "creation-swatch-outline");
+                var marker = FFView.RequireClass<VisualElement>(swatch, "creation-swatch-selected");
+                var button = FFView.RequireClass<Button>(swatch, "creation-swatch-color");
                 outline.name = category + "-outline-" + selected;
                 marker.name = category + "-selected-" + selected;
                 button.name = category + "-color-" + selected;
-                FFStyle.Background(outline, Art + "colors/CCColorOutline");
-                FFStyle.Background(marker, Art + "colors/CCSelectedColor");
-                FFStyle.Background(button, Art + "colors/CCColorInside");
                 button.style.unityBackgroundImageTintColor = colors[selected];
                 button.clicked += () => {
                     PlaySound("select_color");
@@ -492,22 +532,26 @@ namespace FFOne.Creation
                 };
             }
             int pages = (colors.Length + count - 1) / count;
-            Required<Button>(body, category + "-page-left").style.display =
-                Required<Button>(body, category + "-page-right").style.display = pages > 1 ? DisplayStyle.Flex : DisplayStyle.None;
-            if (pages > 1)
+            var left = Required<Button>(body, category + "-page-left");
+            var right = Required<Button>(body, category + "-page-right");
+            left.EnableInClassList("creation-page-unavailable", pages <= 1);
+            right.EnableInClassList("creation-page-unavailable", pages <= 1);
+            if (pages <= 1) return;
+            left.clicked += () => TurnPage(-1);
+            right.clicked += () => TurnPage(1);
+
+            void TurnPage(int delta)
             {
-                ArtButton(category + "-page-left", category == "eye" ? "body/CCBodyshapeRight" : "clothes/CCClothesLeftButton",
-                    () => { PlayButtonSound(); colorPages[category] = (page + pages - 1) % pages; Appearance(); });
-                ArtButton(category + "-page-right", category == "eye" ? "body/CCBodyshapeLeft" : "clothes/CCClothesRightButton",
-                    () => { PlayButtonSound(); colorPages[category] = (page + 1) % pages; Appearance(); });
+                PlaySound("select_color");
+                colorPages[category] = (page + delta + pages) % pages;
+                Appearance();
             }
         }
-        void Clothes(string category, int row)
+        void Clothes(string category)
         {
             var choices = catalog.Choices(category, draft.Style.Gender);
-            var suffix = row == 0 ? "TopButton" : row == 1 ? "Button" : "BottomButton";
-            ArtButton(category + "-previous", "clothes/CCClothesLeft" + suffix, () => Step(category, -1));
-            ArtButton(category + "-next", "clothes/CCClothesRight" + suffix, () => Step(category, 1));
+            BindButton(category + "-previous", () => Step(category, -1));
+            BindButton(category + "-next", () => Step(category, 1));
             for (int i = 0; i < 5; i++)
             {
                 int delta = i - 2;
@@ -516,9 +560,6 @@ namespace FFOne.Creation
                 if (delta != 0) ((Button)button).clicked += () => Step(category, delta);
                 var icon = CreationCatalog.Icon(choices[index]);
                 button.style.backgroundImage = icon == null ? new StyleBackground(StyleKeyword.None) : new StyleBackground(FFWidgets.Texture(icon));
-                // The original carousel fades the icons with GUI.color alpha, keeping their RGB intact.
-                float alpha = i == 2 ? 1 : (i == 1 || i == 3 ? .75f : .5f);
-                button.style.unityBackgroundImageTintColor = new Color(1, 1, 1, alpha);
                 button.tooltip = (string)choices[index]["label"];
             }
         }
@@ -542,11 +583,9 @@ namespace FFOne.Creation
         }
         void PlaySound(string name)
         {
-            if (!IsOpen || busy || sounds == null) return;
-            var clip = FFOne.Content.ContentAssets.Load<AudioClip>("audio/sfx/ui/" + name);
-            if (clip) sounds.PlayOneShot(clip);
+            if (IsOpen && !busy) frontend.PlayUiSound(name);
         }
-        void PlayButtonSound() => PlaySound("mouse_click0" + UnityEngine.Random.Range(1, 6));
+        void PlayButtonSound() => PlaySound("button");
         async void ContinueName()
         {
             if (busy || !IsOpen) return;
@@ -564,7 +603,16 @@ namespace FFOne.Creation
                 if (this == null || operation.IsCancellationRequested || operation != creationLifetime) return;
                 draft.ExistingUid = reserved.Uid;
                 draft.FirstName = reserved.FirstName; draft.LastName = reserved.LastName;
-                RollAppearance(true); Appearance();
+                await frontend.ShowLoadingAsync(FrontendLoadingStage.CharacterCreation);
+                operation.Token.ThrowIfCancellationRequested();
+                RollAppearance(true);
+                await NativeAvatarPreview.PreloadAsync(NativeAvatarPreview.Snapshot(CreationCatalog.Preview(draft)), operation.Token,
+                    value => { if (this && operation == creationLifetime) frontend.SetLoadingProgress(value, value); });
+                if (this == null || operation.IsCancellationRequested || operation != creationLifetime) return;
+                Appearance();
+                body.SetEnabled(false);
+                frontend.SetLoadingResourceProgressVisible(false);
+                await WaitForDraftAsync(operation.Token);
             }
             catch (OperationCanceledException) { }
             catch (Exception ex)
@@ -573,7 +621,18 @@ namespace FFOne.Creation
             }
             finally
             {
-                if (this != null && operation == creationLifetime) { busy = false; body?.SetEnabled(true); }
+                if (this != null && operation == creationLifetime) { frontend.HideLoading(); busy = false; body?.SetEnabled(true); }
+            }
+        }
+        async Task WaitForDraftAsync(CancellationToken cancellation)
+        {
+            float deadline = Time.realtimeSinceStartup + 120;
+            while (!preview.DraftReady)
+            {
+                cancellation.ThrowIfCancellationRequested();
+                if (!string.IsNullOrEmpty(preview.DraftError)) throw new InvalidOperationException(preview.DraftError);
+                if (Time.realtimeSinceStartup > deadline) throw new TimeoutException("Character creator did not render its avatar.");
+                await Task.Yield();
             }
         }
         async void Submit()
@@ -588,7 +647,8 @@ namespace FFOne.Creation
                 await session.CreateCharacterAsync(draft, operation.Token);
                 if (this == null || operation.IsCancellationRequested || operation != creationLifetime) return;
                 int createdSlot = draft.Slot;
-                busy = false; Close(); frontend.RefreshRoster(); frontend.ShowSelection(); frontend.SelectRosterSlot(createdSlot);
+                busy = false; Close(false);
+                await frontend.EnterCreatedCharacterAsync(createdSlot);
             }
             catch (OperationCanceledException) { }
             catch (Exception ex)
@@ -601,25 +661,26 @@ namespace FFOne.Creation
             }
             finally { if (this != null && operation == creationLifetime) { busy = false; body?.SetEnabled(true); } }
         }
-        public void Close()
+        public void Close() => Close(true);
+        void Close(bool returnToSelection)
         {
             if (busy) return;
             creationLifetime?.Cancel(); creationLifetime?.Dispose(); creationLifetime = null;
-            creationMusic?.Stop(); sounds?.Stop();
-            overlay?.RemoveFromHierarchy(); overlay = null; body = null;
+            frontend?.StopCreationMusic();
+            overlay?.RemoveFromHierarchy(); overlay = null; panelHost = null; body = null;
             if (frontend != null)
             {
-                frontend.SetCreationPresentationActive(false);
-                if (frontend.Session.IsLoggedIn) frontend.RefreshRoster();
+                frontend.HideLoading();
+                if (frontend.Session.IsLoggedIn && !returnToSelection) frontend.RefreshRoster();
             }
             if (preview != null) preview.EndDraft();
+            if (returnToSelection && frontend != null && frontend.Session.IsLoggedIn)
+                frontend.ShowSelection();
         }
         void OnDestroy()
         {
             lifetime?.Cancel(); lifetime?.Dispose();
             creationLifetime?.Cancel(); creationLifetime?.Dispose();
-            if (creationMusic != null) Destroy(creationMusic);
-            if (sounds != null) Destroy(sounds);
             if (frontend != null)
             {
                 frontend.CreateCharacterRequested -= Open;

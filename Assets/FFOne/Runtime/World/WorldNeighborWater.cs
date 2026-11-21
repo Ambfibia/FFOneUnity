@@ -23,6 +23,7 @@ namespace FFOne.World
         readonly Dictionary<string, Resident> resident = new();
         Vector2Int previousCell = new(int.MinValue, int.MinValue);
         int previousVersion = -1;
+        string anchorTile;
         public bool Ready => resident.Values.All(r => r.Ready);
         public int VisualCount => resident.Values.Sum(r => r.Visuals);
 
@@ -34,6 +35,8 @@ namespace FFOne.World
             var current = Stream.Catalog.Tiles.OrderBy(t => t.DistanceSquared(Stream.Anchor)).ThenBy(t => t.Z).ThenBy(t => t.X).First();
             // Prefer the containing cell when multiple overflow footprints have zero distance.
             current = Stream.Catalog.Tiles.FirstOrDefault(t => t.X == cell.x && t.Z == cell.y) ?? current;
+            anchorTile = current.Id;
+            bool reveal = Stream.TilePresented(anchorTile);
             var desired = Stream.Catalog.NeighborWater.Where(t => Stream.MapNumber == 0 && Math.Abs(t.X-current.X) <= 1 && Math.Abs(t.Z-current.Z) <= 1 && !Stream.TilePresented(t.Id)).ToDictionary(t => t.Id);
             foreach (var key in resident.Keys.ToArray())
                 if (!desired.ContainsKey(key))
@@ -42,10 +45,13 @@ namespace FFOne.World
                     foreach (var material in item.Owned) Destroy(material);
                     Destroy(item.Root); foreach(var lease in item.Leases)lease.Dispose(); resident.Remove(key);
                 }
+            foreach (var item in resident.Values)
+                if (!item.Retiring && item.Ready && item.Root.activeSelf != reveal) item.Root.SetActive(reveal);
             foreach (var entry in desired)
                 if (!resident.ContainsKey(entry.Key))
                 {
                     var item = new Resident { Root = new GameObject(entry.Key + " neighbor water") };
+                    item.Root.SetActive(false);
                     item.Root.transform.SetParent(transform, false); resident.Add(entry.Key, item);
                     StartCoroutine(Admit(entry.Value, item));
                 }
@@ -71,6 +77,7 @@ namespace FFOne.World
                 item.Visuals++;
             }
             item.Ready = true;
+            if (!item.Retiring) item.Root.SetActive(Stream.TilePresented(anchorTile));
         }
         void OnDestroy()
         {

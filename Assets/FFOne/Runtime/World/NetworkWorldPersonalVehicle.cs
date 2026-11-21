@@ -19,13 +19,18 @@ namespace FFOne.World
             bool changed = id != PersonalVehicleId;
             PersonalVehicleSpeed = id > 0 ? (GameplayUiCatalog.Load().Item(10, id)?.VehicleSpeed ?? 0) / 100f : 0;
             if (!avatar.SetPersonalVehicle(id)) { error = avatar.LastError; MovementEnabled = false; }
-            if (changed) { vehicleMotion.Reset(); ConfigureVehicleEngine(id); }
+            if (changed)
+            {
+                vehicleMotion.Reset();
+                avatar.PlayerAnimation?.ResetLocomotion();
+                ConfigureVehicleEngine(id);
+            }
         }
         float GroundSpeed(float forward) => BuffGroundSpeed(forward < 0 ? 3 : 6);
         Vector3 HorizontalMovement(float side, float forward, float delta)
         {
-            if (!PersonalVehicleMounted) return Quaternion.Euler(0, yaw, 0) * new Vector3(side, 0, forward).normalized * GroundSpeed(forward);
-            var movement = vehicleMotion.Step(side, forward, yaw, BuffVehicleSpeed, motor.isGrounded, delta);
+            if (!PersonalVehicleMounted) return Quaternion.Euler(0, MovementYaw, 0) * new Vector3(side, 0, forward).normalized * GroundSpeed(forward);
+            var movement = vehicleMotion.Step(side, forward, MovementYaw, BuffVehicleSpeed, motor.isGrounded, delta);
             if ((side != 0 || forward != 0) && movement.sqrMagnitude > .001f)
                 foreach (var hit in Physics.RaycastAll(Player.position + Vector3.up, movement.normalized, .5f, ~(1 << 31), QueryTriggerInteraction.Ignore))
                 {

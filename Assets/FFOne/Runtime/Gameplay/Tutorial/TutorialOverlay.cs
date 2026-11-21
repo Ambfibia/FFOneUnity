@@ -1,221 +1,361 @@
+using FFOne.Content;
+using FFOne.UI;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace FFOne.Tutorial
 {
     public sealed partial class TutorialController
     {
-        GUIStyle subtitleStyle, instructionStyle, labelStyle, titleStyle;
-        GUIStyle cinematicSpeakerStyle, cinematicLocationStyle, cinematicSkipStyle;
         bool locationCaption;
-        Texture2D hint;
-        int lastHintChapter = -1, lastHintStep = -1;
-        void OnGUI()
+        TutorialOverlayView tutorialOverlay;
+
+        void AttachTutorialOverlay(VisualElement parent)
         {
-            if (!IsReady || ending) return;
-            EnsureStyles();
-            float width = Screen.width, height = Screen.height;
-            if (paused)
-            {
-                Box(new Rect(width / 2 - 180, height / 2 - 100, 360, 200), new Color(.04f, .07f, .08f, .96f));
-                GUI.Label(new Rect(width / 2 - 160, height / 2 - 85, 320, 40), Russian ? "ПАУЗА" : "PAUSED", titleStyle);
-                if (GUI.Button(new Rect(width / 2 - 130, height / 2 - 30, 260, 38), Russian ? "Продолжить" : "Continue")) paused = false;
-                if (GUI.Button(new Rect(width / 2 - 130, height / 2 + 20, 260, 38), Russian ? "Выбор персонажа" : "Character selection")) Cancel();
-                return;
-            }
-            if (!IsCinematic && hiddenHud == 0)
-            {
-                DrawInstruction(width, height);
-                DrawTarget(width);
-                DrawMarker();
-                DrawMinimap(width);
-                if (interacting != 0) DrawNpcWindow(width, height);
-                else if (journal) DrawJournal(width, height);
-                else if (mainMenu) DrawMainMenu(width, height);
-            }
-            if (bars > 0)
-            {
-                Box(new Rect(0, 0, width, height * .13f * bars), Color.black);
-                Box(new Rect(0, height * (1 - .13f * bars), width, height * .13f * bars), Color.black);
-            }
-            PanPlayer?.Render(new Rect(0, 0, width, height));
-            DrawPicture(width, height);
-            RenderAuxiliary(width, height);
-            if (!string.IsNullOrEmpty(subtitle))
-            {
-                Color color = GUI.color; GUI.color = new Color(1, 1, 1, subtitleOpacity);
-                string text = subtitle.Substring(0, Mathf.Min(subtitle.Length, subtitleCharacters));
-                if (IsCinematic) DrawCinematicSubtitle(width, height, text);
-                else GUI.Label(new Rect(width * .13f, height * .79f, width * .74f, height * .17f), text, subtitleStyle);
-                GUI.color = color;
-            }
-            if (fade > 0) Box(new Rect(0, 0, width, height), new Color(0, 0, 0, fade));
-            if (IsCinematic)
-            {
-                float scale = FFOne.UI.FrontendLayout.CharacterScale(width, height);
-                cinematicSkipStyle.fontSize = Mathf.RoundToInt(12 * scale);
-                if (GUI.Button(new Rect(width / 2 - 250 * scale, 5 * scale, 500 * scale, 25 * scale),
-                    Russian ? "Нажмите ПРОБЕЛ, чтобы пропустить." : "Press SPACE BAR to skip.", cinematicSkipStyle)) SkipScene();
-            }
+            tutorialOverlay = new TutorialOverlayView(this);
+            UiLayers.For(parent).Add(tutorialOverlay.Root, UiLayer.Cinematic);
+            tutorialOverlay.Refresh();
         }
 
-        void DrawCinematicSubtitle(float width, float height, string text)
+        void DetachTutorialOverlay()
         {
-            float scale = FFOne.UI.FrontendLayout.CharacterScale(width, height);
-            cinematicSpeakerStyle.fontSize = cinematicLocationStyle.fontSize = Mathf.RoundToInt(12 * scale);
-            if (locationCaption)
+            tutorialOverlay?.Root.RemoveFromHierarchy();
+            tutorialOverlay = null;
+        }
+
+        void LateUpdate()
+        {
+            try { tutorialOverlay?.Refresh(); }
+            catch (System.Exception error) { LastError = error.Message; Debug.LogException(error, this); Cleanup(); }
+        }
+
+        sealed class TutorialOverlayView
+        {
+            const string TutorialArt = "ui/en/gameplay/tutorial/";
+            const string ViewAddress = "ui/views/Retrobution/GameplayHud";
+            readonly TutorialController owner;
+            internal VisualElement Root { get; }
+            readonly VisualElement scene, instructions, pause, topBar, bottomBar, blackout, jumpKey;
+            readonly Image hint, arrow, scenePicture, auxiliaryPicture, auxiliaryPointer;
+            readonly Label instruction, instructionShadow, secondary, secondaryShadow;
+            readonly Label location, locationShadow, pauseTitle;
+            readonly Dialogue scripted, voice;
+            readonly Button skip, resume, exit;
+            int hintChapter = -1, hintStep = -1;
+            JToken displayedPicture;
+
+            public TutorialOverlayView(TutorialController owner)
             {
-                GUI.Label(new Rect(width * .04f, height * .73f, width * .55f, height * .2f), text, cinematicLocationStyle);
-                return;
+                this.owner = owner;
+                Root = FFView.InstantiateClass(ViewAddress, "tutorial-overlay");
+                scene = Role<VisualElement>("tutorial-presentation");
+                instructions = Role<VisualElement>("tutorial-instructions");
+                hint = Role<Image>("tutorial-hint-image");
+                arrow = Role<Image>("tutorial-hint-arrow");
+                jumpKey = Role<VisualElement>("tutorial-localized-jump-key");
+                var jumpArtwork = Texture("tut_jump");
+                SetJumpStrip(jumpArtwork, 0, 0, 0, 298, 30);
+                SetJumpStrip(jumpArtwork, 1, 0, 55, 298, 36);
+                SetJumpStrip(jumpArtwork, 2, 0, 30, 30, 25);
+                SetJumpStrip(jumpArtwork, 3, 265, 30, 33, 25);
+                SetJumpStrip(jumpArtwork, 4, 140, 30, 1, 25);
+                instructionShadow = Role<Label>("tutorial-instruction-shadow");
+                instruction = Role<Label>("tutorial-instruction");
+                topBar = Role<VisualElement>("tutorial-top-bar");
+                bottomBar = Role<VisualElement>("tutorial-bottom-bar");
+                if (owner.PanPlayer != null) Role<VisualElement>("tutorial-pan-host").Add(owner.PanPlayer.View);
+                scenePicture = Role<Image>("tutorial-scene-picture");
+                auxiliaryPicture = Role<Image>("tutorial-auxiliary-picture");
+                auxiliaryPointer = Role<Image>("tutorial-auxiliary-pointer");
+                secondaryShadow = Role<Label>("tutorial-secondary-instruction-shadow");
+                secondary = Role<Label>("tutorial-secondary-instruction");
+                locationShadow = Role<Label>("tutorial-location-shadow");
+                location = Role<Label>("tutorial-location");
+                scripted = new Dialogue(Role<VisualElement>("tutorial-scripted"));
+                voice = new Dialogue(Role<VisualElement>("tutorial-voice"));
+                blackout = Role<VisualElement>("tutorial-fade");
+                skip = Role<Button>("tutorial-cinematic-skip");
+                skip.clicked += () =>
+                {
+                    if (owner.IsCinematic && !owner.ExternalInputBlocked) owner.SkipScene();
+                };
+                pause = Role<VisualElement>("tutorial-pause");
+                pauseTitle = Role<Label>("tutorial-pause-title");
+                resume = BindPauseButton("tutorial-resume", () => owner.paused = false);
+                exit = BindPauseButton("tutorial-exit", owner.Cancel);
             }
-            int separator = text.IndexOf(':');
-            if (separator >= 0 && separator < 40)
+
+            T Role<T>(string name) where T : VisualElement => FFView.RequireClass<T>(Root, name);
+
+            void SetJumpStrip(Texture2D artwork, int index, float x, float y, float width, float height)
             {
-                GUI.Label(new Rect(width * .13f, height * .845f, width * .74f, 22 * scale), text.Substring(0, separator + 1), cinematicSpeakerStyle);
-                text = text.Substring(separator + 1).TrimStart();
+                // Sample the original strips around the baked English label.
+                var strip = Role<Image>("tutorial-jump-strip-" + index);
+                strip.image = artwork;
+                strip.uv = new Rect(x / 298, 1 - (y + height) / 91, width / 298, height / 91);
             }
-            int previousSize = subtitleStyle.fontSize;
-            subtitleStyle.fontSize = Mathf.RoundToInt(14 * scale);
-            GUI.Label(new Rect(width * .13f, height * .88f, width * .74f, height * .1f), text, subtitleStyle);
-            subtitleStyle.fontSize = previousSize;
-        }
-        void EnsureStyles()
-        {
-            if (subtitleStyle != null) return;
-            // Reuse accepted replacement fonts imported with the front end, including Cyrillic.
-            var fonts = FFOne.Content.ContentAssets.LoadAll<Font>("fonts"); Font font = null;
-            foreach (var candidate in fonts) if (candidate.HasCharacter('Ж')) { font = candidate; break; }
-            subtitleStyle = new GUIStyle(GUI.skin.label) { font = font, fontSize = 21, alignment = TextAnchor.MiddleCenter, wordWrap = true };
-            subtitleStyle.normal.textColor = Color.white;
-            instructionStyle = new GUIStyle(subtitleStyle) { fontSize = 20, fontStyle = FontStyle.Bold };
-            labelStyle = new GUIStyle(subtitleStyle) { fontSize = 16, alignment = TextAnchor.UpperLeft };
-            titleStyle = new GUIStyle(instructionStyle) { fontSize = 22 };
-            var headingFont = FFOne.Content.ContentAssets.Load<Font>("fonts/jeffe");
-            cinematicSpeakerStyle = new GUIStyle(subtitleStyle) { font = headingFont ? headingFont : font };
-            cinematicLocationStyle = new GUIStyle(cinematicSpeakerStyle) { alignment = TextAnchor.UpperLeft };
-            cinematicSkipStyle = new GUIStyle(subtitleStyle) { wordWrap = false };
-        }
-        static void Box(Rect rect, Color color)
-        {
-            Color saved = GUI.color; GUI.color = color; GUI.DrawTexture(rect, Texture2D.whiteTexture); GUI.color = saved;
-        }
-        void DrawInstruction(float width, float height)
-        {
-            if (lastHintChapter != Stage.Chapter || lastHintStep != Stage.Step)
+
+            Button BindPauseButton(string role, System.Action action)
             {
-                lastHintChapter = Stage.Chapter; lastHintStep = Stage.Step;
-                string name = Stage.Chapter == 0 ? Stage.Step switch {
-                    3 => "tut_right", 4 => "tut_left", 5 => "tut_up", 6 => "tut_down", 7 => "tut_move_w", 8 => "tut_move_s", 9 => "tut_move", 10 => "tut_move", 11 => "tut_jump", _ => null
-                } : Stage.Chapter == 1 && Stage.Step >= 2 && Stage.Step <= 4 ? "tut_lmouse"
-                    : Stage.Chapter == 5 && Stage.Step == 4 ? "tut_one" : Stage.Chapter == 5 && Stage.Step == 6 ? "tut_rmouse" : null;
-                hint = name == null ? null : FFOne.Content.ContentAssets.Load<Texture2D>("ui/en/gameplay/tutorial/" + name);
+                var button = Role<Button>(role);
+                button.clicked += () =>
+                {
+                    if (!owner.paused || owner.ExternalInputBlocked) return;
+                    owner.hudInputFrame = Time.frameCount;
+                    action();
+                };
+                return button;
             }
-            if (hint && !AuxiliaryOwnsHint) GUI.DrawTexture(new Rect(48, height - 250, 182, 131), hint, ScaleMode.ScaleToFit);
-            if (!string.IsNullOrEmpty(instruction))
+
+            internal void Refresh()
             {
-                Box(new Rect(width * .18f, height - 105, width * .64f, 76), new Color(0, .06f, .09f, .8f));
-                GUI.Label(new Rect(width * .2f, height - 100, width * .6f, 65), instruction, instructionStyle);
+                bool ready = owner.IsReady && !owner.ending && Root.parent != null;
+                Show(Root, ready);
+                if (!ready) return;
+                float width = Root.parent.resolvedStyle.width;
+                float height = Root.parent.resolvedStyle.height;
+                if (!float.IsFinite(width) || width <= 0) width = Screen.width;
+                if (!float.IsFinite(height) || height <= 0) height = Screen.height;
+                Show(pause, owner.paused);
+                Show(scene, !owner.paused);
+                if (owner.paused)
+                {
+                    pauseTitle.text = owner.Russian ? "ПАУЗА" : "PAUSED";
+                    resume.text = owner.Russian ? "Продолжить" : "Continue";
+                    exit.text = owner.Russian ? "Выбор персонажа" : "Character selection";
+                    return;
+                }
+
+                float scale = RetrobutionLayout.Scale(height);
+                bool cinematic = owner.IsCinematic;
+                bool showHints = !cinematic && owner.hiddenHud == 0 && owner.showComputressHints;
+                Show(instructions, showHints);
+                if (showHints) UpdateInstructions(width, height, scale);
+
+                Show(topBar, owner.bars > 0);
+                Show(bottomBar, owner.bars > 0);
+                topBar.style.backgroundColor = bottomBar.style.backgroundColor = new Color(0, 0, 0, owner.bars);
+
+                owner.PanPlayer?.Present(width, height);
+                UpdatePicture(width, height);
+                UpdateAuxiliary(width, height, scale);
+                UpdateSubtitles(width, height, scale);
+                Show(blackout, owner.fade > 0);
+                blackout.style.opacity = owner.fade;
+                Show(skip, cinematic);
+                if (cinematic)
+                {
+                    float skipScale = FrontendLayout.CharacterScale(width, height);
+                    skip.text = owner.Russian ? "Нажмите ПРОБЕЛ, чтобы пропустить." : "Press SPACE BAR to skip.";
+                    skip.style.fontSize = Mathf.RoundToInt(12 * skipScale);
+                    FFWidgets.Rect(skip, width / 2 - 250 * skipScale, 5 * skipScale, 500 * skipScale, 25 * skipScale);
+                }
             }
-            if (nanoActive) GUI.Label(new Rect(25, height - 80, 170, 45), "1  BUTTERCUP", labelStyle);
-            Box(new Rect(24, 24, 190, 16), new Color(.15f, .05f, .05f, .9f));
-            Box(new Rect(24, 24, 190 * playerHp / 1000f, 16), new Color(.6f, .92f, .18f));
-        }
-        void DrawPicture(float width, float height)
-        {
-            if (picture == null) return;
-            var texture = FFOne.Content.ContentAssets.Load<Texture2D>("ui/en/gameplay/tutorial/" + (string)picture["resource"]);
-            if (!texture) return;
-            var position = picture["position"]!["args"]!;
-            float x = ScreenCoordinate(position[0], width, height), y = ScreenCoordinate(position[1], width, height);
-            int pivot = (int?)picture["legacy_pivot"] ?? 0;
-            float w = texture.width, h = texture.height;
-            if (pivot == 2) x -= w / 2;
-            GUI.DrawTexture(new Rect(x, y, w, h), texture, ScaleMode.ScaleToFit);
-        }
-        static float ScreenCoordinate(Newtonsoft.Json.Linq.JToken value, float width, float height)
-        {
-            float amount = (float)value["args"]![0];
-            return (string)value["type"] switch { "WidthMinus" => width - amount, "HeightMinus" => height - amount, _ => amount };
-        }
-        void DrawTarget(float width)
-        {
-            if (!target) return;
-            Rect box = new(width / 2 - 140, 35, 280, 68);
-            Box(box, new Color(.02f, .05f, .08f, .85f));
-            GUI.Label(new Rect(box.x, box.y + 5, box.width, 28), target.DisplayName, instructionStyle);
-            if (target.Hostile)
+
+            void UpdateInstructions(float width, float height, float scale)
             {
-                Box(new Rect(box.x + 14, box.y + 43, 252, 12), new Color(.2f, .02f, .02f));
-                Box(new Rect(box.x + 14, box.y + 43, 252 * target.Hp / target.MaxHp, 12), new Color(.7f, .12f, .08f));
+                var stage = owner.Stage;
+                if (hintChapter != stage.Chapter || hintStep != stage.Step)
+                {
+                    hintChapter = stage.Chapter;
+                    hintStep = stage.Step;
+                    string name = stage.Chapter == 0 ? stage.Step switch
+                    {
+                        >= 3 and <= 6 => "tut_mouse",
+                        7 or 9 or 10 => "tut_move_w",
+                        8 => "tut_move_s",
+                        11 => "tut_jump",
+                        _ => null
+                    } : stage.Chapter == 1 && stage.Step >= 2 && stage.Step <= 7 ? "tut_lmouse"
+                        : stage.Chapter == 5 && stage.Step == 4 ? "tut_one"
+                        : stage.Chapter == 5 && stage.Step == 6 ? "tut_rmouse" : null;
+                    hint.image = Texture(name);
+                    arrow.image = stage.Chapter == 0 ? Texture(stage.Step switch
+                    {
+                        3 => "tut_right", 4 => "tut_left", 5 => "tut_up", 6 => "tut_down", _ => null
+                    }) : null;
+                }
+                bool showHint = hint.image && !owner.AuxiliaryOwnsHint;
+                bool localizedJump = showHint && owner.Russian && hint.image.name == "tut_jump";
+                Show(hint, showHint && !localizedJump);
+                Show(jumpKey, localizedJump);
+                Show(arrow, showHint && arrow.image);
+                if (showHint)
+                {
+                    var rect = TutorialInstructionLayout.Illustration(hint.image.name, Size(hint.image), height, scale);
+                    if (localizedJump) LayoutJumpKey(rect, scale);
+                    else FFWidgets.Rect(hint, rect);
+                    if (arrow.image) FFWidgets.Rect(arrow, TutorialInstructionLayout.Arrow(stage.Step, Size(arrow.image), height, Time.time, scale));
+                }
+                Caption(instruction, instructionShadow, owner.instruction?.ToUpperInvariant(), TutorialInstructionLayout.Text(width, height, false, scale), scale, 16);
             }
-        }
-        void DrawMarker()
-        {
-            Vector3? destination = marker;
-            if (destination == null && Actor(ObjectiveNpc)) destination = Actor(ObjectiveNpc).transform.position + Vector3.up * 3;
-            if (destination == null) return;
-            Vector3 point = ViewCamera.WorldToScreenPoint(destination.Value);
-            if (point.z <= 0) return;
-            Color color = GUI.color; GUI.color = Color.yellow;
-            GUI.Label(new Rect(point.x - 20, Screen.height - point.y - 30, 40, 40), "▼", instructionStyle);
-            GUI.color = color;
-        }
-        void DrawMinimap(float width)
-        {
-            if (Stage.Chapter < 2) return;
-            Rect bounds = new(width - 182, 20, 160, 160); Box(bounds, new Color(.02f, .12f, .13f, .85f));
-            Vector2 center = bounds.center;
-            Box(new Rect(center.x - 3, center.y - 3, 6, 6), Color.cyan);
-            var objective = Actor(ObjectiveNpc);
-            if (objective)
+
+            void LayoutJumpKey(Rect rect, float scale)
             {
-                Vector3 delta = objective.transform.position - Player.position;
-                Vector2 d = Vector2.ClampMagnitude(new Vector2(delta.x, -delta.z) * .8f, 70);
-                Box(new Rect(center.x + d.x - 4, center.y + d.y - 4, 8, 8), Color.yellow);
+                jumpKey.style.left = rect.x;
+                jumpKey.style.top = rect.y;
+                jumpKey.style.scale = new Scale(new Vector3(scale, scale, 1));
             }
-            GUI.Label(new Rect(bounds.x, bounds.yMax + 4, bounds.width, 30), "TECH SQUARE", instructionStyle);
-        }
-        Rect Window(float width, float height, string title)
-        {
-            Rect rect = new(width / 2 - 230, height / 2 - 150, 460, 300);
-            Box(rect, new Color(.015f, .055f, .075f, .97f));
-            Box(new Rect(rect.x, rect.y, rect.width, 45), new Color(.05f, .28f, .3f));
-            GUI.Label(new Rect(rect.x + 12, rect.y + 4, rect.width - 24, 37), title, titleStyle); return rect;
-        }
-        void DrawNpcWindow(float width, float height)
-        {
-            var npc = Actor(interacting); if (!npc) { interacting = 0; return; }
-            var rect = Window(width, height, npc.GetComponent<TutorialActor>().DisplayName);
-            if (interacting == 1009 || interacting == 1012 || interacting == 4001)
+
+            void UpdatePicture(float width, float height)
             {
-                GUI.Label(new Rect(rect.x + 28, rect.y + 70, rect.width - 56, 80), instruction, labelStyle);
-                GUI.enabled = pendingWarp < 0;
-                if (GUI.Button(new Rect(rect.x + 80, rect.y + 188, 300, 38), Russian ? "Переместиться" : "Warp")) RequestWarp();
-                GUI.enabled = true; return;
+                var picture = owner.picture;
+                if (!ReferenceEquals(displayedPicture, picture))
+                {
+                    displayedPicture = picture;
+                    scenePicture.image = Texture((string)picture?["resource"]);
+                }
+                Show(scenePicture, scenePicture.image);
+                if (!scenePicture.image) return;
+                var position = picture["position"]["args"];
+                float x = Coordinate(position[0], width, height);
+                float y = Coordinate(position[1], width, height);
+                var size = Size(scenePicture.image);
+                if ((int?)picture["legacy_pivot"] == 2) x -= size.x / 2;
+                FFWidgets.Rect(scenePicture, new Rect(new Vector2(x, y), size));
             }
-            string title = Localized("content.mission.task." + (Stage.Chapter == 3 ? "2248" : "2250") + ".title");
-            bool select = Stage.Chapter == 3 && (Stage.Step == 3 || Stage.Step == 16);
-            bool accept = Stage.Chapter == 3 && Stage.Step == 101 || Stage.Chapter == 4 && (Stage.Step == 2 || Stage.Step == 109);
-            bool reward = Stage.Chapter == 3 && Stage.Step == 17;
-            GUI.Label(new Rect(rect.x + 28, rect.y + 65, rect.width - 56, 55), title, instructionStyle);
-            if (select && GUI.Button(new Rect(rect.x + 60, rect.y + 125, 340, 40), title)) missionSelected = true;
-            if (accept && GUI.Button(new Rect(rect.x + 80, rect.y + 185, 300, 40), Russian ? "Принять задание" : "Accept mission")) accepted = true;
-            if (reward && GUI.Button(new Rect(rect.x + 80, rect.y + 185, 300, 40), Russian ? "Получить награду" : "Claim reward")) rewardClaimed = true;
-            bool close = Stage.Chapter == 3 && (Stage.Step == 102 || Stage.Step == 18) || Stage.Chapter == 4 && Stage.Step == 102;
-            if (close && GUI.Button(new Rect(rect.x + 130, rect.y + 235, 200, 35), Russian ? "Закрыть" : "Close")) interacting = 0;
+
+            void UpdateAuxiliary(float width, float height, float scale)
+            {
+                bool visible = owner.AuxiliaryPresentationVisible;
+                auxiliaryPicture.image = owner.auxiliaryPicture;
+                auxiliaryPointer.image = owner.auxiliaryPointer;
+                Show(auxiliaryPicture, visible && auxiliaryPicture.image);
+                Show(auxiliaryPointer, visible && auxiliaryPointer.image);
+                if (visible && auxiliaryPicture.image)
+                    FFWidgets.Rect(auxiliaryPicture, TutorialAuxiliaryGeometry.Rect(owner.auxiliaryPictureAnchor, false,
+                        PictureSize(auxiliaryPicture.image.name), (int)width, (int)height, Time.time, scale));
+                if (visible && auxiliaryPointer.image)
+                    FFWidgets.Rect(auxiliaryPointer, TutorialAuxiliaryGeometry.Rect(owner.auxiliaryPointerAnchor, true,
+                        new Vector2(88, 69), (int)width, (int)height, Time.time, scale));
+                Caption(secondary, secondaryShadow, visible ? owner.auxiliarySecondary?.ToUpperInvariant() : null,
+                    TutorialInstructionLayout.Text(width, height, true, scale), scale, 16);
+            }
+
+            void UpdateSubtitles(float width, float height, float scale)
+            {
+                string text = null;
+                if (!string.IsNullOrEmpty(owner.subtitle) && (owner.locationCaption || !owner.IsCinematic || owner.bars > .9f))
+                {
+                    text = DexterShipTimeline.NormalizeSubtitle(owner.subtitle);
+                    if (owner.subtitleCharacters < text.Length) text = text.Substring(0, owner.subtitleCharacters);
+                }
+                float barTop = height * (1 - DexterShipTimeline.BlackBarRatio);
+                var locationRect = new Rect(50 * scale, barTop - 100 * scale, 200 * scale, 100 * scale);
+                Caption(location, locationShadow, owner.locationCaption ? text : null, locationRect, scale, 14, owner.subtitleOpacity > .9f);
+                location.style.opacity = owner.subtitleOpacity;
+                FFWidgets.Padding(location, 10 * scale, 6 * scale, 4 * scale, 6 * scale);
+                FFWidgets.Padding(locationShadow, 10 * scale, 6 * scale, 4 * scale, 6 * scale);
+
+                Rect bounds = TutorialInstructionLayout.Dialogue(width, height, scale);
+                scripted.Present(owner.locationCaption ? null : text, bounds, scale, owner.subtitleOpacity);
+                voice.Present(owner.VoiceSubtitleVisible ? DexterShipTimeline.NormalizeSubtitle(owner.VoiceSubtitleText) : null, bounds, scale, 1);
+            }
+
+            static float Coordinate(JToken value, float width, float height)
+            {
+                float amount = (float)value["args"][0];
+                return (string)value["type"] switch { "WidthMinus" => width - amount, "HeightMinus" => height - amount, _ => amount };
+            }
+
+            static void Caption(Label label, Label shadow, string text, Rect rect, float scale, int size, bool drawShadow = true)
+            {
+                bool visible = !string.IsNullOrEmpty(text);
+                Show(label, visible);
+                Show(shadow, visible && drawShadow);
+                if (!visible) return;
+                label.text = shadow.text = text;
+                label.style.fontSize = shadow.style.fontSize = Mathf.RoundToInt(size * scale);
+                FFWidgets.Rect(label, rect);
+                rect.position += Vector2.one * scale;
+                FFWidgets.Rect(shadow, rect);
+            }
+
+            static Texture2D Texture(string name) => name == null ? null : ContentAssets.Load<Texture2D>(TutorialArt + name);
+            static Vector2 Size(Texture texture) => new(texture.width, texture.height);
+            static void Show(VisualElement element, bool show) => element.EnableInClassList("ui-suppressed", !show);
+
+            sealed class Dialogue
+            {
+                readonly VisualElement area;
+                readonly Label speaker, body;
+                string previousText;
+                bool hasSpeaker;
+
+                internal Dialogue(VisualElement area)
+                {
+                    this.area = area;
+                    speaker = FFView.RequireClass<Label>(area, "tutorial-dialogue-speaker");
+                    body = FFView.RequireClass<Label>(area, "tutorial-dialogue-body");
+                }
+
+                internal void Present(string text, Rect bounds, float scale, float alpha)
+                {
+                    Show(area, !string.IsNullOrEmpty(text));
+                    if (string.IsNullOrEmpty(text)) return;
+                    if (text != previousText)
+                    {
+                        previousText = text;
+                        int separator = text.IndexOf(':');
+                        hasSpeaker = separator >= 0 && separator < 40;
+                        speaker.text = hasSpeaker ? text.Substring(0, separator + 1) : "";
+                        body.text = hasSpeaker ? text.Substring(separator + 1).TrimStart() : text;
+                    }
+                    float offset = hasSpeaker ? 22 * scale : 0;
+                    Show(speaker, hasSpeaker);
+                    speaker.style.fontSize = Mathf.RoundToInt(12 * scale);
+                    body.style.fontSize = Mathf.RoundToInt(14 * scale);
+                    area.style.opacity = alpha;
+                    FFWidgets.Rect(area, bounds);
+                    FFWidgets.Rect(speaker, 0, 0, bounds.width, offset);
+                    FFWidgets.Rect(body, 0, offset, bounds.width, Mathf.Max(0, bounds.height - offset));
+                }
+            }
         }
-        void DrawJournal(float width, float height)
+    }
+
+    public static class TutorialInstructionLayout
+    {
+        public static Rect Dialogue(float width, float height, float scale)
         {
-            var rect = Window(width, height, Russian ? "ЖУРНАЛ" : "JOURNAL");
-            GUI.Label(new Rect(rect.x + 25, rect.y + 65, rect.width - 50, 40), Localized("content.mission.task.2248.title"), instructionStyle);
-            GUI.Label(new Rect(rect.x + 30, rect.y + 120, rect.width - 60, 90), Localized("content.mission.task.2249.objective"), labelStyle);
-            GUI.enabled = Stage.Chapter != 3 || Stage.Step >= 12;
-            if (GUI.Button(new Rect(rect.x + 130, rect.y + 240, 200, 35), Russian ? "Закрыть" : "Close")) journal = false;
-            GUI.enabled = true;
+            // Same accepted screen-space dialogue width as the ship scene; keep
+            // the text scale independent so wide/high-resolution views still wrap.
+            float margin = width * .1977848f;
+            float barHeight = height * DexterShipTimeline.BlackBarRatio;
+            return new Rect(margin, height - barHeight, width - margin * 2, barHeight);
         }
-        void DrawMainMenu(float width, float height)
+        public static Rect Text(float width, float height, bool secondary, float scale)
         {
-            var rect = Window(width, height, "NANOCOM");
-            if (GUI.Button(new Rect(rect.x + 70, rect.y + 110, 320, 55), Russian ? "Журнал" : "Journal")) { journal = true; mainMenu = false; }
+            float y = secondary ? 0 : (int)height / 4;
+            Vector2 pivot = secondary ? new Vector2(width / 2, 0) : new Vector2(width / 2, y + 30);
+            var rect = Scaled(new Rect(0, y, width, 60), pivot, scale);
+            // Screen width is already in pixels; scaling it again lets long
+            // translated instructions wrap outside the visible viewport.
+            rect.x = 0; rect.width = width;
+            return rect;
         }
+
+        public static Rect Illustration(string resource, Vector2 size, float height, float scale)
+        {
+            float x = resource == "tut_jump" ? 0 : 80;
+            float bottom = resource == "tut_one" ? 250 : resource == "tut_jump" ? 290 : resource.StartsWith("tut_move") ? 330 : 350;
+            return Scaled(new Rect(new Vector2(x, height - bottom), size), new Vector2(0, height), scale);
+        }
+
+        public static Rect Arrow(int step, Vector2 size, float height, float time, float scale)
+        {
+            float offset = -10 + Mathf.Sin(time * Mathf.PI * 4) * 10;
+            Vector2 position = step switch {
+                3 => new Vector2(186 + offset, height - 269),
+                4 => new Vector2(-offset, height - 269),
+                5 => new Vector2(107, height - 396 - offset),
+                6 => new Vector2(107, height - 200 + offset),
+                _ => Vector2.zero
+            };
+            return Scaled(new Rect(position, size), new Vector2(0, height), scale);
+        }
+
+        static Rect Scaled(Rect rect, Vector2 pivot, float scale) => new(pivot + (rect.position - pivot) * scale, rect.size * scale);
     }
 }

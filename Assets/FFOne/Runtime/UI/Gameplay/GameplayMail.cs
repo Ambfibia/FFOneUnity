@@ -23,6 +23,13 @@ namespace FFOne.UI
         readonly List<MailAttachment> mailAttachments = new();
         public bool MailBusy => mailPending != 0 || mailFaulted;
         public int UnreadMail => mailUnread;
+        void SignalNewMail()
+        {
+            // ReceiveNewMail and cnGUINanocom.SetNewMail each start their own copy.
+            playSound?.Invoke("email_arrived");
+            playSound?.Invoke("email_arrived");
+            mailAlarmUntil = Time.unscaledTime + 2;
+        }
         public void OpenMail()
         {
             if (!SocialAvailable) return;
@@ -49,7 +56,11 @@ namespace FFOne.UI
         bool ReceiveMail(ProtocolFrame frame)
         {
             if (!ProtocolMail.TryDecode(frame, out var u)) return false;
-            if (u.Type == ProtocolMail.New) { mailUnread = u.Unread; return true; }
+            if (u.Type == ProtocolMail.New)
+            {
+                if (u.Unread > 0) SignalNewMail();
+                mailUnread = u.Unread; return true;
+            }
             if (u.Type == ProtocolMail.ListOk) mailSummaries = u.Summaries;
             if (u.Type == ProtocolMail.ReadOk)
             {
@@ -77,39 +88,42 @@ namespace FFOne.UI
             RefreshMail(); return true;
         }
         void RebuildMail()
-        { if (Windows.Current == GameplayWindow.Mail) { Windows.Close(); Windows.Open(GameplayWindow.Mail); } }
+        { if (Windows.Current == GameplayWindow.Mail) Windows.Refresh(); }
         VisualElement BuildMailView() => BuildMailPresentation();
         void RefreshMailCost()
         {
-            var root = Windows.Current == GameplayWindow.Mail ? Windows.View : null; var label = root?.Q<Label>("mail-cost"); if (label == null) return;
-            bool valid = int.TryParse(root.Q<TextField>("mail-taros").value, out int amount) && amount >= 0 && amount <= int.MaxValue - 130;
+            var root = Windows.Current == GameplayWindow.Mail ? Windows.View : null; if (root == null) return;
+            var label = MailRole<Label>(root, "mail-cost");
+            bool valid = int.TryParse(MailRole<TextField>(root, "mail-taros").value, out int amount) && amount >= 0 && amount <= int.MaxValue - 130;
             label.text = valid ? T("Total incl. postage: ", "Всего с пересылкой: ") + ProtocolMail.Cost(amount, mailAttachments.Count) + " Taros" : T("Invalid Taros amount", "Неверная сумма Taros");
         }
         void RefreshMail()
         {
             if (Windows.Current != GameplayWindow.Mail || Windows.View == null) return; var root = Windows.View; bool ready = !MailBusy;
-            root.Q<Label>("mail-status").text = mailStatus;
+            MailRole<Label>(root, "mail-status").text = mailStatus;
             foreach (var b in root.Query<Button>().ToList())
                 if (b.name.StartsWith("mail-") && b.name != "mail-close") b.SetEnabled(ready);
-            root.Q<Button>("mail-refresh").SetEnabled(ready && !mailGuideFolder);
-            root.Q<Button>("mail-guide-tab").EnableInClassList("mail-tab-selected", mailGuideFolder);
-            root.Q<Button>("mail-player-tab").EnableInClassList("mail-tab-selected", !mailGuideFolder);
-            RefreshMailTabArt(root);
+            MailRole<Button>(root, "mail-refresh").SetEnabled(ready && !mailGuideFolder);
+            MailRole<Button>(root, "mail-guide-tab").EnableInClassList("mail-tab-selected", mailGuideFolder);
+            MailRole<Button>(root, "mail-player-tab").EnableInClassList("mail-tab-selected", !mailGuideFolder);
             RefreshMailInventory(root, ready);
             root.Query<TextField>().ForEach(field => field.SetEnabled(ready));
             root.Query<DropdownField>().ForEach(field => field.SetEnabled(ready));
             RefreshMailRows(root, ready);
             if (mailCompose)
             {
-                root.Q<Button>("mail-delete").SetEnabled(false);
-                var items = root.Q<ScrollView>("mail-compose-items"); items.Clear();
+                MailRole<Button>(root, "mail-delete").SetEnabled(false);
+                var items = MailRole<ScrollView>(root, "mail-compose-items"); items.Clear();
                 foreach (var item in session.Snapshot.Inventory.Where(i => !i.IsEmpty))
                 {
                     int slot = item.Slot; bool selected = mailAttachments.Any(a => a.InventorySlot == slot);
                     string name = GameplayUiCatalog.Load().Item(item.ItemType, item.ItemId, language)?.Name ?? $"{item.ItemType}:{item.ItemId}";
-                    var b = new Button(() => SelectMailAttachment(item)) { name = "mail-inventory-" + slot, text = (selected ? "✓ " : "") + name + " ×" + item.Quantity };
-                    b.style.height = 29; b.style.flexShrink = 0; b.style.backgroundColor = new Color(.025f, .14f, .21f); b.style.color = Color.white;
-                    FFWidgets.Font(b, true, 12); b.SetEnabled(ready); items.Add(b);
+                    var button = (Button)FFView.InstantiateClass(MailViewAddress, "mail-compose-item-template");
+                    button.name = "mail-inventory-" + slot;
+                    button.text = (selected ? "✓ " : "") + name + " ×" + item.Quantity;
+                    button.clicked += () => SelectMailAttachment(item);
+                    button.SetEnabled(ready);
+                    items.Add(button);
                 }
                 RefreshMailCost(); return;
             }
@@ -117,37 +131,32 @@ namespace FFOne.UI
             bool playerRead = !mailGuideFolder && mailDetail != null && mailDetail.Index == mailSelected;
             bool read = guideMessage != null || playerRead;
             var selectedMessage = mailSummaries.FirstOrDefault(m => m.Index == mailSelected);
-            root.Q<Label>("mail-detail-from").text = guideMessage?.Sender ?? selectedMessage?.Sender ?? "";
-            root.Q<Label>("mail-detail-subject").text = guideMessage?.Subject ?? selectedMessage?.Subject ?? "";
-            root.Q("mail-message").style.display = read ? DisplayStyle.Flex : DisplayStyle.None;
-            root.Q("mail-no-selection").style.display = read ? DisplayStyle.None : DisplayStyle.Flex;
+            MailRole<Label>(root, "mail-detail-from").text = guideMessage?.Sender ?? selectedMessage?.Sender ?? "";
+            MailRole<Label>(root, "mail-detail-subject").text = guideMessage?.Subject ?? selectedMessage?.Subject ?? "";
+            var message = MailRole<VisualElement>(root, "mail-message");
+            SetMailVisibility(message, read);
+            SetMailVisibility(MailRole<Label>(root, "mail-no-selection"), !read);
             bool hasItems = playerRead && mailDetail.Items.Any(item => item.ItemId > 0);
-            root.Q("mail-read-body").style.height = hasItems ? 117 : 215;
-            root.Q("mail-paper-art").style.height = hasItems ? 140 : 238;
-            root.Q("mail-attachments").style.display = hasItems ? DisplayStyle.Flex : DisplayStyle.None;
-            root.Q("mail-claims").style.display = playerRead && (hasItems || mailDetail.Taros > 0) ? DisplayStyle.Flex : DisplayStyle.None;
-            root.Q("mail-guide-note").style.display = guideMessage != null ? DisplayStyle.Flex : DisplayStyle.None;
+            message.EnableInClassList("mail-message--attached", hasItems);
+            var attachments = MailRole<VisualElement>(root, "mail-attachments");
+            SetMailVisibility(attachments, hasItems);
+            SetMailVisibility(MailRole<VisualElement>(root, "mail-claims"), playerRead && (hasItems || mailDetail.Taros > 0));
+            SetMailVisibility(MailRole<Label>(root, "mail-guide-note"), guideMessage != null);
 
-            var portrait = root.Q<Image>("mail-sender-portrait");
+            var portrait = MailRole<Image>(root, "mail-sender-portrait");
             portrait.image = guideMessage == null ? null : FFWidgets.Texture(GameplayUiCatalog.Load().NpcPortrait(guideMessage.Npc));
-            portrait.style.display = guideMessage != null && portrait.image != null ? DisplayStyle.Flex : DisplayStyle.None;
-            // Player mail has no NPC portrait in Panel_EmailList.OnSub.
-            FFWidgets.Rect(root.Q("mail-from-caption"), mailGuideFolder ? 89 : 10, 20, 60, 20);
-            FFWidgets.Rect(root.Q("mail-subject-caption"), mailGuideFolder ? 89 : 10, 45, 80, 20);
-            FFWidgets.Rect(root.Q("mail-detail-from"), mailGuideFolder ? 149 : 70, 17, 220, 20);
-            FFWidgets.Rect(root.Q("mail-detail-subject"), mailGuideFolder ? 174 : 95, 42, 350, 20);
-
-            root.Q<Label>("mail-detail-body").text = guideMessage?.Body ?? (playerRead ? mailDetail.Body : "");
-            root.Q<Label>("mail-detail-body").style.color = new Color(.1f, .1f, .1f);
+            SetMailVisibility(portrait, portrait.image != null);
+            MailRole<Label>(root, "mail-detail-body").text = guideMessage?.Body ?? (playerRead ? mailDetail.Body : "");
             for (int i = 0; i < 4; i++)
             {
-                var b = root.Q<Button>("mail-attachment-" + (i + 1)); var item = playerRead ? mailDetail.Items[i] : default;
+                var b = (Button)attachments[i];
+                var item = playerRead ? mailDetail.Items[i] : default;
                 b.text = item.ItemId == 0 ? "—" : (GameplayUiCatalog.Load().Item(item.ItemType, item.ItemId, language)?.Name ?? $"{item.ItemType}:{item.ItemId}") + " ×" + (item.Option & 0xffff);
                 b.SetEnabled(ready && playerRead && item.ItemId > 0 && session.Snapshot.Inventory.Any(v => v.IsEmpty));
             }
-            root.Q<Button>("mail-take-all").SetEnabled(ready && playerRead && mailDetail.Items.Any(i => i.ItemId > 0) && session.Snapshot.Inventory.Count(i => i.IsEmpty) >= mailDetail.Items.Count(i => i.ItemId > 0));
-            root.Q<Button>("mail-take-taros").text = T("TAKE ", "ЗАБРАТЬ ") + (playerRead ? mailDetail.Taros : 0) + " Taros";
-            root.Q<Button>("mail-take-taros").SetEnabled(ready && playerRead && mailDetail.Taros > 0); root.Q<Button>("mail-delete").SetEnabled(ready && playerRead);
+            MailRole<Button>(root, "mail-take-all").SetEnabled(ready && playerRead && mailDetail.Items.Any(i => i.ItemId > 0) && session.Snapshot.Inventory.Count(i => i.IsEmpty) >= mailDetail.Items.Count(i => i.ItemId > 0));
+            MailRole<Button>(root, "mail-take-taros").text = T("TAKE ", "ЗАБРАТЬ ") + (playerRead ? mailDetail.Taros : 0) + " Taros";
+            MailRole<Button>(root, "mail-take-taros").SetEnabled(ready && playerRead && mailDetail.Taros > 0); MailRole<Button>(root, "mail-delete").SetEnabled(ready && playerRead);
         }
         void SelectMailAttachment(GameplayItemState item)
         {
@@ -168,8 +177,8 @@ namespace FFOne.UI
         void PromptSendMail()
         {
             if (MailBusy) return; var root = Windows.View;
-            if (!long.TryParse(root.Q<TextField>("mail-recipient").value, out long uid) || uid <= 0 || uid == session.Snapshot.CharacterUid ||
-                !int.TryParse(root.Q<TextField>("mail-taros").value, out int amount) || amount < 0 || amount > int.MaxValue - 130) { mailStatus = T("Invalid recipient or amount.", "Неверный получатель или сумма."); RefreshMail(); return; }
+            if (!long.TryParse(MailRole<TextField>(root, "mail-recipient").value, out long uid) || uid <= 0 || uid == session.Snapshot.CharacterUid ||
+                !int.TryParse(MailRole<TextField>(root, "mail-taros").value, out int amount) || amount < 0 || amount > int.MaxValue - 130) { mailStatus = T("Invalid recipient or amount.", "Неверный получатель или сумма."); RefreshMail(); return; }
             int cost = ProtocolMail.Cost(amount, mailAttachments.Count);
             if (cost > session.Snapshot.Taros) { mailStatus = T("Not enough Taros for postage and attachments.", "Недостаточно Taros для вложений и пересылки."); RefreshMail(); return; }
             var items = mailAttachments.ToArray();
@@ -178,7 +187,7 @@ namespace FFOne.UI
                 var real = session.Snapshot.Inventory[a.InventorySlot];
                 if (real.ItemId != a.Item.ItemId || real.ItemType != a.Item.ItemType || real.Quantity < (a.Item.Option & 0xffff)) { mailAttachments.Clear(); mailStatus = T("Inventory changed. Select attachments again.", "Инвентарь изменился. Выберите вложения заново."); RefreshMail(); return; }
             }
-            string subject = root.Q<TextField>("mail-subject").value, body = root.Q<TextField>("mail-body").value;
+            string subject = MailRole<TextField>(root, "mail-subject").value, body = MailRole<TextField>(root, "mail-body").value;
             ShowPrompt(T("SEND MAIL", "ОТПРАВИТЬ ПИСЬМО"), cost + T(" Taros including postage?", " Taros с учётом пересылки?"), null,
                 _ => BeginMail(ProtocolMail.SendOk, () => socialClient.SendMailAsync(uid, subject, body, amount, items, socialToken)), null);
         }

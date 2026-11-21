@@ -1,0 +1,65 @@
+.ff-world-map-hidden { display:none; }
+
+.ff-world-map-markers, .ff-world-map-tooltip, .ff-world-map-marker,
+.ff-world-map-filters, .ff-world-map-filter-glow, .ff-world-map-filter-icon, .ff-world-map-filter-arrow {
+    position:absolute;
+}
+.ff-world-map-markers { left:0; top:0; right:0; bottom:0; }
+.ff-world-map-marker { width:16px; height:16px; }
+.ff-world-map-tooltip {
+    width:200px; height:20px;
+    background-image:url("../Artwork/en/world-map/skin/buddy_select.png");
+    -unity-background-scale-mode:stretch-to-fill;
+    -unity-slice-left:20; -unity-slice-right:3;
+}
+.ff-world-map-tooltip-caption {
+    width:200px; height:20px; font-size:12px; -unity-text-align:middle-left;
+    -unity-font-definition:url("../Fonts/chaletbook-regular-sdf.asset");
+}
+.ff-world-map-filters { left:553px; top:45px; width:384px; height:30px; flex-direction:row; }
+.ff-world-map-filter {
+    width:30px; height:30px; flex-shrink:0; margin-right:2px;
+    background-image:url("../Artwork/en/character/creation/layout/CCLeftIn3BG.png");
+    -unity-background-scale-mode:stretch-to-fill;
+    -unity-slice-left:5; -unity-slice-right:5; -unity-slice-top:5; -unity-slice-bottom:5;
+}
+.ff-world-map-filter-glow {
+    left:0; top:0; right:0; bottom:0; opacity:.1;
+    background-image:url("../Artwork/en/world-map/markers/neon-shine-background.png");
+    -unity-background-scale-mode:stretch-to-fill;
+}
+.ff-world-map-filter-enabled .ff-world-map-filter-glow { opacity:.333; }
+.ff-world-map-filter:hover .ff-world-map-filter-glow,
+.ff-world-map-filter:focus .ff-world-map-filter-glow { opacity:1; }
+.ff-world-map-filter-icon { left:7px; top:7px; width:16px; height:16px; }
+.ff-world-map-filter-arrow {
+    display:none; left:10px; top:-7px; width:8px; height:11px; rotate:90deg;
+    background-image:url("../Artwork/en/world-map/filters/filter-arrow.png");
+    -unity-background-scale-mode:stretch-to-fill;
+}
+.ff-world-map-filter:hover .ff-world-map-filter-arrow,
+.ff-world-map-filter:focus .ff-world-map-filter-arrow { display:flex; }
+
+.ff-world-map .retro-control > .retro-text {
+    -unity-font-definition:url("../Fonts/jeffe-sdf.asset"); font-size:12px; -unity-font-style:normal;
+}
+.ff-world-map .retro-control > .ff-world-map-control-caption {
+    top:0; bottom:0; font-size:11px; -unity-text-align:middle-center; white-space:nowrap;
+    color:rgb(204,255,255);
+}
+.ff-world-map .retro-control:hover > .ff-world-map-control-caption,
+.ff-world-map .retro-control.retro-on > .ff-world-map-control-caption {
+    color:rgb(0,36,62);
+}
+.ff-world-map .retro-control:active > .ff-world-map-control-caption {
+    color:rgb(204,255,255);
+}
+.ff-world-map .retro-control.retro-on:active > .ff-world-map-control-caption {
+    color:rgb(0,36,62);
+}
+.ff-world-map .retro-control > .ff-world-map-location-heading,
+.ff-world-map .retro-control > .ff-world-map-location {
+    top:0; bottom:0; -unity-text-align:middle-left; white-space:nowrap;
+}
+.ff-world-map-location-frame { left:55px; top:616px; width:144px; height:20px; }
+.ff-world-map-location-value { left:204px; top:616px; width:266px; height:20px; }

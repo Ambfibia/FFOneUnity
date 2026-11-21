@@ -1,24 +1,131 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
   <Style src="../../Styles/Retrobution.uss" />
-  <ui:VisualElement name="journal-root" class="retro-screen" picking-mode="Ignore">
-    <ui:VisualElement name="journal-window" class="retro-control" style="left:0px; top:0px; width:1036px; height:654px; overflow:visible;">
-      <ui:VisualElement name="journal-frame" class="retro-control retro-style-f6d42dd9bf39d885" picking-mode="Ignore" style="left:0px; top:0px; width:1036px; height:654px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="journal-frame-label" class="retro-text" text="Mission Journal" picking-mode="Ignore" /></ui:VisualElement>
-      <ui:VisualElement name="journal-empty" class="retro-control retro-style-631177e2a516078a" picking-mode="Ignore" style="left:16px; top:30px; width:565px; height:612px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="journal-empty-label" class="retro-text" text="No mission selected" picking-mode="Ignore" /></ui:VisualElement>
-      <ui:VisualElement name="journal-details" class="retro-control retro-style-460ed507635b9cdb" style="left:10px; top:10px; width:565px; height:612px; display:none;"><ui:VisualElement class="retro-background" picking-mode="Ignore" />
-      <ui:VisualElement name="mission-title" class="retro-control retro-style-99def525269703f0" picking-mode="Ignore" style="left:36px; top:12px; width:317px; height:47px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="mission-title-label" class="retro-text" text="" picking-mode="Ignore" /></ui:VisualElement>
-      <ui:VisualElement name="mission-level" class="retro-control retro-style-983b005e25bc9933" picking-mode="Ignore" style="left:36px; top:61px; width:317px; height:15px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="mission-level-label" class="retro-text" text="" picking-mode="Ignore" /></ui:VisualElement>
-      <ui:VisualElement name="mission-details-heading" class="retro-control retro-style-983b005e25bc9933" picking-mode="Ignore" style="left:90px; top:145px; width:300px; height:20px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="mission-details-heading-label" class="retro-text" text="MISSION DETAILS:" picking-mode="Ignore" /></ui:VisualElement>
-      <ui:VisualElement name="mission-description" class="retro-control retro-style-983b005e25bc9933" picking-mode="Ignore" style="left:50px; top:164px; width:490px; height:100px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="mission-description-label" class="retro-text" text="" picking-mode="Ignore" /></ui:VisualElement>
+  <Style src="../../Styles/Gameplay.uss" />
+  <Style src="../../Styles/FFTheme.uss" />
+  <Style src="../../Styles/NanoReward.uss" />
+  <Style src="../../Styles/NpcMissionConversation.uss" />
+  <Style src="../../Styles/Barber.uss" />
+  <ui:VisualElement class="ff-barber-screen">
+    <ui:VisualElement class="barber-panel">
+      <ui:Label class="barber-title ff-label" />
+      <ui:VisualElement class="barber-columns">
+        <ui:Image class="barber-avatar" picking-mode="Ignore" scale-mode="ScaleToFit" />
+        <ui:VisualElement class="barber-controls">
+          <ui:Label class="barber-step ff-label" />
+          <ui:VisualElement class="barber-options" />
+          <ui:Label class="barber-status ff-label" />
+          <ui:Label class="barber-total ff-label" />
+          <ui:VisualElement class="barber-footer">
+            <ui:Button class="barber-back ff-button" />
+            <ui:Button class="barber-reset ff-button" />
+            <ui:Button class="barber-continue ff-button" />
+          </ui:VisualElement>
+        </ui:VisualElement>
       </ui:VisualElement>
-      <ui:VisualElement name="journal-active-background" class="retro-control retro-style-fc1ca44c1a6c8c6a" picking-mode="Ignore" style="left:597px; top:11px; width:382px; height:633px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="journal-active-background-label" class="retro-text" text="Active" picking-mode="Ignore" /></ui:VisualElement>
-      <ui:VisualElement name="journal-completed-state" picking-mode="Ignore" style="display:none; position:absolute; left:0; top:0; right:0; bottom:0;">
-      <ui:VisualElement name="journal-completed-background" class="retro-control retro-style-73645c681d1cec26" picking-mode="Ignore" style="left:597px; top:11px; width:382px; height:633px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="journal-completed-background-label" class="retro-text" text="Completed" picking-mode="Ignore" /></ui:VisualElement>
-      </ui:VisualElement>
-      <ui:Button name="tab-active" class="retro-control retro-style-d1fc51a1826e43f3" style="left:597px; top:11px; width:100px; height:30px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="tab-active-label" class="retro-text" text="Active" picking-mode="Ignore" /></ui:Button>
-      <ui:Button name="tab-completed" class="retro-control retro-style-65fa9f8f0b05b844" style="left:680px; top:11px; width:100px; height:30px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="tab-completed-label" class="retro-text" text="Completed" picking-mode="Ignore" /></ui:Button>
-      <ui:ScrollView name="journal-list" mode="Vertical" class="retro-control" style="left:608px; top:51px; width:368px; height:558px;" />
-      <ui:Button name="close" class="retro-control retro-style-cc1a3966e5718b57" style="left:996px; top:11px; width:32px; height:32px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="close-label" class="retro-text" text="" picking-mode="Ignore" /></ui:Button>
-      <ui:Button name="help" class="retro-control retro-style-18fe4a074da1cc0d" style="left:986px; top:608px; width:30px; height:30px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="help-label" class="retro-text" text="" picking-mode="Ignore" /></ui:Button>
     </ui:VisualElement>
   </ui:VisualElement>
+  <ui:VisualElement class="barber-option">
+    <ui:Label class="barber-field ff-label" />
+    <ui:Button class="barber-prev ff-button" text="‹" />
+    <ui:Label class="barber-value ff-label" />
+    <ui:Button class="barber-next ff-button" text="›" />
+  </ui:VisualElement>
+  <ui:VisualElement name="journal-root" class="ff-journal-root retro-screen" picking-mode="Ignore">
+    <ui:VisualElement name="journal-window" class="ff-journal-window retro-control" style="left:0px; top:0px; width:1036px; height:654px; overflow:visible;">
+      <ui:VisualElement class="ff-journal-underlay" picking-mode="Ignore" />
+      <ui:VisualElement name="journal-frame" class="retro-control retro-style-f6d42dd9bf39d885" picking-mode="Ignore" style="left:0px; top:0px; width:1036px; height:654px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="journal-frame-label" class="ff-journal-frame-label retro-text" text="Mission Journal" picking-mode="Ignore" /></ui:VisualElement>
+      <ui:VisualElement name="journal-empty" class="ff-journal-empty retro-control retro-style-631177e2a516078a" picking-mode="Ignore" style="left:16px; top:30px; width:565px; height:612px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="journal-empty-label" class="ff-journal-empty-label retro-text" text="No mission selected" picking-mode="Ignore" /></ui:VisualElement>
+      <ui:VisualElement name="journal-details" class="ff-journal-details retro-control retro-style-460ed507635b9cdb" style="left:10px; top:10px; width:565px; height:612px; display:none;"><ui:VisualElement class="mission-active-panel retro-background" picking-mode="Ignore" />
+      <ui:VisualElement class="mission-offer-panel retro-background" picking-mode="Ignore" style="left:0; top:0; right:0; bottom:0; background-image:url('../../Artwork/en/gameplay/mission/journal/offdlg.png'); -unity-slice-left:38; -unity-slice-right:27;" />
+      <ui:VisualElement class="mission-completed-panel retro-background" picking-mode="Ignore" style="left:0; top:0; right:0; bottom:0; background-image:url('../../Artwork/en/gameplay/mission/journal/enddlg.png'); -unity-slice-left:38; -unity-slice-right:27;" />
+      <ui:Image class="mission-banner retro-control" picking-mode="Ignore" scale-mode="StretchToFill" style="left:1px; width:549px; height:74px;" />
+      <ui:VisualElement name="mission-title" class="retro-control retro-style-99def525269703f0" picking-mode="Ignore" style="left:36px; top:12px; width:317px; height:47px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="mission-title-label" class="ff-mission-title-label retro-text" text="" picking-mode="Ignore" /></ui:VisualElement>
+      <ui:VisualElement name="mission-level" class="retro-control retro-style-983b005e25bc9933" picking-mode="Ignore" style="left:36px; top:61px; width:317px; height:15px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="mission-level-label" class="ff-mission-level-label retro-text" text="" picking-mode="Ignore" /></ui:VisualElement>
+      <ui:VisualElement class="mission-journal-contact" picking-mode="Ignore">
+        <ui:Image class="mission-contact-portrait" scale-mode="ScaleToFit" />
+        <ui:Label class="mission-contact-name ff-label" />
+        <ui:Label class="mission-contact-location ff-label" />
+      </ui:VisualElement>
+      <ui:VisualElement name="mission-details-heading" class="ff-mission-details-heading retro-control retro-style-983b005e25bc9933" picking-mode="Ignore"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="mission-details-heading-label" class="ff-mission-details-heading-label retro-text" text="MISSION DETAILS:" picking-mode="Ignore" /></ui:VisualElement>
+      <ui:ScrollView class="mission-description retro-control" mode="Vertical">
+        <ui:Label name="mission-description-label" class="mission-description-copy ff-copy" text="" picking-mode="Ignore" style="flex-shrink:0; margin-left:3px; margin-right:3px; font-size:14px; -unity-font-definition:url('../../Fonts/chaletbook-regular-sdf.asset');" />
+      </ui:ScrollView>
+      <ui:Label class="mission-clock retro-control ff-label" picking-mode="Ignore" style="left:53px; top:505px; width:485px; height:24px; color:yellow; display:none;" />
+      </ui:VisualElement>
+      <ui:VisualElement name="journal-active-background" class="retro-control retro-style-fc1ca44c1a6c8c6a" picking-mode="Ignore" style="left:597px; top:11px; width:382px; height:633px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="journal-active-background-label" class="ff-journal-active-background-label retro-text" text="Active" picking-mode="Ignore" /></ui:VisualElement>
+      <ui:VisualElement name="journal-completed-state" picking-mode="Ignore" style="display:none; position:absolute; left:0; top:0; right:0; bottom:0;">
+      <ui:VisualElement name="journal-completed-background" class="retro-control retro-style-73645c681d1cec26" picking-mode="Ignore" style="left:597px; top:11px; width:382px; height:633px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="journal-completed-background-label" class="ff-journal-completed-background-label retro-text" text="Completed" picking-mode="Ignore" /></ui:VisualElement>
+      </ui:VisualElement>
+      <ui:Button name="tab-active" class="ff-tab-active retro-control retro-style-d1fc51a1826e43f3" style="left:597px; top:11px; width:100px; height:30px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="tab-active-label" class="ff-tab-active-label retro-text" text="Active" picking-mode="Ignore" /></ui:Button>
+      <ui:Button name="tab-completed" class="ff-tab-completed retro-control retro-style-65fa9f8f0b05b844" style="left:680px; top:11px; width:100px; height:30px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="tab-completed-label" class="ff-tab-completed-label retro-text" text="Completed" picking-mode="Ignore" /></ui:Button>
+      <ui:ScrollView name="journal-list" mode="Vertical" class="ff-journal-list retro-control" style="left:608px; top:51px; width:368px; height:558px;" />
+      <ui:Button name="close" class="ff-journal-action-close retro-control retro-style-cc1a3966e5718b57" style="left:996px; top:11px; width:32px; height:32px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="close-label" class="retro-text" text="" picking-mode="Ignore" /></ui:Button>
+      <ui:Button name="help" class="ff-journal-action-help retro-control retro-style-18fe4a074da1cc0d" style="left:986px; top:608px; width:30px; height:30px;"><ui:VisualElement class="retro-background" picking-mode="Ignore" /><ui:Label name="help-label" class="retro-text" text="" picking-mode="Ignore" /></ui:Button>
+      <ui:Button class="mission-primary retro-control retro-style-8a77c0b6e7a21a2e" style="top:562px; display:none;">
+        <ui:VisualElement class="retro-background" picking-mode="Ignore" />
+        <ui:Label class="mission-primary-copy retro-text" picking-mode="Ignore" style="color:white;" />
+      </ui:Button>
+    </ui:VisualElement>
+  </ui:VisualElement>
+  <ui:VisualElement name="npc-services" class="npc-service-root ff-screen" picking-mode="Ignore">
+    <ui:VisualElement name="top-bar" class="npc-service-band npc-service-band--top" picking-mode="Ignore" />
+    <ui:VisualElement name="bottom-bar" class="npc-service-band npc-service-band--bottom" picking-mode="Ignore" />
+    <ui:Label name="travel-status" class="ff-label npc-service-status" picking-mode="Ignore" />
+    <ui:VisualElement name="npc-utilities" class="npc-service-window" picking-mode="Ignore">
+      <ui:Label name="npc-name" class="ff-label npc-service-name" picking-mode="Ignore" />
+      <ui:VisualElement class="npc-service-rows" picking-mode="Ignore" />
+      <ui:Button name="npc-close" class="ff-button npc-service-close" />
+    </ui:VisualElement>
+  </ui:VisualElement>
+  <ui:Button class="ff-button npc-service-action">
+    <ui:Image name="icon" class="npc-service-icon" scale-mode="StretchToFill" picking-mode="Ignore" />
+  </ui:Button>
+  <ui:VisualElement class="nano-reward-screen">
+    <ui:VisualElement class="nano-reward-bar nano-reward-bar-top" picking-mode="Ignore" />
+    <ui:VisualElement class="nano-reward-bar nano-reward-bar-bottom" picking-mode="Ignore" />
+    <ui:VisualElement class="nano-reward-panel">
+      <ui:Label class="nano-reward-title" enable-rich-text="false" />
+      <ui:VisualElement class="nano-reward-power nano-reward-first">
+        <ui:Image class="nano-reward-icon" scale-mode="ScaleToFit" picking-mode="Ignore" />
+        <ui:Label class="nano-reward-name" enable-rich-text="false" />
+        <ui:Label class="nano-reward-description" enable-rich-text="false" />
+        <ui:Button class="ff-button nano-reward-select" />
+      </ui:VisualElement>
+      <ui:VisualElement class="nano-reward-power nano-reward-second">
+        <ui:Image class="nano-reward-icon" scale-mode="ScaleToFit" picking-mode="Ignore" />
+        <ui:Label class="nano-reward-name" enable-rich-text="false" />
+        <ui:Label class="nano-reward-description" enable-rich-text="false" />
+        <ui:Button class="ff-button nano-reward-select" />
+      </ui:VisualElement>
+      <ui:VisualElement class="nano-reward-power nano-reward-third">
+        <ui:Image class="nano-reward-icon" scale-mode="ScaleToFit" picking-mode="Ignore" />
+        <ui:Label class="nano-reward-name" enable-rich-text="false" />
+        <ui:Label class="nano-reward-description" enable-rich-text="false" />
+        <ui:Button class="ff-button nano-reward-select" />
+      </ui:VisualElement>
+    </ui:VisualElement>
+  </ui:VisualElement>
+  <ui:VisualElement class="npc-conversation-fade" picking-mode="Ignore" />
+  <ui:VisualElement class="npc-mission-screen" picking-mode="Position">
+    <ui:VisualElement class="npc-service-band npc-service-band--top" picking-mode="Ignore" />
+    <ui:VisualElement class="npc-service-band npc-service-band--bottom" picking-mode="Ignore" />
+    <ui:VisualElement class="npc-mission-panel">
+      <ui:VisualElement class="npc-mission-top tutorial-npc-mission-top">
+        <ui:Label class="npc-mission-name" enable-rich-text="false" />
+      </ui:VisualElement>
+      <ui:ScrollView class="npc-mission-body tutorial-npc-mission-body" mode="Vertical" vertical-scroller-visibility="Auto" horizontal-scroller-visibility="Hidden">
+        <ui:Label class="npc-mission-section npc-mission-active-heading" />
+        <ui:VisualElement class="npc-mission-active" />
+        <ui:Label class="npc-mission-section npc-mission-offer-heading" />
+        <ui:VisualElement class="npc-mission-offers" />
+      </ui:ScrollView>
+      <ui:VisualElement class="npc-mission-bottom tutorial-npc-mission-bottom">
+        <ui:Button class="ff-button npc-mission-close"><ui:Image class="npc-mission-exit-icon" picking-mode="Ignore" /></ui:Button>
+      </ui:VisualElement>
+    </ui:VisualElement>
+  </ui:VisualElement>
+  <ui:Button class="ff-button npc-mission-option tutorial-npc-mission-button">
+    <ui:Image class="npc-mission-option-icon" picking-mode="Ignore" scale-mode="ScaleToFit" />
+    <ui:Label class="npc-mission-option-title" picking-mode="Ignore" enable-rich-text="false" />
+  </ui:Button>
 </ui:UXML>

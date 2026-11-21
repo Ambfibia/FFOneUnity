@@ -20,7 +20,7 @@ namespace FFOne.UI
         internal async Task LiveLoginInstance(int port, string account)
         {
             await Session.LoginAsync("127.0.0.1", port, account, "test-only-password", lifetime.Token);
-            ShowSelection(); SelectRosterSlot(1); await EnterSelectedWorldAsync();
+            await EnterLiveFixtureWorld();
         }
         internal void LiveResetInstance()
         {
@@ -71,7 +71,7 @@ namespace FFOne.UI
                 var endpoint = LoginServer.Parse(Environment.GetEnvironmentVariable(DevelopmentConnection.ServerVariable)).Endpoint;
                 if (!endpoint.IsLoopback) throw new InvalidOperationException("Instance acceptance requires the isolated loopback server.");
                 port = endpoint.Port;
-                await Wait(() => (frontend = FindFirstObjectByType<FrontendController>()) && frontend.Root?.panel != null, "frontend ready");
+                await Wait(() => (frontend = FindFirstObjectByType<FrontendController>()) && frontend.LiveFrontendReady, "frontend ready");
                 image = new RenderTexture(1280, 720, 24, RenderTextureFormat.ARGB32); image.Create();
                 foreach (var item in plan.cases.Where(c => c.disposition == "eligible"))
                 {
@@ -79,12 +79,12 @@ namespace FFOne.UI
                     try
                     {
                         await Login(item);
-                        await Route(item, item.entry);
+                        var preWarp = await Route(item, item.entry);
                         var evidence = SceneEvidence(frontend.LiveWorld.Stream, item);
                         await Capture("instance-" + item.map);
                         var contentErrors = frontend.LiveWorld.Replicas.ContentFailures.ToArray();
                         Check(contentErrors.Length == 0, $"map {item.map}: admitted NPC content has no model or animation failures");
-                        var point = item.reconnectPosition;
+                        var point = preWarp ?? item.reconnectPosition;
                         if (item.exit.Length > 0)
                         {
                             await Route(item, item.exit);
@@ -152,8 +152,9 @@ namespace FFOne.UI
                 $"map {item.map}: normal account login finishes scene and loading handshake");
             frontend.LiveWorld.View.targetTexture = image;
         }
-        async Task Route(Case item, IEnumerable<Edge> route)
+        async Task<Point> Route(Case item, IEnumerable<Edge> route)
         {
+            Point overworldPortal = null;
             foreach (var edge in route)
             {
                 Check(frontend.LiveWorld.MapNumber == edge.fromMap, $"map {item.map}: native warp {edge.warp} starts on authored source map {edge.fromMap}");
@@ -163,20 +164,27 @@ namespace FFOne.UI
                 await Wait(() => frontend.LiveWorld.IsReady, $"map {item.map}: source portal scenery finishes admission");
                 NetworkEntityView npc = null;
                 await Wait(() => (npc = frontend.LiveWorld.Replicas.Actors.FirstOrDefault(a => a.Entity.Kind == WorldEntityKind.Npc &&
-                    a.Entity.NpcType == edge.npcType && Math.Abs(a.Entity.X - edge.npcX) < 500 && Math.Abs(a.Entity.Y - edge.npcY) < 500)),
+                    a.Entity.NpcType == edge.npcType && a.Entity.X == edge.npcX && a.Entity.Y == edge.npcY && a.Entity.Z == edge.npcZ)),
                     $"map {item.map}: original NPC {edge.npcType} enters native interest");
                 Check(frontend.LiveUi.OpenNpcTravel(npc.Entity, npc.Definition), $"map {item.map}: native portal window opens");
                 await Frames(2);
                 Submit(frontend.LiveUi.Windows.View.Q<Button>("npc-warp-" + edge.warp));
+                if (edge.fromMap == 0)
+                {
+                    var position = WorldCoordinates.ToServer(frontend.LiveWorld.Player.position);
+                    overworldPortal = new Point { x = position.x, y = position.y, z = position.z };
+                }
                 Submit(frontend.Root.Q<Button>("prompt-confirm"));
                 await Wait(() => frontend.LiveWorld && frontend.LiveWorld.MapNumber == edge.map && frontend.LiveWorld.IsReady &&
                     frontend.LiveWorld.MovementEnabled && !frontend.LiveUi.Windows.IsOpen && !frontend.LiveUi.TravelBusy,
-                    $"map {item.map}: native warp {edge.warp} completes authoritative map {edge.map}, scene and movement readiness");
+                    $"map {item.map}: native warp {edge.warp} completes authoritative map {edge.map}, scene and movement readiness",
+                    () => frontend.LiveWorld?.LastError);
                 var entry = frontend.Session.World;
                 Check(entry.X == edge.x && entry.Y == edge.y && entry.Z == edge.z,
                     $"map {item.map}: server preserves exact authored warp {edge.warp} destination");
                 await AfterMissionWarp(item, edge);
             }
+            return overworldPortal;
         }
         object SceneEvidence(WorldStreamer stream, Case item)
         {
@@ -254,8 +262,8 @@ namespace FFOne.UI
             if (!image) return;
             foreach (var camera in FindObjectsByType<Camera>(FindObjectsSortMode.None))
             {
-                if (!camera.enabled || camera.targetTexture != image) continue;
-                var request = new UniversalRenderPipeline.SingleCameraRequest { destination = image };
+                if (!camera.enabled || !camera.targetTexture) continue;
+                var request = new UniversalRenderPipeline.SingleCameraRequest { destination = camera.targetTexture };
                 if (RenderPipeline.SupportsRenderRequest(camera, request)) RenderPipeline.SubmitRenderRequest(camera, request);
             }
         }

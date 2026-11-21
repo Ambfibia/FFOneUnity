@@ -68,10 +68,11 @@ namespace FFOne.Tests
             var catalog = GameplayUiCatalog.Load();
             var nanos = catalog.Nanos().ToArray();
             Assert.That(nanos.Length, Is.GreaterThanOrEqualTo(68));
-            Assert.That(nanos.Select(nano => nano.ItemId), Does.Contain(72));
-            Assert.That(nanos.Select(nano => nano.ItemId), Has.No.Member(52), "Retired Unstable Nano alias must stay empty.");
+            Assert.That(nanos.Select(nano => nano.ItemId), Is.EquivalentTo(Enumerable.Range(1, 68)));
+            Assert.That(nanos.Count(n => n.Name == "Unstable Nano"), Is.EqualTo(1));
+            Assert.That(catalog.Nano(62).Name, Is.EqualTo("Van Kleiss"));
             Assert.That(catalog.Nano(1).NanoSortOrder, Is.EqualTo(5));
-            Assert.That(catalog.Nano(41).NanoSortOrder, Is.EqualTo(3));
+            Assert.That(catalog.Nano(39).NanoSortOrder, Is.EqualTo(3));
             foreach (var nano in nanos)
             {
                 Assert.That(ContentAssets.Load<Texture2D>(nano.IconAddress), Is.Not.Null, "Owned art for Nano " + nano.ItemId);
@@ -79,8 +80,8 @@ namespace FFOne.Tests
             }
             // These accepted model additions still have zeroed native icon rows; no
             // custom portraits have been authored for them in the installed catalog.
-            Assert.That(catalog.Nano(71).IconAddress, Is.EqualTo("icons/entities/nanos/nanoicon_missing"));
-            Assert.That(catalog.Nano(72).NanoReadyIconAddress, Is.EqualTo("icons/entities/nanos/ready/nanoready_missing"));
+            Assert.That(catalog.Nano(67).IconAddress, Is.EqualTo("icons/entities/nanos/nanoicon_missing"));
+            Assert.That(catalog.Nano(68).NanoReadyIconAddress, Is.EqualTo("icons/entities/nanos/ready/nanoready_missing"));
         }
 
         [Test]

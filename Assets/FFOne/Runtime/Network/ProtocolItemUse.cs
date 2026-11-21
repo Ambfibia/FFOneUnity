@@ -18,6 +18,7 @@ namespace FFOne.Network
     }
     public static class ProtocolItemUse
     {
+        public const uint ChestOpen = 0x13000047, ChestOpened = 0x3100007d, ChestFailed = 0x3100007e;
         public const uint Request = 0x13000073, Success = 0x310000d3, Broadcast = 0x310000d4, Fail = 0x310000d2;
         public static byte[] Payload(int slot, int nanoSlot)
         {
@@ -50,6 +51,17 @@ namespace FFOne.Network
     }
     public sealed partial class FusionClient
     {
+        public Task OpenChestAsync(int slot, EquipmentItem chest, CancellationToken token = default)
+        {
+            if (slot < 0 || slot >= 50 || chest.ItemType != 9 || chest.ItemId <= 0)
+                throw new ArgumentException("Chest must occupy a main inventory slot.");
+            var request = new byte[20];
+            ProtocolGameplay.I(request, 0, (int)ItemContainer.Inventory);
+            ProtocolGameplay.I(request, 4, slot);
+            ProtocolServices.WriteItem(request, 8, chest);
+            return SendGameplayAsync(ProtocolItemUse.ChestOpen, request, token);
+        }
+
         public Task UseItemAsync(int slot, int nanoSlot = 0, CancellationToken token = default)
             => SendGameplayAsync(ProtocolItemUse.Request, ProtocolItemUse.Payload(slot, nanoSlot), token);
     }

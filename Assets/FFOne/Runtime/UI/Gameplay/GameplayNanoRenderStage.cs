@@ -147,8 +147,8 @@ namespace FFOne.UI
 
         static void NextIdle(Slot slot)
         {
-            string idle = "stand" + UnityEngine.Random.Range(1, 4);
-            if (!slot.Animation[idle]) idle = "stand1";
+            string idle = FFOne.World.NanoClipNames.Resolve(slot.Resource, "stand" + UnityEngine.Random.Range(1, 4));
+            if (!slot.Animation[idle]) idle = FFOne.World.NanoClipNames.Resolve(slot.Resource, "stand1");
             if (!slot.Animation[idle]) return;
             slot.Idle = idle; slot.LastIdleTime = 0;
             slot.Animation[idle].time = 0;

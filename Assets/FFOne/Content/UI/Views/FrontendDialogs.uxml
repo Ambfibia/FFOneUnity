@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="/Assets/FFOne/Content/UI/Styles/FrontendDialogs.uss" />
+    <ui:VisualElement name="frontend-modal" class="frontend-modal ff-frontend-dialog">
+        <ui:VisualElement name="modal-panel" class="ff-frontend-dialog-panel" picking-mode="Ignore">
+            <ui:VisualElement class="ff-frontend-registration" picking-mode="Ignore">
+                <ui:Label name="registration-text" class="ff-copy ff-frontend-registration-text" picking-mode="Ignore" enable-rich-text="false" />
+                <ui:Button name="close-registration" class="ff-button ff-button--primary ff-frontend-registration-close" />
+            </ui:VisualElement>
+            <ui:VisualElement class="ff-frontend-delete" picking-mode="Ignore">
+                <ui:Label name="delete-title" class="ff-label ff-frontend-delete-title" picking-mode="Ignore" />
+                <ui:Label name="delete-prompt" class="ff-copy ff-frontend-delete-prompt" picking-mode="Ignore" />
+                <ui:TextField name="delete-first-name" class="ff-input ff-frontend-delete-name" max-length="8" />
+                <ui:Button name="cancel-delete" class="ff-button ff-frontend-delete-cancel" />
+                <ui:Button name="confirm-delete" class="ff-button ff-frontend-delete-confirm" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -128,7 +128,11 @@ namespace FFOne.Editor
                 foreach (var expected in plan.Manifest.Assets)
                 {
                     var entry = saved.Assets.SingleOrDefault(e => e.SourceLocalId == expected.SourceLocalId);
-                    if (entry == null || (entry.Path != expected.Path && !(plan.ShareEnvironment && entry.Path.StartsWith(EnvironmentSharedAssets.Root + "/", StringComparison.Ordinal))) || entry.Type != expected.Type)
+                    bool matchesPath = entry != null &&
+                        (entry.Path == expected.Path ||
+                         ContentPaths.Resolve(entry.Path) == ContentPaths.Resolve(expected.Path) ||
+                         (plan.ShareEnvironment && entry.Path.StartsWith(EnvironmentSharedAssets.Root + "/", StringComparison.Ordinal)));
+                    if (!matchesPath || entry.Type != expected.Type)
                         throw new InvalidDataException("Publication asset identity mismatch: " + expected.Path);
                     ValidatePublished(entry.Path, entry.Guid, objects.Single(o => LocalId(o) == entry.SourceLocalId).GetType());
                 }

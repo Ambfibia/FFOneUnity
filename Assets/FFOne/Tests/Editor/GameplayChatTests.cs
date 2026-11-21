@@ -2,7 +2,11 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 using FFOne.Network;
+using FFOne.Content;
+using FFOne.UI;
 using NUnit.Framework;
+using UnityEngine.TextCore.Text;
+using UnityEngine.UIElements;
 
 namespace FFOne.Tests
 {
@@ -55,6 +59,22 @@ namespace FFOne.Tests
 
     public sealed class GameplayChatTests
     {
+        [Test]
+        public void ChatUsesSourceTypographyWithoutNativeScrollbars()
+        {
+            var chat = FFView.Instantiate("ui/views/Retrobution/Chat", "chat-root");
+            GameplayChatPresentation.Configure(chat);
+            var history = chat.Q<ScrollView>("chat-history");
+            Assert.That(history.horizontalScrollerVisibility, Is.EqualTo(ScrollerVisibility.Hidden));
+            Assert.That(history.verticalScrollerVisibility, Is.EqualTo(ScrollerVisibility.Hidden));
+            var jeffe = ContentAssets.Load<FontAsset>("fonts/jeffe-sdf");
+            var chalet = ContentAssets.Load<FontAsset>("fonts/chaletbook-regular-sdf");
+            Assert.That(jeffe, Is.Not.Null); Assert.That(chalet, Is.Not.Null);
+            foreach (string id in new[] { "chat-all-label", "chat-friend-label", "chat-group-label", "chat-active-tab-label" })
+                Assert.That(chat.Q<Label>(id).style.unityFontDefinition.value.fontAsset, Is.EqualTo(jeffe), id);
+            Assert.That(chat.Q<Label>("chat-inactive-hint").style.unityFontDefinition.value.fontAsset, Is.EqualTo(chalet));
+        }
+
         [Test]
         public void FixedTextFieldRejectsOverflowNulEmptyAndInvalidSurrogatesWithoutTruncation()
         {

@@ -56,6 +56,16 @@ namespace FFOne.Network
                 throw new ProtocolException("Invalid buff update operation/source.");
             result = ReadTime(p, 12, id, operation, source, ProtocolGameplay.I(p, 40)); return true;
         }
+        public static bool TryNanoCondition(ProtocolFrame frame, int playerId, out int condition)
+        {
+            condition = 0;
+            if (frame == null || frame.PacketType != ProtocolGameplay.NanoActiveBroadcast) return false;
+            var p = frame.Payload;
+            Protocol0104.RequireSize(p, 20);
+            if (ProtocolGameplay.I(p, 0) != playerId) return false;
+            condition = ProtocolGameplay.I(p, 12);
+            return true;
+        }
         static BuffUpdate ReadTime(byte[] p, int offset, int id, int operation, int source, int condition)
         {
             if (id < 1 || id > 25) throw new ProtocolException("Invalid native buff slot.");

@@ -1,0 +1,47 @@
+{
+  "status": "done",
+  "verification": "passed",
+  "notes": "На свежем клиенте проверены аудиоисточник и окно приглашения. Offline UI дополнительно зафиксировал один вызов нужного сигнала до ответа.",
+  "evidence": "Два сетевых клиента. Получатель открыл приглашение, UI AudioSource начал воспроизводить сигнал до ответа. Проверены отказ и принятие повторного предложения. Кадры: Logs/Studio/DashboardFive-20261119/validation-harness/live/trade/. 19.11.2026. Unity 6000.4.0f1, свежая Windows-сборка со свежим каталогом, реальный изолированный RustyFusion. Протокол: Logs/Studio/DashboardFive-20261119/verification-20261119.json; сборка: Logs/Studio/DashboardFive-20261119/rebuild/unity-build.log; SHA-256: Logs/Studio/DashboardFive-20261119/rebuild/artifact-sha256.json.",
+  "history": [
+    {
+      "time": "2026-11-18T14:14:44+00:00",
+      "changes": {
+        "evidence": "18.11.2026. GameplayTradeController открывает приглашение, GameplayPrompt вызывает звук только при ответе. Кадр trade-invitation.png, отдельной записи звука приглашения нет.",
+        "status": "ready",
+        "verification": "analyzed"
+      }
+    },
+    {
+      "time": "2026-11-19T10:13:48+00:00",
+      "changes": {
+        "status": "active"
+      }
+    },
+    {
+      "time": "2026-11-19T10:46:31+00:00",
+      "changes": {
+        "evidence": "Тесты состояний обмена прошли. Существующий клип affirmation_screen_popup проверен по Addressables GUID. Добавлена smoke-проверка одного вызова сигнала до ответа. 19.11.2026. Unity 6000.4.0f1, EditMode 40/40: Logs/Studio/DashboardFive-20261119/tests.xml. Компиляция Runtime Editor и Player через Roslyn: Logs/Studio/DashboardFive-20261119/roslyn-runtime.log, Logs/Studio/DashboardFive-20261119/roslyn-player.log. Сборка Windows прервана при Generate Bundle Packing: Logs/Studio/DashboardFive-20261119/unity-build.log.",
+        "notes": "Сигнал подключён к открытию входящего приглашения. Остались проверка слышимости, отмена и принятие на двух изолированных клиентах и кадры окна.",
+        "status": "review",
+        "verification": "tested"
+      }
+    },
+    {
+      "time": "2026-11-19T11:10:55+00:00",
+      "changes": {
+        "status": "active"
+      }
+    },
+    {
+      "time": "2026-11-19T11:44:03+00:00",
+      "changes": {
+        "evidence": "Два сетевых клиента. Получатель открыл приглашение, UI AudioSource начал воспроизводить сигнал до ответа. Проверены отказ и принятие повторного предложения. Кадры: Logs/Studio/DashboardFive-20261119/validation-harness/live/trade/. 19.11.2026. Unity 6000.4.0f1, свежая Windows-сборка со свежим каталогом, реальный изолированный RustyFusion. Протокол: Logs/Studio/DashboardFive-20261119/verification-20261119.json; сборка: Logs/Studio/DashboardFive-20261119/rebuild/unity-build.log; SHA-256: Logs/Studio/DashboardFive-20261119/rebuild/artifact-sha256.json.",
+        "notes": "На свежем клиенте проверены аудиоисточник и окно приглашения. Offline UI дополнительно зафиксировал один вызов нужного сигнала до ответа.",
+        "status": "done",
+        "verification": "passed"
+      }
+    }
+  ],
+  "updated": "2026-11-19T11:44:03+00:00"
+}

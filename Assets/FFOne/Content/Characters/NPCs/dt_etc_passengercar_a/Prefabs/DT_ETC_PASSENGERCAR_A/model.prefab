@@ -234,7 +234,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7456984964577241997}
-  - component: {fileID: 1937550467820964377}
+  - component: {fileID: 7498150010190677199}
+  - component: {fileID: 3213579546581050508}
+  - component: {fileID: 336914753616607209}
   m_Layer: 0
   m_Name: model
   m_TagString: Untagged
@@ -258,23 +260,43 @@ Transform:
   - {fileID: 8745279524305594580}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!111 &1937550467820964377
-Animation:
+--- !u!95 &7498150010190677199
+Animator:
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1135494351254133596}
   m_Enabled: 1
-  serializedVersion: 4
-  m_Animation: {fileID: 7400000, guid: d1c0342947b90704386a87ce13b120ff, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: d1c0342947b90704386a87ce13b120ff, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 01bc645391de6194aa6e419ea1f04191, type: 2}
+  m_CullingMode: 0
   m_UpdateMode: 0
-  m_CullingType: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 1
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &3213579546581050508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1135494351254133596}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b7ac68c382befc4d9fc82662c17e418, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.Content.NativeNpcAnimator
+  animator: {fileID: 7498150010190677199}
+  AnimationSounds: []
+  Faces: []
 --- !u!1 &1182171936062129314
 GameObject:
   m_ObjectHideFlags: 0
@@ -1203,3 +1225,28 @@ Transform:
   - {fileID: 1836233143381026256}
   m_Father: {fileID: 3945867480037790746}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &336914753616607209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1135494351254133596}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ee3989daf214b8c805f250337cb2f41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FFOne.Runtime::FFOne.World.WorldNpcSkins
+  surfaces:
+  - Renderer: {fileID: 3619795621273401410}
+    Slot: 0
+    Default: {fileID: 2100000, guid: 08fca948d438ed948aec131b280ccfc0, type: 2}
+    Choices:
+    - Types: 660b0000
+      Material: {fileID: 2100000, guid: b8684db678cb5ce7a85589de2eede28f, type: 2}
+    - Types: 670b0000
+      Material: {fileID: 2100000, guid: b8c1a31ffd595c29a08e90bf0a3d5966, type: 2}
+    - Types: 680b0000
+      Material: {fileID: 2100000, guid: 589c0ca88e4658c7aadd886d97869244, type: 2}
+    - Types: 690b0000
+      Material: {fileID: 2100000, guid: 5283f6e9018e571385123050db506373, type: 2}

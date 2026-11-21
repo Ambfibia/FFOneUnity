@@ -5,7 +5,9 @@ namespace FFOne.UI
     public static class RetrobutionLayout
     {
         // Primary 20260821 FFGUIUtility.GetUiScale; the source default uiScaleFactor is 1.
-        public static float Scale(float height, float factor = 1) => Mathf.Lerp(1, height / 681f, factor);
+        internal static bool AutomaticScale { get; set; } = true;
+        public static float Scale(float height) => Scale(height, AutomaticScale ? 1 : 0);
+        public static float Scale(float height, float factor) => Mathf.Lerp(1, height / 681f, factor);
 
         // cnQuit.ScrollWindow truncates before integer division; GUI.matrix then scales around
         // the integer screen-center pivot. Rounding after scaling shifts odd-sized viewports.
