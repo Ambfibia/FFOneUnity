@@ -20,9 +20,9 @@ FusionForge проверяет, что палитра весов ссылает�
 
 Unity 6000.4.0f1 прошла 15 выбранных EditMode-тестов. Они проверяют сборку всех 195 шаблонов HNPC, трансформы их жёстких креплений после обновления анимации, оба скелета игрока, сохранение корня при смене рюкзака, дополнительную текстуру очков, шлем и предзагрузку составной футболки TDWT. [Результаты Unity](../../Logs/Studio/Cosmetics-20261121/tests-release.xml)
 
-Свежая Windows-сборка прошла создание двух персонажей, смену одежды с проверкой пивота, первый кадр мира и холодный рендер двух портретов ростера на изолированном RustyFusion `a9254ce`. В мире загрузились шесть HNPC. Повторный вход одного HNPC в область видимости прошёл асинхронную сборку. В обоих прогонах отсутствовали ошибки загрузки и блокирующие ожидания ресурсов внешности. Отдельные задержки инициализации и мира остались в журнале. [Протокол Windows](../../Logs/Studio/Cosmetics-20261121/client-smoke/validation.json)
+Свежая Windows-сборка прошла создание двух персонажей, смену одежды с проверкой пивота, первый кадр мира и холодный рендер двух портретов ростера на изолированном RustyFusion `a9254ce`. В мире загрузились шесть HNPC. Повторный вход одного HNPC в область видимости прошёл асинхронную сборку. После перезапуска на первом персонаже отрисовались составная футболка TDWT, очки и Plumber. Длинные части рюкзака выходят за верх кадра при сохранении центра тела. В обоих прогонах отсутствовали ошибки загрузки и блокирующие ожидания ресурсов внешности. Отдельные задержки инициализации и мира остались в журнале. [Протокол Windows](../../Logs/Studio/Cosmetics-20261121/client-smoke-confirmed/validation.json)
 
-1. [Создание до смены одежды](../../Logs/Studio/Cosmetics-20261121/client-smoke/creation-world/captures/appearance.png)
-2. [Создание после смены одежды](../../Logs/Studio/Cosmetics-20261121/client-smoke/creation-world/captures/appearance-after-clothes.png)
-3. [Первый кадр мира](../../Logs/Studio/Cosmetics-20261121/client-smoke/creation-world/captures/overworld-entry.png)
-4. [Ростер после перезапуска](../../Logs/Studio/Cosmetics-20261121/client-smoke/cold-occupied-roster/captures/selection-cold-occupied.png)
+1. [Создание до смены одежды](../../Logs/Studio/Cosmetics-20261121/client-smoke-confirmed/creation-world/captures/appearance.png)
+2. [Создание после смены одежды](../../Logs/Studio/Cosmetics-20261121/client-smoke-confirmed/creation-world/captures/appearance-after-clothes.png)
+3. [Первый кадр мира](../../Logs/Studio/Cosmetics-20261121/client-smoke-confirmed/creation-world/captures/overworld-entry.png)
+4. [Ростер со снаряжением после перезапуска](../../Logs/Studio/Cosmetics-20261121/client-smoke-confirmed/cold-occupied-roster/captures/selection-cold-occupied.png)
